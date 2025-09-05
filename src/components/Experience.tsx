@@ -31,7 +31,6 @@ const experiences: ExperienceItem[] = [
       'CI/CD Pipelines',
       'GIT',
       'YAML',
-      'HTML/CSS/JavaScript',
       'Automation Testing',
       'Confluence',
       'Agile Methodology',
@@ -241,20 +240,20 @@ function Experience() {
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-600">
+          <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-green-600">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
               <div>
                 <h4 className="text-xl font-bold text-gray-800">
                   Bachelor of Arts, History, International Relations, Political
                   Science
                 </h4>
-                <p className="text-lg text-blue-600 font-semibold">
+                <p className="text-lg text-green-600 font-semibold">
                   Victoria University of Wellington
                 </p>
                 <p className="text-gray-600">Wellington, New Zealand</p>
               </div>
               <div className="mt-2 md:mt-0">
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
                   Feb 2017 - Jan 2020
                 </span>
               </div>
