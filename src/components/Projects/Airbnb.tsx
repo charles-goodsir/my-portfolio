@@ -169,7 +169,7 @@ function Airbnb({ setActiveSection }: AirbnbProps) {
       </div>
 
       {/* Screenshots - Full Width Section */}
-      <div className="bg-white py-12 px-4">
+      <div className="">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
             Project Screenshots
@@ -177,21 +177,16 @@ function Airbnb({ setActiveSection }: AirbnbProps) {
         </div>
         <div className="space-y-8">
           {images.map((image, index) => (
-            <div
-              key={index}
-              className="bg-gray-100 shadow-lg"
-              style={{ height: '500px' }}
-            >
+            <div key={index} className="flex justify-center">
               <img
                 src={image.src}
                 alt={image.alt}
+                className="border border-gray-300 rounded-lg shadow-lg"
                 style={{
-                  height: '500px !important',
-                  width: '100% !important',
-                  objectFit: 'cover',
-                  objectPosition: 'center !important',
-                  display: 'block !important',
-                  minHeight: '500px !important',
+                  maxHeight: '600px',
+                  maxWidth: '90%',
+                  objectFit: 'contain',
+                  display: 'block',
                 }}
               />
             </div>
