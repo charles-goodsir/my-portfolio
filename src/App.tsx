@@ -6,6 +6,7 @@ import Experience from './components/Experience'
 import Projects from './components/Project'
 import Contact from './components/Contact'
 import Detour from './components/Projects/Detour'
+import Airbnb from './components/Projects/Airbnb'
 
 function App() {
   const [activeSection, setActiveSection] = useState('home')
@@ -24,6 +25,8 @@ function App() {
         return <Contact />
       case 'project-detour':
         return <Detour setActiveSection={setActiveSection} />
+      case 'project-airbnb':
+        return <Airbnb setActiveSection={setActiveSection} />
       default:
         return <Home setActiveSection={setActiveSection} />
     }

@@ -14,6 +14,13 @@ const projects: Project[] = [
     technologies: ['React Native', 'TypeScript', 'Supabase', 'Apple Maps API'],
   },
   {
+    id: 'airbnb',
+    title: 'Airbnb Clone - Homepage',
+    description:
+      'A basic React homepage with interactive calendar and date selection functionality',
+    technologies: ['React', 'JavaScript', 'CSS', 'Date Picker', 'Material UI'],
+  },
+  {
     id: 'portfolio',
     title: 'Portfolio Website (You are here now!)',
     description:
