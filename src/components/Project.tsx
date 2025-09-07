@@ -14,6 +14,21 @@ const projects: Project[] = [
     technologies: ['React Native', 'TypeScript', 'Supabase', 'Apple Maps API'],
   },
   {
+    id: 'news-dashboard',
+    title: 'News Dashboard',
+    description:
+      'A full-stack news aggregation dashboard with Python web scraping, database population, and React frontend',
+    technologies: [
+      'React',
+      'TypeScript',
+      'Python',
+      'Web Scraping',
+      'Database',
+      'Tailwind CSS',
+      'Vite',
+    ],
+  },
+  {
     id: 'airbnb',
     title: 'Airbnb Clone - Homepage',
     description:

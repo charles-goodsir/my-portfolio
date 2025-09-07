@@ -6,6 +6,7 @@ import Experience from './components/Experience'
 import Projects from './components/Project'
 import Contact from './components/Contact'
 import Detour from './components/Projects/Detour'
+import NewsDashboard from './components/Projects/NewsDashboard'
 import Airbnb from './components/Projects/Airbnb'
 
 function App() {
@@ -25,6 +26,8 @@ function App() {
         return <Contact />
       case 'project-detour':
         return <Detour setActiveSection={setActiveSection} />
+      case 'project-news-dashboard':
+        return <NewsDashboard setActiveSection={setActiveSection} />
       case 'project-airbnb':
         return <Airbnb setActiveSection={setActiveSection} />
       default:
