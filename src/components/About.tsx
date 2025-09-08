@@ -1,5 +1,5 @@
 import Me from '../assets/MyPic/Me.jpeg'
-import CV from '../assets/CV/CharlesGoodsir.pdf'
+import CV from '../assets/CV/Charles_Goodsir_CV.pdf'
 
 function About() {
   return (
