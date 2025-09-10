@@ -14,6 +14,19 @@ const projects: Project[] = [
     technologies: ['React Native', 'TypeScript', 'Supabase', 'Apple Maps API'],
   },
   {
+    id: 'flight-tracker',
+    title: 'Flight Tracker',
+    description:
+      'An automated flight tracking system that monitors flights and sends notifications via Discord and Telegram',
+    technologies: [
+      'Python',
+      'AWS Lightsail',
+      'Discord Bot API',
+      'Telegram Bot API',
+      'Linux VM',
+    ],
+  },
+  {
     id: 'news-dashboard',
     title: 'News Dashboard',
     description:
