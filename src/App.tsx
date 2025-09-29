@@ -9,6 +9,7 @@ import Detour from './components/Projects/Detour'
 import FlightTracker from './components/Projects/FlightTracker'
 import NewsDashboard from './components/Projects/NewsDashboard'
 import Airbnb from './components/Projects/Airbnb'
+import FinanceTracker from './components/Projects/FinanceTracker'
 
 function App() {
   const [activeSection, setActiveSection] = useState('home')
@@ -33,6 +34,8 @@ function App() {
         return <NewsDashboard setActiveSection={setActiveSection} />
       case 'project-airbnb':
         return <Airbnb setActiveSection={setActiveSection} />
+      case 'project-finance-tracker':
+        return <FinanceTracker setActiveSection={setActiveSection} />
       default:
         return <Home setActiveSection={setActiveSection} />
     }

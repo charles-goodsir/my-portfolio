@@ -49,6 +49,22 @@ const projects: Project[] = [
     technologies: ['React', 'JavaScript', 'CSS', 'Date Picker', 'Material UI'],
   },
   {
+    id: 'finance-tracker',
+    title: 'Finance Tracker 2.0',
+    description:
+      'A comprehensive personal finance management application with FastAPI backend, AWS serverless architecture, and automated transaction tracking',
+    technologies: [
+      'Python',
+      'FastAPI',
+      'AWS Lambda',
+      'DynamoDB',
+      'JavaScript',
+      'Progressive Web App',
+      'Telegram Bot API',
+      'Serverless',
+    ],
+  },
+  {
     id: 'portfolio',
     title: 'Portfolio Website (You are here now!)',
     description:
