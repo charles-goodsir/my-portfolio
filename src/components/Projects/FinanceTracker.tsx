@@ -1,10 +1,12 @@
-import Screenshot1 from '../../assets/finance-tracker/screenshot1.png'
-import Screenshot2 from '../../assets/finance-tracker/screenshot2.png'
-import Screenshot3 from '../../assets/finance-tracker/screenshot3.png'
-import Screenshot4 from '../../assets/finance-tracker/screenshot4.png'
-import Screenshot5 from '../../assets/finance-tracker/screenshot5.png'
+import Accounts_1 from '../../assets/Finance-Tracker/Accounts_1.png'
+import Accounts_2 from '../../assets/Finance-Tracker/Accounts_2.png'
+import CSV_Import from '../../assets/Finance-Tracker/CSV_Import.png'
+import Goals from '../../assets/Finance-Tracker/Goals.png'
+import Main_Screen from '../../assets/Finance-Tracker/Main_Screen.png'
+import Smart_Insights from '../../assets/Finance-Tracker/Smart_Insights.png'
+import Transactions from '../../assets/Finance-Tracker/Transactions.png'
 interface FinanceTrackerProps {
-  setActiveSection: (section: string) => void
+  setActiveSection: (nextSection: string) => void
 }
 
 function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
@@ -38,33 +40,34 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
             Finance Tracker 2.0
           </h1>
           <p className="text-xl text-gray-600 mb-6">
-            A comprehensive personal finance management application that
-            combines modern web technologies with cloud infrastructure to
-            provide automated transaction tracking, smart categorization, and
-            intelligent insights.
+            A desktop finance tracker for macOS that imports bank CSVs,
+            auto‑classifies transactions, lets you review/commit them, manage
+            account balances and monthly snapshots, view a dashboard with
+            insights/health, and receive Telegram reminders/notifications.
           </p>
           <p className="text-xl text-gray-600 mb-6">
-            Built with FastAPI backend, AWS serverless architecture, and a
-            beautiful responsive frontend. Features automated transaction
-            processing, smart categorization, and real-time notifications via
-            Telegram.
+            It uses a local SQLite cache for a fast, offline‑friendly UI and an
+            AWS backend for persistent data, insights, and learning.
           </p>
 
           {/* Technologies */}
           <div className="flex flex-wrap gap-3 mb-8">
             {[
               'Python',
-              'FastAPI',
+              'PyQt6',
+              'SQLite (local cache)',
+              'Requests (HTTP)',
+              'FastAPI (Lambda)',
               'AWS Lambda',
-              'DynamoDB',
               'API Gateway',
+              'AWS SAM (template.yaml)',
+              'DynamoDB',
+              'EventBridge (cron)',
               'CloudWatch',
-              'JavaScript',
-              'Progressive Web App',
+              'Google Gemini (classification fallback)',
               'Telegram Bot API',
-              'AWS SAM',
-              'Serverless',
-              'REST APIs',
+              'python-dotenv',
+              'PyInstaller (packaging)',
             ].map((tech) => (
               <span
                 key={tech}
@@ -95,33 +98,30 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
           </h2>
           <div className="prose prose-lg max-w-none">
             <p className="text-gray-700 mb-4">
-              Finance Tracker 2.0 is a production-ready personal finance
-              management application that demonstrates full-stack development
-              skills with modern cloud technologies. The application provides
-              automated transaction tracking, smart categorization, and
-              intelligent insights to help users manage their finances
-              effectively.
+              Finance Tracker 2.0 is a native desktop app built with PyQt6 for
+              macOS. A local SQLite cache powers fast reads and offline usage,
+              while an AWS backend provides durable storage, insights, and a
+              learning system that improves from user feedback.
             </p>
             <p className="text-gray-700 mb-4">
-              The backend is built with FastAPI and deployed on AWS Lambda for
-              serverless scalability, while the frontend uses vanilla JavaScript
-              with a responsive design that works as a Progressive Web App. The
-              system integrates with DynamoDB for flexible data storage and
-              includes Telegram bot integration for real-time notifications.
+              The backend uses FastAPI on Lambda behind API Gateway and is
+              managed with AWS SAM (template.yaml). DynamoDB stores
+              transactions, monthly snapshots, learning patterns, and stats.
+              EventBridge drives a monthly Telegram reminder. Hybrid
+              classification combines rules with a Google Gemini fallback and
+              persists user corrections for continuous improvement.
             </p>
             <p className="text-gray-700 mb-4">
-              Key features include automated recurring transaction processing,
-              smart CSV import/export capabilities, intelligent transaction
-              categorization, and a beautiful dashboard interface. The
-              application supports both local development (SQLite) and
-              production deployment (DynamoDB) with comprehensive error handling
-              and logging.
+              Key features include CSV import with interactive review, smart
+              auto‑classification, account balances and monthly snapshots, a
+              dashboard with insights and health indicators, and Telegram
+              reminders/commit summaries.
             </p>
             <p className="text-gray-700">
-              This project showcases expertise in cloud architecture, serverless
-              development, API design, database management, and modern web
-              technologies while solving real-world financial management
-              challenges.
+              This project demonstrates Python desktop (PyQt6), data modeling
+              with SQLite and DynamoDB, serverless architecture, hybrid
+              ML‑assisted classification, and integrations like Telegram and
+              dotenv‑based configuration.
             </p>
           </div>
         </div>
@@ -134,28 +134,26 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                Backend Infrastructure
+                Desktop Application (macOS)
               </h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• FastAPI framework for high-performance APIs</li>
-                <li>• AWS Lambda for serverless compute</li>
-                <li>• DynamoDB for NoSQL data storage</li>
-                <li>• API Gateway for RESTful endpoints</li>
-                <li>• CloudWatch Events for automated scheduling</li>
-                <li>• AWS SAM for Infrastructure as Code</li>
+                <li>• PyQt6 UI with Qt Widgets</li>
+                <li>• Local data storage with SQLite</li>
+                <li>• Background threads for long-running tasks</li>
+                <li>• Native menus, dialogs, and keyboard shortcuts</li>
+                <li>• Packaged for macOS via PyInstaller</li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                Frontend Technology
+                Backend (AWS)
               </h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• Vanilla JavaScript with modern ES6+</li>
-                <li>• Responsive CSS with mobile-first design</li>
-                <li>• Progressive Web App capabilities</li>
-                <li>• Real-time data updates and form handling</li>
-                <li>• Beautiful, intuitive user interface</li>
-                <li>• Cross-platform compatibility</li>
+                <li>• FastAPI on Lambda behind API Gateway</li>
+                <li>• AWS SAM (template.yaml) for IaC and deployments</li>
+                <li>• DynamoDB: transactions, snapshots, patterns, stats</li>
+                <li>• EventBridge cron: monthly Telegram reminder</li>
+                <li>• CloudWatch: logs and metrics</li>
               </ul>
             </div>
           </div>
@@ -184,23 +182,29 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
                 Automation & Integration
               </h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• Automated recurring transactions</li>
-                <li>• Telegram bot notifications</li>
-                <li>• CloudWatch Events scheduling</li>
-                <li>• Real-time data synchronization</li>
-                <li>• Multi-environment support</li>
+                <li>• CSV import with interactive review & commit</li>
+                <li>• Auto‑classification (rules + Gemini fallback)</li>
+                <li>• Telegram reminders and commit summaries</li>
+                <li>• Optional cloud sync via FastAPI</li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                User Experience
+                Desktop Experience
               </h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• Responsive dashboard design</li>
-                <li>• Progressive Web App functionality</li>
-                <li>• Intuitive form handling</li>
-                <li>• Real-time feedback and updates</li>
-                <li>• Mobile-optimized interface</li>
+                <li>• Native macOS UI with PyQt6</li>
+                <li>
+                  • Tabs: Dashboard, Transactions, CSV Import, Accounts, Goals,
+                  Insights
+                </li>
+                <li>
+                  • Credit Card widget: utilization, activity, payment history
+                </li>
+                <li>
+                  • Quick insights, recent transactions, health indicators
+                </li>
+                <li>• CSV import/export workflows</li>
               </ul>
             </div>
             <div>
@@ -209,10 +213,13 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
               </h3>
               <ul className="space-y-2 text-gray-700">
                 <li>• Comprehensive error handling</li>
-                <li>• CORS configuration</li>
+                <li>
+                  • Data model conventions (exclude transfers/payments/ATM from
+                  spend)
+                </li>
                 <li>• Data validation and sanitization</li>
-                <li>• CloudWatch logging</li>
-                <li>• Automated backup and recovery</li>
+                <li>• Application logs and diagnostics</li>
+                <li>• Backup/restore of local database</li>
               </ul>
             </div>
           </div>
@@ -226,55 +233,53 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                Backend Components
+                Backend Components (AWS)
               </h3>
               <ul className="space-y-2 text-gray-700">
                 <li>
-                  • <strong>FastAPI Application:</strong> High-performance REST
-                  API with automatic documentation
+                  • <strong>FastAPI on Lambda:</strong> REST API with Pydantic
+                  models and serialization
                 </li>
                 <li>
-                  • <strong>DynamoDB Models:</strong> Flexible NoSQL data models
-                  for transactions and categories
+                  • <strong>DynamoDB Tables:</strong> Transactions, snapshots,
+                  learning patterns, aggregate stats
                 </li>
                 <li>
-                  • <strong>Lambda Handlers:</strong> Serverless function
-                  handlers for API endpoints
+                  • <strong>EventBridge (cron):</strong> Monthly Telegram
+                  reminder trigger
                 </li>
                 <li>
-                  • <strong>Telegram Integration:</strong> Bot API for real-time
-                  notifications
+                  • <strong>Hybrid Classifier:</strong> Rules engine with Gemini
+                  fallback and confidence scoring
                 </li>
                 <li>
-                  • <strong>CloudWatch Events:</strong> Automated scheduling for
-                  recurring transactions
+                  • <strong>Learning System:</strong> Stores corrections and
+                  applies patterns over time
                 </li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                Frontend Architecture
+                Desktop Architecture (PyQt6)
               </h3>
               <ul className="space-y-2 text-gray-700">
                 <li>
-                  • <strong>Modular JavaScript:</strong> Clean, maintainable
-                  code structure
+                  • <strong>PyQt6 Widgets:</strong> Tabs for Dashboard,
+                  Transactions, CSV Import, Accounts, Goals, Insights
                 </li>
                 <li>
-                  • <strong>Responsive Design:</strong> Mobile-first CSS with
-                  Tailwind-like utilities
+                  • <strong>Model-View Patterns:</strong> Clean state/data flow
                 </li>
                 <li>
-                  • <strong>Progressive Web App:</strong> Installable with
-                  offline capabilities
+                  • <strong>SQLite Cache:</strong> Fast reads and offline
+                  support with migrations
                 </li>
                 <li>
-                  • <strong>Real-time Updates:</strong> Dynamic data loading and
-                  form handling
+                  • <strong>Background Workers:</strong> Threads for long tasks
                 </li>
                 <li>
-                  • <strong>Error Handling:</strong> User-friendly error
-                  messages and feedback
+                  • <strong>Requests & Dotenv:</strong> HTTP to AWS API;
+                  configuration via .env
                 </li>
               </ul>
             </div>
@@ -283,11 +288,11 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
                 DevOps & Deployment
               </h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• AWS SAM for Infrastructure as Code</li>
-                <li>• Automated deployment pipeline</li>
-                <li>• Environment management (local/production)</li>
-                <li>• CloudWatch monitoring and logging</li>
-                <li>• Version control with Git</li>
+                <li>• AWS SAM for IaC (template.yaml)</li>
+                <li>• PyInstaller packaging for macOS</li>
+                <li>• Optional code signing/notarization</li>
+                <li>• Environment configs via python-dotenv</li>
+                <li>• CloudWatch monitoring for backend</li>
               </ul>
             </div>
           </div>
@@ -313,14 +318,14 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                Phase 5: Mobile & PWA
+                Phase 5: Desktop Enhancements
               </h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• Enhanced PWA features</li>
-                <li>• Offline support</li>
-                <li>• Push notifications</li>
-                <li>• Camera integration (OCR)</li>
-                <li>• Native app experience</li>
+                <li>• Auto-updates for macOS builds</li>
+                <li>• System tray and background sync</li>
+                <li>• Native notifications</li>
+                <li>• Receipt scanning (OCR)</li>
+                <li>• Accessibility improvements</li>
               </ul>
             </div>
             <div>
@@ -354,7 +359,7 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
               </p>
               <div className="bg-gray-100 rounded-lg overflow-hidden max-w-2xl">
                 <img
-                  src={Screenshot1}
+                  src={Main_Screen}
                   alt="Finance Tracker dashboard showing transaction overview and navigation"
                   className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
                 />
@@ -371,7 +376,7 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
               </p>
               <div className="bg-gray-100 rounded-lg overflow-hidden max-w-2xl">
                 <img
-                  src={Screenshot2}
+                  src={Transactions}
                   alt="Transaction management interface with form inputs and categorization"
                   className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
                 />
@@ -379,10 +384,23 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
             </div>
 
             <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Accounts Management
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Manage your accounts with the accounts feature.
+              </p>
               <div className="bg-gray-100 rounded-lg overflow-hidden max-w-2xl">
                 <img
-                  src={Screenshot3}
-                  alt="Category management interface showing predefined and custom categories"
+                  src={Accounts_1}
+                  alt="Accounts Management Interface allowing adding and editing account balances"
+                  className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="bg-gray-100 rounded-lg overflow-hidden max-w-2xl">
+                <img
+                  src={Accounts_2}
+                  alt="Second Accounts Screenshot"
                   className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
@@ -398,7 +416,7 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
               </p>
               <div className="bg-gray-100 rounded-lg overflow-hidden max-w-2xl">
                 <img
-                  src={Screenshot4}
+                  src={CSV_Import}
                   alt="CSV import/export interface for bulk data management"
                   className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
                 />
@@ -407,16 +425,32 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
 
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                Category Management{' '}
+                Goals Management
               </h3>
               <p className="text-gray-600 mb-4">
-                Organize transactions with custom categories and smart defaults
-                for better financial tracking.{' '}
+                Set and manage your financial goals with the goals feature.
+              </p>
+            </div>
+            <div className="bg-gray-100 rounded-lg overflow-hidden max-w-2xl">
+              <img
+                src={Goals}
+                alt="Goals management interface showing you your financial goals"
+                className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Smart Insights{' '}
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Get quick insights into your financial health with the smart
+                insights feature.
               </p>
               <div className="bg-gray-100 rounded-lg overflow-hidden max-w-2xl">
                 <img
-                  src={Screenshot5}
-                  alt="Settings and configuration panel with various options"
+                  src={Smart_Insights}
+                  alt="Smart insights showing you your financial health"
                   className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
