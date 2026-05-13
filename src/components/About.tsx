@@ -1,5 +1,5 @@
 import Me from '../assets/MyPic/Me.jpeg'
-import CV from '../assets/CV/Charles_Goodsir_CV.pdf'
+import CV from '../assets/CV/Charles.Goodsir.pdf'
 
 function About() {
   return (
@@ -14,7 +14,7 @@ function About() {
           <h2 className="text-4xl font-bold text-gray-800 mb-4">About Me</h2>
           <a
             href={CV}
-            download="Charles_Goodsir_CV.pdf"
+            download="Charles.Goodsir.pdf"
             className="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             <svg
@@ -55,6 +55,16 @@ function About() {
                 currently learning Python and am eager to dive deeper into its
                 capabilities for data science, automation, and backend
                 development.
+              </p>
+              <p className="text-gray-700 mb-4">
+                I'm also studying for{' '}
+                <strong className="font-semibold text-gray-800">
+                  CompTIA Security+
+                </strong>{' '}
+                and actively interested in roles where software, IT operations,
+                and security overlap—whether that is secure development, IT
+                security support, security-aware engineering, or pathways into
+                broader cybersecurity work.
               </p>
               <p className="text-gray-700 mb-4">
                 I'm particularly drawn to projects that solve real-world
@@ -119,6 +129,19 @@ function About() {
                   complex functionality simple.
                 </p>
               </div>
+
+              <div className="bg-emerald-50 p-4 rounded-lg border-l-4 border-emerald-600">
+                <h4 className="font-semibold text-gray-800 mb-2">
+                  IT &amp; Security-Focused Roles
+                </h4>
+                <p className="text-gray-700 text-sm">
+                  Building on service-desk experience and Security+ study, I'm
+                  keen on roles such as IT security support, junior security or
+                  SOC-adjacent positions, secure software delivery, and
+                  technical paths where risk, identity, and resilient systems
+                  matter.
+                </p>
+              </div>
             </div>
 
             {/* Key Skills */}
@@ -135,6 +158,7 @@ function About() {
                   'API Development',
                   'Tailwind CSS',
                   'Git',
+                  'CompTIA Security+ (studying)',
                   'Problem Solving',
                   'Team Collaboration',
                 ].map((skill) => (

@@ -1,124 +1,51 @@
-
-1
-Charles Goodsir
-Email: goodsirces@gmail.com
-Phone: (+64) 27 81 44772
-LinkedIn: linkedin.com/in/charles-goodsir
-GitHub: https://github.com/charles-goodsir
-AppStore: https://apps.apple.com/nz/app/detour/id6743507600
-Experienced Configuration Engineer and Agile Stream Tech Lead with five years of experience with
-.NET and GitHub, specializing in product architecture and design. Recently completed a Full Stack
-program at Dev Academy Aotearoa, with a focus on JavaScript, CSS, HTML, TypeScript, and React.
-Demonstrated leadership by successfully guiding a team in delivering high-impact features across
-multiple platforms. Currently working part-time on a mobile app project built with React Native
-and Expo Router, integrating Supabase and Firestore for cloud functionality. Actively pursuing a
-hands-on developer role to further leverage my technical expertise and leadership experience in
-driving product innovation and delivering customized solutions.
-Core Skills/Competencies
-▪ GitHub
-▪ JSON
-▪ Azure DevOps
-▪ CI/CI Pipelines
-▪ GIT
-▪ YAML
-▪ HTML/CSS/JavaScript
-▪ Automation Testing
-▪ Firebase Authentication
-▪ React
-▪ TypeScript
-▪ VS Code
-▪ Supabase
-▪ Cron
-▪ Miro
-▪ Confluence
-▪ Technical Problem Solving
-▪ Technical Business Process Analysis
-▪ Technical Documentation
-▪ Presentation Skills
-▪ Leadership Skills
-▪ Time Management
-▪ Analytical Skills
-▪ Decision Making
-▪ Client Training
-▪ Negotiation Skills
-▪ Dedicated Team Player
-▪ Agile Methodology
-Personal Project
-Mobile App Auckland, New Zealand
-Development, Architecture, Cloud Current (Side Project)
-▪ Developed a React Native iOS and Android app using Expo Router coded in Typescript to
-help users discover points of interest through integrated maps, with features for navigation and
-social interaction.
-▪ Designed the architecture and integrated Supabase as the backend database to store user
-posts, geolocation data, and bi-directional friendship relationships.
-▪ Optimized image loading with Supabase Storage and FastImage, enhancing performance with
-advanced caching mechanisms for a seamless user experience.
-▪ Implemented geolocation-based features to filter and display posts and attractions dynamically
-based on user location and preferences.
-▪ Designed a scalable Firestore data model to support user-generated content, social
-interactions, and real-time updates.
-▪ Integrated Supabase Authentication to enable secure user authentication and provide cross-
-device access to personalized content.
-▪ Deployed the app to iOS platforms using Expo Application Services (EAS), ensuring smooth
-over-the-air updates, streamlined CI/CD workflows, and production-ready release process.
-Professional Experience
-DATACOM SOLUTIONS (NZ) Auckland, New Zealand
-Software Configuration Engineer – Finance Domain Sept 2021 - Current
-▪ Designed, coded/configured, tested, and delivered applications across multiple regions
-within NZ & Australia.
-▪ Conducted automation testing using Gherkin scripts to validate end-to-end business
-processes, guaranteeing thorough quality assurance and smooth functionality throughout the
-entire workflow.
-▪ Collaborated with cross functional domain teams to configure solutions aligning with business
-requirements, ensuring adherence to standardised processes for consistent outcomes.
-▪ Worked closely with BAs, developers, configurators, product managers, and clients to deliver
-features in a large enterprise environment.
-▪ Automated workflows using in-house power tools for local government councils.
-▪ Built strong rapport with my customers and developed relationships local government councils
-by:
-o Leading weekly CRM/ERP overview and training sessions.
-o Demoing new features in external sprint reviews.
-▪ Optimised and remodelled configuration to improve system performance by:
-o Identifying issues with existing configuration and implementing effective solutions. For
-instance, redesigned a workflow to reduce runtime/system load from 2.5 minutes to 20
-seconds.
-▪ Developed technical documentation through Confluence articles to support internal releases.
-▪ Provided training for associate analysts and offered continuous advice, guidance, and
-mentorship on duties and best practices.
-DATACOM SOLUTIONS (NZ)
-Service Desk Analyst
-Wellington, New
-Zealand
-Sept 2020 – Sept 2021
-▪ Provided first-level support for Ministry of Business, Innovation and Employment -
-documenting each call verifying customer information and including all troubleshooting steps.
-▪ Researched, resolved, and responded to questions received via -telephone calls, emails, and
-call-backs in a timely manner, escalate problems to appropriate individuals.
-▪ Assisted in the resolution of user and support issues among company sites to ensure timely
-distribution of knowledge and positive impact on user satisfaction.
-Education
-Dev Academy Aotearoa
-Level 6 in Applied Software Development
-Auckland,
-New Zealand
-Jul 2024 - Dec 2024
-VICTORIA UNIVERSITY OF WELLINGTON
-Bachelor of Arts, History, International Relations, Political Science
-Wellington,
-New Zealand
-Feb 2017 - Jan 2020
-Skills
-▪ Proven leadership experience managing teams and driving team performance.
-▪ Substantial experience in complex process analysis and process improvement, specifically in
-CRM/ERP regulatory for local government councils.
-▪ Strong problem-solving skills, and an ability to grasp abstract concepts and complex problems
-to further develop and build on organisational regulatory frameworks.
-▪ Ability to facilitate and deliver group training from experience delivering training to both clients
-and colleagues on best practices and new processes.
-▪ Versatile experience within the software development cycle through the end-to-end delivery of
-features.
-Additional Courses
-Skillsoft: • Agile for Software Development: Lean, Agile, & Scrum Methodologies
-▪ Agile Software Development: Agile Development Life Cycle
-▪ Agile Organizations: DevOps & Agile
-References available on request
+CHARLES GOODSIR
+Auckland, NZ • goodsirces@gmail.com • 027 814 4772 • LinkedIn • Portfolio • Detour App
+PROFESSIONAL SUMMARY
+Technically versatile application engineer and career-transitioning security professional with 4+ years delivering enterprise
+software solutions and a self-shipped, live mobile app on the App Store. Pursuing CompTIA Security+ (SY0-701) with hands-on
+experience in automation, cloud architecture, and adversarial thinking developed through scripting and penetration-adjacent
+problem solving.
+EXPERIENCE
+Software Application Engineer - Finance Domain | Datacom Solutions Auckland, NZ | Sep 2021 - Present
+• Architected and delivered CRM/ERP solutions across NZ & AU local council clients, reducing configuration defect rates by
+~30% through standardised testing frameworks.
+• Engineered end-to-end workflow automation using Gherkin-based test scripting, cutting a critical workflow runtime by 90%
+(2.5 min → 20 sec) and eliminating a class of recurring production defects.
+• Drove adoption of a new enterprise finance module across 3 councils by leading training sessions and sprint demos, achieving
+100% go-live on schedule.
+• Mentored junior engineers, accelerating their time-to-independent delivery.
+Service Desk Analyst | Datacom Solutions (MBIE) Wellington, NZ | Sep 2020 - Sep 2021
+• Resolved 200+ IT incidents per month across phone, email, and remote sessions for the Ministry of Business, Innovation and
+Employment, maintaining a first-call resolution rate above 80%.
+• Reduced repeat support call volume by 25% by identifying recurring issue patterns and authoring knowledge-base articles
+adopted across the wider service desk team.
+• Triaged and coordinated escalation of critical infrastructure incidents involving network access, identity management, and
+remote desktop services, minimising mean-time-to-resolve by ~35%.
+PROJECTS
+Detour – Cross-Platform Mobile App (Solo Developer) | Live on App Store | 2024 - Present
+• Architected a production-grade full-stack mobile app from zero using React Native, TypeScript, Supabase, and Firestore
+handling auth, geolocation, real-time data, and social features.
+• Engineered Supabase Auth with row-level security policies to enforce data access controls, restricting user data exposure to
+authenticated owners only.
+• Implemented geolocation-based content filtering with sub-200ms query performance by optimising PostGIS spatial indexes on
+a self-managed Postgres instance.
+• Deployed to production via CI/CD pipeline (Expo EAS), reducing manual release effort to near-zero and enabling over-the-air
+updates without App Store re-submission.
+• Built and shipped the app independently from architecture to App Store approval demonstrating end-to-end ownership of the
+software development lifecycle.
+Python Automation & Scripting | Personal Projects | Ongoing
+• Built web scrapers and data-gathering bots in Python to automate collection of structured information from public sources,
+reinforcing practical knowledge of HTTP, APIs, and data parsing.
+EDUCATION & CERTIFICATIONS
+CompTIA Security+ (SY0-701) In Progress - Expected 2025
+Active exam preparation via Percipio; weekly practice exams; focus areas: threat analysis, identity & access management,
+cryptography, security operations.
+Level 6 Diploma in Applied Software Development Dev Academy Aotearoa | 2023 - 2024
+BA - History, International Relations & Political Science Victoria University of Wellington | 2017 - 2020
+SKILLS
+Languages TypeScript, JavaScript, Python, SQL, YAML, HTML/CSS, C# (.NET - enterprise context)
+Cloud & Infra Supabase (Postgres + PostGIS), Firestore, Azure DevOps, CI/CD (Expo EAS), Git
+Frameworks React Native, React, Node.js
+Tools Confluence, Jira, Miro, Azure DevOps, Gherkin / BDD
+Practices Agile/Scrum, threat-oriented UAT, technical documentation, incident triage, mentorship
+Certifications CompTIA Security+ SY0-701 (in progress)

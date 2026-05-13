@@ -9,7 +9,7 @@ interface ExperienceItem {
 
 const experiences: ExperienceItem[] = [
   {
-    title: 'Software Configuration Engineer – Finance Domain',
+    title: 'Software Application Engineer – Finance Domain',
     company: 'DATACOM SOLUTIONS (NZ)',
     location: 'Auckland, New Zealand',
     duration: 'Sept 2021 - Current',
@@ -115,7 +115,7 @@ function Experience() {
       {/* Skills Translation Section */}
       <div className="mt-12">
         <h3 className="text-2xl font-semibold mb-6">
-          Why I'm Ready for Coding Roles
+          Why I'm Ready for Technical Roles
         </h3>
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-lg p-8 border-l-4 border-indigo-600">
           <div className="grid md:grid-cols-2 gap-8">
@@ -152,6 +152,14 @@ function Experience() {
                   <span>
                     <strong>Documentation & Best Practices:</strong> Created
                     technical documentation and mentored team members
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-indigo-600 mr-2 mt-1">•</span>
+                  <span>
+                    <strong>Security awareness:</strong> Studying for CompTIA
+                    Security+; background in structured support and
+                    enterprise-grade delivery supports secure, reliable systems
                   </span>
                 </li>
               </ul>
@@ -197,12 +205,11 @@ function Experience() {
             <p className="text-gray-700 text-center font-medium">
               <strong>
                 Combined with my recent Full Stack Development training at Dev
-                Academy Aotearoa,
+                Academy Aotearoa and ongoing CompTIA Security+ preparation,
               </strong>
-              these professional experiences provide a strong foundation for
-              transitioning into hands-on coding roles, bringing both technical
-              expertise and proven ability to deliver high-quality software
-              solutions in collaborative environments.
+              these experiences support both hands-on software roles and
+              security-aware IT paths—bringing technical depth, disciplined
+              delivery, and a growing focus on resilient systems.
             </p>
           </div>
         </div>
@@ -210,8 +217,33 @@ function Experience() {
 
       {/* Education Section */}
       <div className="mt-12">
-        <h3 className="text-2xl font-semibold mb-6">Education</h3>
+        <h3 className="text-2xl font-semibold mb-6">Education &amp; Certifications</h3>
         <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-emerald-600">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+              <div>
+                <h4 className="text-xl font-bold text-gray-800">
+                  CompTIA Security+ (SY0-701)
+                </h4>
+                <p className="text-lg text-emerald-600 font-semibold">
+                  CompTIA · In progress
+                </p>
+                <p className="text-gray-600">Self-paced study</p>
+              </div>
+              <div className="mt-2 md:mt-0">
+                <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">
+                  Current
+                </span>
+              </div>
+            </div>
+            <p className="text-gray-700">
+              Preparing for Security+ to formalize core cybersecurity knowledge
+              across threats, vulnerabilities, identity, risk, and secure
+              operations—complementing hands-on software and enterprise IT
+              experience.
+            </p>
+          </div>
+
           <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-green-600">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
               <div>

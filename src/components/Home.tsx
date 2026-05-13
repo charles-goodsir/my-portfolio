@@ -14,11 +14,12 @@ function Home({ setActiveSection }: HomeProps) {
             Hi, I'm <span className="text-blue-600">Charles</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-            Full-Stack Developer & Problem Solver
+            Full-Stack Developer · Studying CompTIA Security+
           </p>
           <p className="text-lg text-gray-500 mb-12 max-w-2xl mx-auto">
-            I build clean, user-friendly applications and solve real-world
-            problems with modern web technologies.
+            I build clean, user-friendly applications with modern web
+            technologies, and I'm growing toward IT and security-focused roles
+            grounded in practical engineering and risk-aware delivery.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
