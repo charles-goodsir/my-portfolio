@@ -22,7 +22,7 @@ adopted across the wider service desk team.
 • Triaged and coordinated escalation of critical infrastructure incidents involving network access, identity management, and
 remote desktop services, minimising mean-time-to-resolve by ~35%.
 PROJECTS
-Detour – Cross-Platform Mobile App (Solo Developer) | Live on App Store | 2024 - Present
+Detour - Cross-Platform Mobile App (Solo Developer) | Live on App Store | 2024 - Present
 • Architected a production-grade full-stack mobile app from zero using React Native, TypeScript, Supabase, and Firestore
 handling auth, geolocation, real-time data, and social features.
 • Engineered Supabase Auth with row-level security policies to enforce data access controls, restricting user data exposure to

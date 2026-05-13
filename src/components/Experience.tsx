@@ -9,7 +9,7 @@ interface ExperienceItem {
 
 const experiences: ExperienceItem[] = [
   {
-    title: 'Software Application Engineer – Finance Domain',
+    title: 'Software Application Engineer - Finance Domain',
     company: 'DATACOM SOLUTIONS (NZ)',
     location: 'Auckland, New Zealand',
     duration: 'Sept 2021 - Current',
@@ -40,7 +40,7 @@ const experiences: ExperienceItem[] = [
     title: 'Service Desk Analyst',
     company: 'DATACOM SOLUTIONS (NZ)',
     location: 'Wellington, New Zealand',
-    duration: 'Sept 2020 – Sept 2021',
+    duration: 'Sept 2020 to Sept 2021',
     description: [
       'Provided first-level support for Ministry of Business, Innovation and Employment - documenting each call verifying customer information',
       'Researched, resolved, and responded to questions received via telephone calls, emails, and call-backs in a timely manner',
@@ -208,7 +208,7 @@ function Experience() {
                 Academy Aotearoa and ongoing CompTIA Security+ preparation,
               </strong>
               these experiences support both hands-on software roles and
-              security-aware IT paths—bringing technical depth, disciplined
+              security-aware IT paths, with technical depth, disciplined
               delivery, and a growing focus on resilient systems.
             </p>
           </div>
@@ -217,7 +217,9 @@ function Experience() {
 
       {/* Education Section */}
       <div className="mt-12">
-        <h3 className="text-2xl font-semibold mb-6">Education &amp; Certifications</h3>
+        <h3 className="text-2xl font-semibold mb-6">
+          Education &amp; Certifications
+        </h3>
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-emerald-600">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
@@ -237,10 +239,9 @@ function Experience() {
               </div>
             </div>
             <p className="text-gray-700">
-              Preparing for Security+ to formalize core cybersecurity knowledge
-              across threats, vulnerabilities, identity, risk, and secure
-              operations—complementing hands-on software and enterprise IT
-              experience.
+              Studying for Security+ to get a clearer picture of threats,
+              vulnerabilities, identity, risk, and secure operations, on top of
+              what I already do in software and enterprise IT.
             </p>
           </div>
 

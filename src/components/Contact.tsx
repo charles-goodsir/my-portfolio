@@ -6,8 +6,8 @@ function Contact() {
           Get In Touch
         </h2>
         <p className="text-lg text-gray-600 text-center mb-8">
-          I'm always interested in new opportunities—especially software,
-          platform, or security-adjacent roles aligned with my CompTIA Security+
+          I'm always interested in new opportunities, especially software,
+          platform, or security-adjacent roles that fit with my CompTIA Security+
           study. Feel free to reach out!
         </p>
 

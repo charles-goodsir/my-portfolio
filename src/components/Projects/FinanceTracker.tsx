@@ -412,7 +412,7 @@ function FinanceTracker({ setActiveSection }: FinanceTrackerProps) {
               </h3>
               <p className="text-gray-600 mb-4">
                 Bulk data management with CSV import/export functionality for
-                seamless data migration.
+                smooth data migration.
               </p>
               <div className="bg-gray-100 rounded-lg overflow-hidden max-w-2xl">
                 <img

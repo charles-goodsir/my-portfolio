@@ -42,34 +42,31 @@ function About() {
             </h3>
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 mb-4">
-                I'm Charles Goodsir, a passionate full-stack developer with a
-                love for creating innovative solutions and bringing ideas to
-                life through code. My journey in technology began with a
-                curiosity for how things work and has evolved into a career
-                focused on building meaningful applications.
+                I'm Charles Goodsir, a full-stack developer. I like shipping
+                software that solves a real problem, not just code for its own
+                sake. I got into tech from wanting to know how systems actually
+                work, and that curiosity is still what drives most of what I do.
               </p>
               <p className="text-gray-700 mb-4">
-                With expertise in React, Node.js, TypeScript, and modern web
-                technologies, I specialize in building clean, scalable
-                applications that provide exceptional user experiences. I'm
-                currently learning Python and am eager to dive deeper into its
-                capabilities for data science, automation, and backend
-                development.
+                I work mainly with React, Node.js, TypeScript, and the usual
+                modern web stack. I'm building clean, scalable apps with a focus
+                on good UX. I'm also picking up Python for data work,
+                automation, and backend tasks.
               </p>
               <p className="text-gray-700 mb-4">
-                I'm also studying for{' '}
+                I'm studying for{' '}
                 <strong className="font-semibold text-gray-800">
                   CompTIA Security+
                 </strong>{' '}
-                and actively interested in roles where software, IT operations,
-                and security overlap—whether that is secure development, IT
-                security support, security-aware engineering, or pathways into
-                broader cybersecurity work.
+                and I'm open to roles where software, IT operations, and
+                security meet: secure development, IT security support,
+                engineering with security in mind, or a step toward broader
+                cybersecurity work.
               </p>
               <p className="text-gray-700 mb-4">
-                I'm particularly drawn to projects that solve real-world
-                problems and make a positive impact, and I'm excited to expand
-                my skills with Python to tackle even more complex challenges.
+                I like projects that fix something annoying or important for
+                users. I want to keep levelling up my Python so I can take on
+                bigger, messier problems.
               </p>
               <p className="text-gray-700">
                 When I'm not coding, you can find me exploring new technologies,
@@ -84,15 +81,27 @@ function About() {
             <h3 className="text-2xl font-semibold text-gray-800 mb-4">
               Roles I'm Passionate About
             </h3>
+
+            <div className="bg-emerald-50 p-4 rounded-lg border-l-4 border-emerald-600">
+              <h4 className="font-semibold text-gray-800 mb-2">
+                IT &amp; Security-Focused Roles
+              </h4>
+              <p className="text-gray-700 text-sm">
+                Building on service-desk experience and Security+ study, I'm
+                keen on roles such as IT security support, junior security or
+                SOC-adjacent positions, secure software delivery, and technical
+                paths where risk, identity, and resilient systems matter.
+              </p>
+            </div>
             <div className="space-y-4">
               <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
                 <h4 className="font-semibold text-gray-800 mb-2">
                   Full-Stack Developer
                 </h4>
                 <p className="text-gray-700 text-sm">
-                  Building end-to-end applications with modern frameworks and
-                  technologies. I love the challenge of creating seamless user
-                  experiences from frontend to backend.
+                Building end-to-end applications with modern frameworks and
+                technologies. I like wiring the UI to the backend so the whole
+                flow feels coherent for users.
                 </p>
               </div>
 
@@ -101,10 +110,10 @@ function About() {
                   Data Engineer
                 </h4>
                 <p className="text-gray-700 text-sm">
-                  Currently learning Python for data pipelines, web scraping
-                  solutions, and automated data collection systems. I'm excited
-                  to master Python's data science libraries and turn raw data
-                  into actionable insights.
+                  Currently learning Python for data pipelines, web scraping,
+                  and automated data collection. I'm getting comfortable with
+                  Python's data tooling so I can turn messy inputs into
+                  something people can actually use.
                 </p>
               </div>
 
@@ -113,9 +122,9 @@ function About() {
                   Software Engineer
                 </h4>
                 <p className="text-gray-700 text-sm">
-                  Creating robust, scalable software solutions. I'm passionate
-                  about clean code, best practices, and building systems that
-                  stand the test of time.
+                  Solid, scalable software with tests where they help and
+                  structure that won't confuse the next person. I care about
+                  readable code and systems that keep running without drama.
                 </p>
               </div>
 
@@ -124,22 +133,9 @@ function About() {
                   Frontend Developer
                 </h4>
                 <p className="text-gray-700 text-sm">
-                  Crafting beautiful, responsive user interfaces that delight
-                  users. I focus on creating intuitive experiences that make
-                  complex functionality simple.
-                </p>
-              </div>
-
-              <div className="bg-emerald-50 p-4 rounded-lg border-l-4 border-emerald-600">
-                <h4 className="font-semibold text-gray-800 mb-2">
-                  IT &amp; Security-Focused Roles
-                </h4>
-                <p className="text-gray-700 text-sm">
-                  Building on service-desk experience and Security+ study, I'm
-                  keen on roles such as IT security support, junior security or
-                  SOC-adjacent positions, secure software delivery, and
-                  technical paths where risk, identity, and resilient systems
-                  matter.
+                  Responsive layouts and components that behave predictably. I
+                  try to keep complex flows understandable so users aren't
+                  guessing what to do next.
                 </p>
               </div>
             </div>

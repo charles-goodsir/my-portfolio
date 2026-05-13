@@ -18,8 +18,8 @@ function Home({ setActiveSection }: HomeProps) {
           </p>
           <p className="text-lg text-gray-500 mb-12 max-w-2xl mx-auto">
             I build clean, user-friendly applications with modern web
-            technologies, and I'm growing toward IT and security-focused roles
-            grounded in practical engineering and risk-aware delivery.
+            technologies, and I'm moving toward IT and security-focused roles
+            where solid engineering and security both matter.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
