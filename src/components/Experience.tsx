@@ -157,9 +157,9 @@ function Experience() {
                 <li className="flex items-start">
                   <span className="text-indigo-600 mr-2 mt-1">•</span>
                   <span>
-                    <strong>Security awareness:</strong> Studying for CompTIA
-                    Security+; background in structured support and
-                    enterprise-grade delivery supports secure, reliable systems
+                    <strong>Security:</strong> CompTIA Security+ certified;
+                    background in structured support and enterprise-grade
+                    delivery supports secure, reliable systems
                   </span>
                 </li>
               </ul>
@@ -205,7 +205,7 @@ function Experience() {
             <p className="text-gray-700 text-center font-medium">
               <strong>
                 Combined with my recent Full Stack Development training at Dev
-                Academy Aotearoa and ongoing CompTIA Security+ preparation,
+                Academy Aotearoa and CompTIA Security+ certification,
               </strong>
               these experiences support both hands-on software roles and
               security-aware IT paths, with technical depth, disciplined
@@ -228,20 +228,20 @@ function Experience() {
                   CompTIA Security+ (SY0-701)
                 </h4>
                 <p className="text-lg text-emerald-600 font-semibold">
-                  CompTIA · In progress
+                  CompTIA · Certified
                 </p>
-                <p className="text-gray-600">Self-paced study</p>
+                <p className="text-gray-600">Jul 2026</p>
               </div>
               <div className="mt-2 md:mt-0">
                 <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">
-                  Current
+                  Jul 2026
                 </span>
               </div>
             </div>
             <p className="text-gray-700">
-              Studying for Security+ to get a clearer picture of threats,
-              vulnerabilities, identity, risk, and secure operations, on top of
-              what I already do in software and enterprise IT.
+              Covers threats, vulnerabilities, identity, risk, and secure
+              operations, complementing hands-on software and enterprise IT
+              work.
             </p>
           </div>
 

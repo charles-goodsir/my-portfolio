@@ -14,7 +14,7 @@ function Home({ setActiveSection }: HomeProps) {
             Hi, I'm <span className="text-blue-600">Charles</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-            Full-Stack Developer · Studying CompTIA Security+
+            Full-Stack Developer · CompTIA Security+ Certified
           </p>
           <p className="text-lg text-gray-500 mb-12 max-w-2xl mx-auto">
             I build clean, user-friendly applications with modern web

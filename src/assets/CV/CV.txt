@@ -2,7 +2,7 @@ CHARLES GOODSIR
 Auckland, NZ • goodsirces@gmail.com • 027 814 4772 • LinkedIn • Portfolio • Detour App
 PROFESSIONAL SUMMARY
 Technically versatile application engineer and career-transitioning security professional with 4+ years delivering enterprise
-software solutions and a self-shipped, live mobile app on the App Store. Pursuing CompTIA Security+ (SY0-701) with hands-on
+software solutions and a self-shipped, live mobile app on the App Store. CompTIA Security+ (SY0-701) certified with hands-on
 experience in automation, cloud architecture, and adversarial thinking developed through scripting and penetration-adjacent
 problem solving.
 EXPERIENCE
@@ -37,9 +37,8 @@ Python Automation & Scripting | Personal Projects | Ongoing
 • Built web scrapers and data-gathering bots in Python to automate collection of structured information from public sources,
 reinforcing practical knowledge of HTTP, APIs, and data parsing.
 EDUCATION & CERTIFICATIONS
-CompTIA Security+ (SY0-701) In Progress - Expected 2025
-Active exam preparation via Percipio; weekly practice exams; focus areas: threat analysis, identity & access management,
-cryptography, security operations.
+CompTIA Security+ (SY0-701) | Jul 2026
+Threat analysis, identity and access management, cryptography, and security operations.
 Level 6 Diploma in Applied Software Development Dev Academy Aotearoa | 2023 - 2024
 BA - History, International Relations & Political Science Victoria University of Wellington | 2017 - 2020
 SKILLS
@@ -48,4 +47,4 @@ Cloud & Infra Supabase (Postgres + PostGIS), Firestore, Azure DevOps, CI/CD (Exp
 Frameworks React Native, React, Node.js
 Tools Confluence, Jira, Miro, Azure DevOps, Gherkin / BDD
 Practices Agile/Scrum, threat-oriented UAT, technical documentation, incident triage, mentorship
-Certifications CompTIA Security+ SY0-701 (in progress)
+Certifications CompTIA Security+ SY0-701

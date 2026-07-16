@@ -8,7 +8,7 @@ function Contact() {
         <p className="text-lg text-gray-600 text-center mb-8">
           I'm always interested in new opportunities, especially software,
           platform, or security-adjacent roles that fit with my CompTIA Security+
-          study. Feel free to reach out!
+          certification. Feel free to reach out!
         </p>
 
         <div className="grid md:grid-cols-3 gap-6">
