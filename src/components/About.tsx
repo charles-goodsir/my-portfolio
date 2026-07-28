@@ -42,36 +42,43 @@ function About() {
             </h3>
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 mb-4">
-                I'm Charles Goodsir, a full-stack developer. I like shipping
-                software that solves a real problem, not just code for its own
-                sake. I got into tech from wanting to know how systems actually
-                work, and that curiosity is still what drives most of what I do.
+                I'm Charles Goodsir, a full-stack developer moving into
+                application security. I spent years building and shipping
+                software in enterprise environments, and that background helps
+                when the job is finding flaws in how apps are actually built,
+                not just spotting them on a checklist.
               </p>
               <p className="text-gray-700 mb-4">
-                I work mainly with React, Node.js, TypeScript, and the usual
-                modern web stack. I'm building clean, scalable apps with a focus
-                on good UX. I'm also picking up Python for data work,
-                automation, and backend tasks.
-              </p>
-              <p className="text-gray-700 mb-4">
-                I hold{' '}
+                I'm{' '}
                 <strong className="font-semibold text-gray-800">
-                  CompTIA Security+
+                  CompTIA Security+ certified
                 </strong>{' '}
-                and I'm open to roles where software, IT operations, and
-                security meet: secure development, IT security support,
-                engineering with security in mind, or broader cybersecurity
-                work.
+                and working through hands-on practice like PortSwigger labs
+                with Burp Suite, which I log in my CyberDiary. On the dev side
+                I work with React, Node.js, TypeScript, and Python for
+                automation and backend tasks.
               </p>
               <p className="text-gray-700 mb-4">
-                I like projects that fix something annoying or important for
-                users. I want to keep levelling up my Python so I can take on
-                bigger, messier problems.
+                I'm targeting{' '}
+                <strong className="font-semibold text-gray-800">
+                  application security
+                </strong>{' '}
+                roles now, and working toward{' '}
+                <strong className="font-semibold text-gray-800">
+                  DevSecOps
+                </strong>{' '}
+                and{' '}
+                <strong className="font-semibold text-gray-800">
+                  cloud security
+                </strong>{' '}
+                longer term. I want to be the person who can read the code,
+                understand the threat, and help teams fix issues before they
+                hit production.
               </p>
               <p className="text-gray-700">
-                When I'm not coding, you can find me exploring new technologies,
-                contributing to open-source projects, or sharing knowledge with
-                the developer community.
+                Outside of labs and projects, I keep up with security news, dig
+                into how real-world breaches happened, and write up what I learn
+                so I don't forget the details.
               </p>
             </div>
           </div>
@@ -79,64 +86,54 @@ function About() {
           {/* Roles & Interests */}
           <div>
             <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-              Roles I'm Passionate About
+              Roles I'm Targeting
             </h3>
 
-            <div className="bg-emerald-50 p-4 rounded-lg border-l-4 border-emerald-600">
-              <h4 className="font-semibold text-gray-800 mb-2">
-                IT &amp; Security-Focused Roles
-              </h4>
-              <p className="text-gray-700 text-sm">
-                Building on service-desk experience and my Security+
-                certification, I'm keen on roles such as IT security support,
-                junior security or SOC-adjacent positions, secure software
-                delivery, and technical paths where risk, identity, and resilient
-                systems matter.
-              </p>
-            </div>
             <div className="space-y-4">
+              <div className="bg-emerald-50 p-4 rounded-lg border-l-4 border-emerald-600">
+                <h4 className="font-semibold text-gray-800 mb-2">
+                  Application Security
+                </h4>
+                <p className="text-gray-700 text-sm">
+                  My main focus. Web app testing, secure code review, threat
+                  modelling, and helping teams understand risk in software they
+                  already ship. Security+ and PortSwigger lab work are building
+                  blocks here.
+                </p>
+              </div>
+
+              <div className="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-600">
+                <h4 className="font-semibold text-gray-800 mb-2">DevSecOps</h4>
+                <p className="text-gray-700 text-sm">
+                  Where I want to grow next. Baking security into CI/CD,
+                  automated checks in the pipeline, and working with engineers
+                  to catch issues early instead of at release time. My
+                  background with Azure DevOps and GitHub gives me a head start
+                  on the delivery side.
+                </p>
+              </div>
+
+              <div className="bg-sky-50 p-4 rounded-lg border-l-4 border-sky-600">
+                <h4 className="font-semibold text-gray-800 mb-2">
+                  Cloud Security
+                </h4>
+                <p className="text-gray-700 text-sm">
+                  Longer-term goal. Understanding misconfigurations, identity
+                  and access in cloud environments, and securing workloads I've
+                  actually deployed. I've built serverless apps on AWS and want
+                  to go deeper on securing that kind of infrastructure.
+                </p>
+              </div>
+
               <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
                 <h4 className="font-semibold text-gray-800 mb-2">
                   Full-Stack Developer
                 </h4>
                 <p className="text-gray-700 text-sm">
-                Building end-to-end applications with modern frameworks and
-                technologies. I like wiring the UI to the backend so the whole
-                flow feels coherent for users.
-                </p>
-              </div>
-
-              <div className="bg-pink-50 p-4 rounded-lg border-l-4 border-pink-500">
-                <h4 className="font-semibold text-gray-800 mb-2">
-                  Data Engineer
-                </h4>
-                <p className="text-gray-700 text-sm">
-                  Currently learning Python for data pipelines, web scraping,
-                  and automated data collection. I'm getting comfortable with
-                  Python's data tooling so I can turn messy inputs into
-                  something people can actually use.
-                </p>
-              </div>
-
-              <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
-                <h4 className="font-semibold text-gray-800 mb-2">
-                  Software Engineer
-                </h4>
-                <p className="text-gray-700 text-sm">
-                  Solid, scalable software with tests where they help and
-                  structure that won't confuse the next person. I care about
-                  readable code and systems that keep running without drama.
-                </p>
-              </div>
-
-              <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
-                <h4 className="font-semibold text-gray-800 mb-2">
-                  Frontend Developer
-                </h4>
-                <p className="text-gray-700 text-sm">
-                  Responsive layouts and components that behave predictably. I
-                  try to keep complex flows understandable so users aren't
-                  guessing what to do next.
+                  Where I come from, and still relevant. React, Node.js,
+                  TypeScript, APIs, and databases. Knowing how apps are built
+                  end to end makes AppSec work more credible because I can
+                  follow a vulnerability from the browser to the backend.
                 </p>
               </div>
             </div>
@@ -146,18 +143,18 @@ function About() {
               <h4 className="font-semibold text-gray-800 mb-3">Key Skills</h4>
               <div className="flex flex-wrap gap-2">
                 {[
+                  'Application Security',
+                  'CompTIA Security+',
+                  'Burp Suite',
+                  'Secure Coding',
+                  'Threat Modelling',
+                  'CI/CD',
                   'React',
                   'TypeScript',
                   'Python',
                   'Node.js',
-                  'Web Scraping',
-                  'Database Design',
-                  'API Development',
-                  'Tailwind CSS',
+                  'AWS',
                   'Git',
-                  'CompTIA Security+',
-                  'Problem Solving',
-                  'Team Collaboration',
                 ].map((skill) => (
                   <span
                     key={skill}

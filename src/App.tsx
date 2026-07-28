@@ -5,6 +5,7 @@ import About from './components/About'
 import Experience from './components/Experience'
 import Projects from './components/Project'
 import Contact from './components/Contact'
+import CyberDiary from './components/CyberDiary'
 import Detour from './components/Projects/Detour'
 import FlightTracker from './components/Projects/FlightTracker'
 import NewsDashboard from './components/Projects/NewsDashboard'
@@ -24,6 +25,8 @@ function App() {
         return <Experience />
       case 'projects':
         return <Projects setActiveSection={setActiveSection} />
+      case 'cyberdiary':
+        return <CyberDiary />
       case 'contact':
         return <Contact />
       case 'project-detour':

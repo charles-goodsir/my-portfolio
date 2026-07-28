@@ -14,12 +14,12 @@ function Home({ setActiveSection }: HomeProps) {
             Hi, I'm <span className="text-blue-600">Charles</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-            Full-Stack Developer · CompTIA Security+ Certified
+            Application Security Engineer · CompTIA Security+ Certified
           </p>
           <p className="text-lg text-gray-500 mb-12 max-w-2xl mx-auto">
-            I build clean, user-friendly applications with modern web
-            technologies, and I'm moving toward IT and security-focused roles
-            where solid engineering and security both matter.
+            Full-stack background, application security focus. Working toward
+            DevSecOps and cloud security roles where I can combine building
+            software with breaking and fixing it properly.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
@@ -29,10 +29,10 @@ function Home({ setActiveSection }: HomeProps) {
               View My Work
             </button>
             <button
-              onClick={() => setActiveSection('contact')}
+              onClick={() => setActiveSection('cyberdiary')}
               className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition-all duration-300"
             >
-              Get In Touch
+              Cyber Diary
             </button>
           </div>
         </div>

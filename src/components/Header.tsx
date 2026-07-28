@@ -9,6 +9,7 @@ function Header({ activeSection, setActiveSection }: HeaderProps) {
     { id: 'about', label: 'About' },
     { id: 'experience', label: 'Experience' },
     { id: 'projects', label: 'Projects' },
+    { id: 'cyberdiary', label: 'CyberDiary' },
     { id: 'contact', label: 'Contact' },
   ]
 
