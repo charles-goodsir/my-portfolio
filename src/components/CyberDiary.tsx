@@ -1,5 +1,24 @@
 import { useMemo, useState } from 'react'
 import { cyberDiaryEntries } from '../data/cyberDiaryEntries'
+import sqliSolver from '../assets/LabScripts/sqli_solver.py?raw'
+import lab12Script from '../assets/LabScripts/lab12.py?raw'
+import lab14Script from '../assets/LabScripts/lab14.py?raw'
+
+const scriptMap: Record<string, string> = {
+  'LabScripts/sqli_solver.py': sqliSolver,
+  'LabScripts/lab12.py': lab12Script,
+  'LabScripts/lab14.py': lab14Script,
+}
+
+const screenshotModules = import.meta.glob('../assets/Burp/*.png', {
+  eager: true,
+  import: 'default',
+}) as Record<string, string>
+
+function resolveScreenshot(screenshot?: string) {
+  if (!screenshot) return undefined
+  return screenshotModules[`../assets/${screenshot}`]
+}
 
 function formatDate(isoDate: string) {
   const [year, month, day] = isoDate.split('-').map(Number)
@@ -15,7 +34,9 @@ function CyberDiary() {
   const [activeCategory, setActiveCategory] = useState('All')
 
   const categories = useMemo(() => {
-    const unique = [...new Set(cyberDiaryEntries.map((entry) => entry.category))]
+    const unique = [
+      ...new Set(cyberDiaryEntries.map((entry) => entry.category)),
+    ]
     return ['All', ...unique]
   }, [])
 
@@ -23,12 +44,10 @@ function CyberDiary() {
     const filtered =
       activeCategory === 'All'
         ? cyberDiaryEntries
-        : cyberDiaryEntries.filter(
-            (entry) => entry.category === activeCategory
-          )
+        : cyberDiaryEntries.filter((entry) => entry.category === activeCategory)
 
     return [...filtered].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     )
   }, [activeCategory])
 
@@ -83,6 +102,11 @@ function CyberDiary() {
                 <span className="inline-block mt-2 bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
                   {entry.category}
                 </span>
+                {entry.milestone && (
+                  <span className="inline-block mt-2 ml-2 bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+                    ✓ Path complete
+                  </span>
+                )}
               </div>
 
               <div className="px-6 py-5 space-y-5">
@@ -115,6 +139,14 @@ function CyberDiary() {
                         {paragraph}
                       </p>
                     ))}
+                    {entry.screenshot &&
+                      resolveScreenshot(entry.screenshot) && (
+                        <img
+                          src={resolveScreenshot(entry.screenshot)}
+                          alt={`${entry.title} screenshot`}
+                          className="rounded border border-gray-200 max-w-full"
+                        />
+                      )}
                   </div>
                 )}
 
@@ -150,6 +182,29 @@ function CyberDiary() {
                               {lab.solution}
                             </pre>
                           </div>
+                          {lab.screenshot &&
+                            resolveScreenshot(lab.screenshot) && (
+                              <div>
+                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                  Screenshot
+                                </p>
+                                <img
+                                  src={resolveScreenshot(lab.screenshot)}
+                                  alt={lab.title}
+                                  className="w-full h-auto rounded"
+                                />
+                              </div>
+                            )}
+                          {lab.script && scriptMap[lab.script] && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Script
+                              </p>
+                              <pre className="bg-gray-900 text-emerald-300 text-xs rounded p-3 overflow-x-auto whitespace-pre font-mono leading-relaxed">
+                                <code>{scriptMap[lab.script]}</code>
+                              </pre>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
