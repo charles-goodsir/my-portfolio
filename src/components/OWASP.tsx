@@ -1,4 +1,4 @@
-import { owaspTop10 } from '../data/owasptop10'
+import { owaspTop10 } from '../data/owaspTop10'
 
 function OwaspTop10() {
   return (
