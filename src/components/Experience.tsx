@@ -14,15 +14,13 @@ const experiences: ExperienceItem[] = [
     location: 'Auckland, New Zealand',
     duration: 'Sept 2021 - Current',
     description: [
-      'Designed, coded/configured, tested, and delivered applications across multiple regions within NZ & Australia',
-      'Conducted automation testing using Gherkin scripts to validate end-to-end business processes, guaranteeing thorough quality assurance',
-      'Collaborated with cross functional domain teams to configure solutions aligning with business requirements',
-      'Worked closely with BAs, developers, configurators, product managers, and clients to deliver features in a large enterprise environment',
-      'Automated workflows using in-house power tools for local government councils',
-      'Led weekly CRM/ERP overview and training sessions and demoed new features in external sprint reviews',
-      'Optimised and remodelled configuration to improve system performance, reducing runtime from 2.5 minutes to 20 seconds',
-      'Developed technical documentation through Confluence articles to support internal releases',
-      'Provided training for associate analysts and offered continuous advice, guidance, and mentorship on duties and best practices',
+      'Designed, coded/configured, tested, and delivered enterprise CRM/ERP applications across multiple NZ and Australian regions, working within Azure DevOps CI/CD pipelines from commit through to production release',
+      'Built automation test suites using Gherkin/BDD scripts to validate end-to-end business logic - the same systematic verification mindset (input validation, edge cases, expected vs. actual behaviour) used in security testing',
+      'Partnered with BAs, developers, configurators, product managers, and clients across cross-functional teams to turn business requirements into secure, maintainable configuration',
+      'Automated manual workflows for local government councils using in-house tooling, reducing risk from manual data handling',
+      'Diagnosed and remodelled system configuration to cut runtime from 2.5 minutes to 20 seconds - root-cause analysis directly transferable to performance triage and DoS-adjacent investigation',
+      'Authored technical documentation in Confluence to support internal releases and onboarding, and led weekly CRM/ERP overview and training sessions',
+      'Mentored associate analysts on delivery best practice and provided ongoing guidance - an early taste of the knowledge-sharing culture central to security teams',
     ],
     technologies: [
       'GitHub',
@@ -42,11 +40,10 @@ const experiences: ExperienceItem[] = [
     location: 'Wellington, New Zealand',
     duration: 'Sept 2020 to Sept 2021',
     description: [
-      'Provided first-level support for Ministry of Business, Innovation and Employment - documenting each call verifying customer information',
-      'Researched, resolved, and responded to questions received via telephone calls, emails, and call-backs in a timely manner',
-      'Escalated problems to appropriate individuals when necessary',
-      'Assisted in the resolution of user and support issues among company sites to ensure timely distribution of knowledge',
-      'Maintained positive impact on user satisfaction through effective problem resolution',
+      'Provided first-line technical support for the Ministry of Business, Innovation and Employment, accurately logging and verifying case details for every call',
+      'Investigated, resolved, and escalated issues raised via phone, email, and callback within SLA windows - early exposure to structured incident handling and prioritisation',
+      'Escalated to the right specialist teams when outside first-line scope, and shared resolutions across sites to prevent repeat tickets',
+      'Built a foundation in clear, calm communication under pressure, which carries directly into reporting vulnerabilities and incidents to non-technical stakeholders',
     ],
     technologies: [
       'Customer Support',
@@ -115,87 +112,91 @@ function Experience() {
       {/* Skills Translation Section */}
       <div className="mt-12">
         <h3 className="text-2xl font-semibold mb-6">
-          Why I'm Ready for Technical Roles
+          Why I'm Ready for Application Security &amp; DevSecOps Roles
         </h3>
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-lg p-8 border-l-4 border-indigo-600">
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <h4 className="text-lg font-bold text-gray-800 mb-4">
-                Technical Foundation
+                Security Foundation
               </h4>
               <ul className="space-y-2 text-gray-700">
                 <li className="flex items-start">
                   <span className="text-indigo-600 mr-2 mt-1">•</span>
                   <span>
-                    <strong>Version Control & CI/CD:</strong> Extensive
-                    experience with GitHub, Azure DevOps, and automated
-                    deployment pipelines
+                    <strong>CompTIA Security+ (SY0-701):</strong> Certified in
+                    July 2026, covering threats, vulnerabilities, identity,
+                    risk, and secure operations
                   </span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-indigo-600 mr-2 mt-1">•</span>
                   <span>
-                    <strong>Testing & Quality Assurance:</strong> Conducted
-                    automation testing using Gherkin scripts and end-to-end
-                    validation
+                    <strong>AppSec homelab:</strong> Building a
+                    vulnerable-by-design .NET/React app wired into a CI/CD
+                    security pipeline (Semgrep SAST, OWASP Dependency-Check/Snyk
+                    SCA, OWASP ZAP DAST, gitleaks secret scanning), self-hosted
+                    on Ubuntu Server.{' '}
+                    <strong>
+                      Plans have been laid out and initial setup is in progress.
+                    </strong>
                   </span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-indigo-600 mr-2 mt-1">•</span>
                   <span>
-                    <strong>Configuration & Architecture:</strong> Designed and
-                    implemented scalable solutions across multiple regions
+                    <strong>Hands-on offensive practice:</strong> Working
+                    through PortSwigger's Web Security Academy with Burp Suite -
+                    SQL injection labs completed and documented, more in
+                    progress
                   </span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-indigo-600 mr-2 mt-1">•</span>
                   <span>
-                    <strong>Documentation & Best Practices:</strong> Created
-                    technical documentation and mentored team members
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-indigo-600 mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Security:</strong> CompTIA Security+ certified;
-                    background in structured support and enterprise-grade
-                    delivery supports secure, reliable systems
+                    <strong>Code-level fluency:</strong> 4+ years of production
+                    .NET/C# and TypeScript/React means I can read and reason
+                    about the code I'd be securing, not just the vulnerability
+                    class
                   </span>
                 </li>
               </ul>
             </div>
             <div>
               <h4 className="text-lg font-bold text-gray-800 mb-4">
-                Professional Skills
+                Engineering Foundation
               </h4>
               <ul className="space-y-2 text-gray-700">
                 <li className="flex items-start">
                   <span className="text-indigo-600 mr-2 mt-1">•</span>
                   <span>
-                    <strong>Problem Solving:</strong> Optimized system
-                    performance, reducing runtime from 2.5 minutes to 20 seconds
+                    <strong>CI/CD & release delivery:</strong> Version control,
+                    pipelines, and release management across GitHub and Azure
+                    DevOps for multi-region enterprise systems
                   </span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-indigo-600 mr-2 mt-1">•</span>
                   <span>
-                    <strong>Cross-functional Collaboration:</strong> Worked with
-                    BAs, developers, product managers, and clients in enterprise
-                    environments
+                    <strong>Full-stack ownership:</strong> Independently shipped
+                    Detour (React Native, TypeScript, Supabase), live on the App
+                    Store - end-to-end ownership from UI to auth and data layer
                   </span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-indigo-600 mr-2 mt-1">•</span>
                   <span>
-                    <strong>Leadership & Training:</strong> Led training
-                    sessions and provided mentorship to junior team members
+                    <strong>Systematic testing mindset:</strong> BDD/Gherkin
+                    automation experience translates directly into writing and
+                    validating security test cases
                   </span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-indigo-600 mr-2 mt-1">•</span>
                   <span>
-                    <strong>Agile Methodology:</strong> Experienced in agile
-                    development processes and sprint-based delivery
+                    <strong>Cross-functional delivery:</strong> Proven at
+                    translating business requirements into working, documented
+                    solutions across BAs, developers, and product teams
                   </span>
                 </li>
               </ul>
@@ -204,12 +205,14 @@ function Experience() {
           <div className="mt-6 p-4 bg-white rounded-lg border border-indigo-200">
             <p className="text-gray-700 text-center font-medium">
               <strong>
-                Combined with my recent Full Stack Development training at Dev
-                Academy Aotearoa and CompTIA Security+ certification,
-              </strong>
-              these experiences support both hands-on software roles and
-              security-aware IT paths, with technical depth, disciplined
-              delivery, and a growing focus on resilient systems.
+                Combined with Full Stack Development training at Dev Academy
+                Aotearoa, CompTIA Security+, and a self-directed AppSec homelab
+                and Web Security Academy practice,
+              </strong>{' '}
+              this background is aimed at Application Security Engineer, Product
+              Security Engineer, and DevSecOps Engineer roles - bringing real
+              application development experience to the security side, rather
+              than security knowledge without the code background to back it up.
             </p>
           </div>
         </div>
