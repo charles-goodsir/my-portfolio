@@ -37,6 +37,40 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'portswigger-xss-labs-1',
+    date: '2026-07-30',
+    category: 'PortSwigger Labs',
+    vulnType: 'XSS',
+    title: 'Cross-Site Scripting (XSS) lab 1 (reflected XSS)',
+    workedOn: [
+      'Started the PortSwigger Cross-Site Scripting (XSS) learning path',
+      'Completed Lab 1: reflected XSS into an HTML context with nothing encoded',
+    ],
+    body: [
+      'First attempt at XSS after finishing the SQL injection path. Different mental model to SQLi - instead of manipulating a database query, the goal is getting the browser itself to execute a script that gets reflected back into the page unencoded.',
+      'Went in with a rough idea from JavaScript that a <script> tag triggers execution, but the specifics of what actually fires in a browser context took a bit of trial and error.',
+    ],
+    screenshot: 'Burp/Lab1XSS.png',
+    labs: [
+      {
+        title: 'Lab 1: Reflected XSS into HTML context with nothing encoded',
+        notes: [
+          "Started with <script>alert</script> - failed. Referencing alert on its own doesn't call it, it just refers to the function.",
+          'Realised alert needs to actually be invoked as a function call: <script>alert(1)</script> - this fired the alert and solved the lab.',
+          'Takeaway: the payload needs to be valid, executable JavaScript, not just the presence of a <script> tag - the same rule as writing normal JS in a console.',
+        ],
+        solution: '<script>alert(1)</script>',
+        status: 'completed',
+      },
+    ],
+    tools: ['Web Browser', 'Burp Suite'],
+    tags: ['XSS', 'reflected XSS', 'JavaScript'],
+    link: {
+      label: 'Cross-site scripting (XSS)',
+      url: 'https://portswigger.net/web-security/cross-site-scripting',
+    },
+  },
+  {
     id: 'portswigger-sqli-path-complete',
     date: '2026-07-30',
     category: 'PortSwigger Labs',

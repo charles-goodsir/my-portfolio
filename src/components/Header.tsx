@@ -10,6 +10,7 @@ function Header({ activeSection, setActiveSection }: HeaderProps) {
     { id: 'experience', label: 'Experience' },
     { id: 'projects', label: 'Projects' },
     { id: 'cyberdiary', label: 'CyberDiary' },
+    { id: 'owasptop10', label: 'OWASP Top 10' },
     { id: 'contact', label: 'Contact' },
   ]
 

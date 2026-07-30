@@ -11,6 +11,7 @@ import FlightTracker from './components/Projects/FlightTracker'
 import NewsDashboard from './components/Projects/NewsDashboard'
 import Airbnb from './components/Projects/Airbnb'
 import FinanceTracker from './components/Projects/FinanceTracker'
+import OwaspTop10 from './components/OWASP'
 
 function App() {
   const [activeSection, setActiveSection] = useState('home')
@@ -27,6 +28,8 @@ function App() {
         return <Projects setActiveSection={setActiveSection} />
       case 'cyberdiary':
         return <CyberDiary />
+      case 'owasptop10':
+        return <OwaspTop10 />
       case 'contact':
         return <Contact />
       case 'project-detour':

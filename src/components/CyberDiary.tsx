@@ -31,25 +31,24 @@ function formatDate(isoDate: string) {
 }
 
 function CyberDiary() {
-  const [activeCategory, setActiveCategory] = useState('All')
-
-  const categories = useMemo(() => {
+  const [activeVulnType, setActiveVulnType] = useState('All')
+  const vulnTypes = useMemo(() => {
     const unique = [
-      ...new Set(cyberDiaryEntries.map((entry) => entry.category)),
+      ...new Set(cyberDiaryEntries.map((entry) => entry.vulnType)),
     ]
     return ['All', ...unique]
   }, [])
 
   const entries = useMemo(() => {
     const filtered =
-      activeCategory === 'All'
+      activeVulnType === 'All'
         ? cyberDiaryEntries
-        : cyberDiaryEntries.filter((entry) => entry.category === activeCategory)
+        : cyberDiaryEntries.filter((entry) => entry.vulnType === activeVulnType)
 
     return [...filtered].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     )
-  }, [activeCategory])
+  }, [activeVulnType])
 
   return (
     <section id="cyberdiary" className="max-w-3xl mx-auto py-12 px-4">
@@ -63,17 +62,17 @@ function CyberDiary() {
       </header>
 
       <div className="flex flex-wrap gap-2 mb-10">
-        {categories.map((category) => (
+        {vulnTypes.map((vulnType) => (
           <button
-            key={category}
-            onClick={() => setActiveCategory(category)}
+            key={vulnType}
+            onClick={() => setActiveVulnType(vulnType)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
-              activeCategory === category
-                ? 'bg-emerald-600 text-white'
+              activeVulnType === vulnType
+                ? 'bg-violet-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            {category}
+            {vulnType}
           </button>
         ))}
       </div>
@@ -81,7 +80,7 @@ function CyberDiary() {
       <div className="space-y-10">
         {entries.length === 0 ? (
           <p className="text-gray-500 text-center py-12">
-            No entries in this category yet.
+            No entries for this category yet.
           </p>
         ) : (
           entries.map((entry) => (
@@ -89,21 +88,21 @@ function CyberDiary() {
               key={entry.id}
               className="bg-white rounded-lg shadow-lg overflow-hidden"
             >
-              <div className="bg-emerald-50 border-b border-emerald-100 px-6 py-4">
+              <div className="bg-violet-50 border-b border-violet-100 px-6 py-4">
                 <time
                   dateTime={entry.date}
-                  className="text-sm font-medium text-emerald-800"
+                  className="text-sm font-medium text-violet-800"
                 >
                   {formatDate(entry.date)}
                 </time>
                 <h3 className="text-xl font-bold text-gray-800 mt-1">
                   {entry.title}
                 </h3>
-                <span className="inline-block mt-2 bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+                <span className="inline-block mt-2 bg-violet-100 text-violet-800 px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
                   {entry.category}
                 </span>
                 {entry.milestone && (
-                  <span className="inline-block mt-2 ml-2 bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+                  <span className="inline-block mt-2 ml-2 bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
                     ✓ Path complete
                   </span>
                 )}
@@ -120,7 +119,7 @@ function CyberDiary() {
                         key={item}
                         className="text-gray-700 text-sm flex items-start"
                       >
-                        <span className="text-emerald-600 mr-2 mt-0.5 shrink-0">
+                        <span className="text-violet-600 mr-2 mt-0.5 shrink-0">
                           •
                         </span>
                         {item}
@@ -167,7 +166,7 @@ function CyberDiary() {
                                 key={`${entry.id}-lab-${index}-note-${noteIndex}`}
                                 className="text-gray-700 text-sm flex items-start"
                               >
-                                <span className="text-emerald-600 mr-2 mt-0.5 shrink-0">
+                                <span className="text-violet-600 mr-2 mt-0.5 shrink-0">
                                   •
                                 </span>
                                 {note}
@@ -178,7 +177,7 @@ function CyberDiary() {
                             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                               Solution
                             </p>
-                            <pre className="bg-gray-900 text-emerald-300 text-xs rounded p-3 overflow-x-auto whitespace-pre-wrap font-mono leading-relaxed">
+                            <pre className="bg-gray-900 text-violet-300 text-xs rounded p-3 overflow-x-auto whitespace-pre-wrap font-mono leading-relaxed">
                               {lab.solution}
                             </pre>
                           </div>
@@ -200,7 +199,7 @@ function CyberDiary() {
                               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                                 Script
                               </p>
-                              <pre className="bg-gray-900 text-emerald-300 text-xs rounded p-3 overflow-x-auto whitespace-pre font-mono leading-relaxed">
+                              <pre className="bg-gray-900 text-violet-300 text-xs rounded p-3 overflow-x-auto whitespace-pre font-mono leading-relaxed">
                                 <code>{scriptMap[lab.script]}</code>
                               </pre>
                             </div>
@@ -236,7 +235,7 @@ function CyberDiary() {
                         {entry.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="inline-block bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded text-xs mr-1.5 mb-1"
+                            className="inline-block bg-violet-50 text-violet-800 px-2 py-0.5 rounded text-xs mr-1.5 mb-1"
                           >
                             {tag}
                           </span>
@@ -251,7 +250,7 @@ function CyberDiary() {
                     href={entry.link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block text-emerald-700 hover:text-emerald-900 text-sm font-medium underline underline-offset-2"
+                    className="inline-block text-violet-700 hover:text-violet-900 text-sm font-medium underline underline-offset-2"
                   >
                     {entry.link.label} →
                   </a>
