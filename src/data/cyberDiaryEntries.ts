@@ -41,7 +41,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-07-30',
     category: 'PortSwigger Labs',
     vulnType: 'XSS',
-    title: 'Cross-Site Scripting (XSS) lab 1 (reflected XSS)',
+    title: 'Cross-Site Scripting (XSS) Lab 1 (reflected XSS)',
     workedOn: [
       'Started the PortSwigger Cross-Site Scripting (XSS) learning path',
       'Completed Lab 1: reflected XSS into an HTML context with nothing encoded',
