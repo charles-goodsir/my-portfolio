@@ -1,6 +1,17 @@
 import { owaspTop10 } from '../data/owaspTop10'
 
-function OwaspTop10() {
+const progressStyles: Record<string, string> = {
+  'Not started': 'bg-gray-100 text-gray-700',
+  Planned: 'bg-blue-100 text-blue-800',
+  'In progress': 'bg-amber-100 text-amber-800',
+  Completed: 'bg-green-100 text-green-800',
+}
+
+interface OwaspTop10Props {
+  navigateToDiary: (vulnType: string) => void
+}
+
+function OwaspTop10({ navigateToDiary }: OwaspTop10Props) {
   return (
     <section id="owasp-top-10" className="max-w-3xl mx-auto py-12 px-4">
       <header className="mb-10">
@@ -23,6 +34,13 @@ function OwaspTop10() {
               <span className="inline-block bg-orange-100 text-orange-800 px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
                 {risk.rank}
               </span>
+              {risk.progress && (
+                <span
+                  className={`inline-block ml-2 px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide ${progressStyles[risk.progress]}`}
+                >
+                  {risk.progress}
+                </span>
+              )}
               <h3 className="text-xl font-bold text-gray-800 mt-1">
                 {risk.title}
               </h3>
@@ -83,12 +101,12 @@ function OwaspTop10() {
               </div>
 
               {risk.relatedDiaryVulnType && (
-                <a
-                  href="#cyberdiary"
+                <button
+                  onClick={() => navigateToDiary(risk.relatedDiaryVulnType!)}
                   className="inline-block text-orange-700 hover:text-orange-900 text-sm font-medium underline underline-offset-2"
                 >
                   See my {risk.relatedDiaryVulnType} lab write-ups →
-                </a>
+                </button>
               )}
             </div>
           </article>

@@ -15,6 +15,12 @@ import OwaspTop10 from './components/OWASP'
 
 function App() {
   const [activeSection, setActiveSection] = useState('home')
+  const [scrollToVulnType, setScrollToVulnType] = useState<string | null>(null)
+
+  const navigateToDiary = (vulnType: string) => {
+    setScrollToVulnType(vulnType)
+    setActiveSection('cyberdiary')
+  }
 
   const renderSection = () => {
     switch (activeSection) {
@@ -27,9 +33,14 @@ function App() {
       case 'projects':
         return <Projects setActiveSection={setActiveSection} />
       case 'cyberdiary':
-        return <CyberDiary />
+        return (
+          <CyberDiary
+            scrollToVulnType={scrollToVulnType}
+            onScrollHandled={() => setScrollToVulnType(null)}
+          />
+        )
       case 'owasptop10':
-        return <OwaspTop10 />
+        return <OwaspTop10 navigateToDiary={navigateToDiary} />
       case 'contact':
         return <Contact />
       case 'project-detour':

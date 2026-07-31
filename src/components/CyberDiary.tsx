@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { cyberDiaryEntries } from '../data/cyberDiaryEntries'
 import sqliSolver from '../assets/LabScripts/sqli_solver.py?raw'
 import lab12Script from '../assets/LabScripts/lab12.py?raw'
@@ -30,7 +30,12 @@ function formatDate(isoDate: string) {
   })
 }
 
-function CyberDiary() {
+interface CyberDiaryProps {
+  scrollToVulnType?: string | null
+  onScrollHandled?: () => void
+}
+
+function CyberDiary({ scrollToVulnType, onScrollHandled }: CyberDiaryProps) {
   const [activeVulnType, setActiveVulnType] = useState('All')
   const vulnTypes = useMemo(() => {
     const unique = [
@@ -38,6 +43,24 @@ function CyberDiary() {
     ]
     return ['All', ...unique]
   }, [])
+
+  useEffect(() => {
+    if (!scrollToVulnType) return
+
+    const latestMatch = [...cyberDiaryEntries]
+      .filter((entry) => entry.vulnType === scrollToVulnType)
+      .sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      )[0]
+
+    if (latestMatch) {
+      document
+        .getElementById(latestMatch.id)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+
+    onScrollHandled?.()
+  }, [scrollToVulnType, onScrollHandled])
 
   const entries = useMemo(() => {
     const filtered =
@@ -86,6 +109,7 @@ function CyberDiary() {
           entries.map((entry) => (
             <article
               key={entry.id}
+              id={entry.id}
               className="bg-white rounded-lg shadow-lg overflow-hidden"
             >
               <div className="bg-violet-50 border-b border-violet-100 px-6 py-4">
