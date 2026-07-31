@@ -17,7 +17,7 @@ This site doubles as a running log of that pivot — not just a static resume, b
 - **Experience** — professional background, reframed toward AppSec/DevSecOps, plus education and certifications
 - **CyberDiary** — a dated log of security labs completed, with write-ups, solutions, screenshots, and scripts, filterable by vulnerability type
 - **OWASP Top 10 (2025)** — a reference page covering all ten categories, with what I'm actively doing to learn each one
-- **Projects** — including [Detour](https://apps.apple.com/), a React Native app I shipped independently to the App Store, and other full-stack builds
+- **Projects** — including [Detour](https://apps.apple.com/us/app/detour/id6743507600), a React Native app I shipped independently to the App Store, and other full-stack builds
 
 ## Tech Stack
 
@@ -42,14 +42,6 @@ To build for production:
 ```bash
 npm run build
 ```
-
-## Project Structure
-
-src/
-├── components/ # Page sections (Experience, CyberDiary, OWASP, Projects, etc.)
-│ └── Projects/ # Individual project detail pages
-├── data/ # Content data (cyberDiaryEntries.ts, owaspTop10.ts)
-└── assets/ # Screenshots and lab scripts referenced in CyberDiary
 
 ## Connect
 
