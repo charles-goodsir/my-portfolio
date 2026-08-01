@@ -29,6 +29,7 @@ export interface DiaryEntry {
   link?: { label: string; url: string }
   milestone?: boolean
   screenshot?: string
+  screenshots?: string[]
 }
 
 /**
@@ -36,6 +37,54 @@ export interface DiaryEntry {
  * Keep dates as YYYY-MM-DD so sorting stays correct.
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
+  {
+    id: 'appsec-homelab-entry-4-first-pipeline-run',
+    date: '2026-08-01',
+    category: 'AppSec Homelab',
+    vulnType: 'AppSec Homelab',
+    title:
+      'AppSec Homelab Entry 4: building the vulnerable app and running the first pipeline scan',
+    workedOn: [
+      'Built a bare-bones vulnerable-by-design app (.NET/C# backend, TypeScript/React frontend) to test what I learned in the PortSwigger SQLi and XSS labs',
+      'Debugged the app from first build errors through to a working login and product search',
+      'Manually confirmed the SQLi login bypass and reflected XSS both work as intended',
+      'Added a GitHub Actions workflow running Semgrep, and fixed the first real finding it produced',
+    ],
+    body: [
+      "Started today by testing out what I've learned from the labs with SQLi and XSS. Created a new repo specifically for an app that's deliberately vulnerable to these attacks - a bare-bones product search on the main page, with a login that can be bypassed via SQLi.",
+      "Haven't done C# in a while, so this doubled as shaking off the cobwebs. Had some assistance from Claude to help jog my memory on different things. Hit a lot of errors getting it building for the first time - login didn't work, product search didn't work. Most were easy fixes once I found them: references not resolving, spelling mistakes, and issues connecting the backend to the frontend.",
+      "Once it was up and running, I could actually test what I'd learned: logging in with administrator'-- and a random password logged me in as admin, and searching <img src=x onerror=alert(1)> triggered the alert. One thing the PortSwigger labs never show is what the code actually looks like behind a vulnerability like this - seeing the raw string concatenation that causes it was genuinely useful in a way reading about it isn't.",
+      'After committing everything, I set up a GitHub Actions workflow with Semgrep to catch issues automatically. It picked up the SQL injection in ProductsController.cs immediately, which was great to see work. It did NOT flag the XSS in the frontend, though - something to dig into and tweak the ruleset for next time.',
+      'The genuinely unexpected find was a second blocking issue, unrelated to the app itself: the workflow file was using a mutable actions/checkout@v4 tag rather than a pinned commit SHA, which Semgrep flagged as a supply chain risk (A03:2025 - Software Supply Chain Failures) - tags and branch refs can be silently repointed by the action owner, which is exactly how the trivy-action and kics-github-action compromises happened. Fixed it by pinning to the full SHA: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.',
+      "That's as far as I got this round. Next step is figuring out why the XSS didn't get flagged and tweaking the Semgrep config to catch it too.",
+    ],
+    tools: [
+      '.NET / C#',
+      'TypeScript',
+      'React',
+      'SQLite',
+      'GitHub Actions',
+      'Semgrep',
+    ],
+    tags: [
+      'AppSec homelab',
+      'SQL injection',
+      'XSS',
+      'CI/CD pipeline',
+      'Semgrep',
+      'software supply chain',
+    ],
+    link: {
+      label: 'appsec-homelab repo',
+      url: 'https://github.com/charles-goodsir/appsec-homelab',
+    },
+    screenshots: [
+      'Homelab/SQLiHomeLabDay1.png',
+      'Homelab/XSSHomeLabDay1.png',
+      'Homelab/WorkflowRunningDay1.png',
+      'Homelab/FirstWorkflowResultDay1.png',
+    ],
+  },
   {
     id: 'portswigger-xss-labs-1',
     date: '2026-07-30',

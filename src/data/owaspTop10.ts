@@ -43,17 +43,19 @@ export const owaspTop10: OwaspRisk[] = [
   {
     rank: 'A03:2025',
     title: 'Software Supply Chain Failures',
-    progress: 'Planned',
+    progress: 'In progress',
     summary:
       'New in 2025. Risks introduced through third-party dependencies, build pipelines, and CI/CD tooling - compromised packages, unsigned artifacts, and weak build integrity.',
     whyItMatters:
       'Directly relevant to your homelab pipeline - this is exactly what Dependency-Check/Snyk (SCA) and gitleaks are there to catch before a bad dependency or leaked secret reaches production.',
     howToLearnIt: [
-      'Homelab CI/CD pipeline is planned but not built yet - once it exists, wire in Dependency-Check or Snyk to gate builds',
-      'Learn what an SBOM (Software Bill of Materials) is, and generate one once the homelab app exists',
-      'Read up on real supply-chain incidents (e.g. compromised npm/PyPI packages) to understand the attack pattern',
+      "Ran Semgrep against my own homelab's GitHub Actions workflow and it flagged the checkout action using a mutable @v4 tag rather than a pinned commit SHA - a real, unprompted example of exactly this risk category",
+      'Fixed it by pinning to the full commit SHA (actions/checkout@8ade135a...) instead of a floating tag',
+      'Next: wire Dependency-Check or Snyk into the same pipeline to cover dependency-level supply chain risk, not just pipeline config',
+      'Learn what an SBOM (Software Bill of Materials) is, and generate one for the homelab app',
     ],
     tools: ['OWASP Dependency-Check', 'Snyk', 'gitleaks', 'Syft/SBOM tooling'],
+    relatedDiaryVulnType: 'AppSec Homelab',
   },
   {
     rank: 'A04:2025',
@@ -81,8 +83,9 @@ export const owaspTop10: OwaspRisk[] = [
     howToLearnIt: [
       'Completed the PortSwigger SQL injection path (15 of 17 labs - 2 remain blocked behind Burp Pro)',
       'Currently working through the PortSwigger XSS path',
+      'Built a deliberately vulnerable .NET/React app and reproduced both SQL injection (login bypass) and reflected XSS in my own code, confirming what the labs teach translates to a real codebase',
+      'Wired Semgrep into a GitHub Actions pipeline - it correctly caught the seeded SQLi but missed the seeded XSS, which is now something to dig into (rule coverage gap or payload needs adjusting)',
       'Planning to move on to Command Injection and NoSQL Injection labs after XSS',
-      'Once the homelab pipeline exists, add a Semgrep rule set for injection patterns and see what it flags',
     ],
     tools: [
       'Burp Suite',

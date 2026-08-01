@@ -10,10 +10,10 @@ const scriptMap: Record<string, string> = {
   'LabScripts/lab14.py': lab14Script,
 }
 
-const screenshotModules = import.meta.glob('../assets/Burp/*.png', {
-  eager: true,
-  import: 'default',
-}) as Record<string, string>
+const screenshotModules = import.meta.glob(
+  ['../assets/Burp/*.png', '../assets/Homelab/*.png'],
+  { eager: true, import: 'default' },
+) as Record<string, string>
 
 function resolveScreenshot(screenshot?: string) {
   if (!screenshot) return undefined
@@ -162,17 +162,23 @@ function CyberDiary({ scrollToVulnType, onScrollHandled }: CyberDiaryProps) {
                         {paragraph}
                       </p>
                     ))}
-                    {entry.screenshot &&
-                      resolveScreenshot(entry.screenshot) && (
-                        <img
-                          src={resolveScreenshot(entry.screenshot)}
-                          alt={`${entry.title} screenshot`}
-                          className="rounded border border-gray-200 max-w-full"
-                        />
-                      )}
+                    {entry.screenshots && entry.screenshots.length > 0 && (
+                      <div className="space-y-3">
+                        {entry.screenshots.map(
+                          (screenshot) =>
+                            resolveScreenshot(screenshot) && (
+                              <img
+                                key={screenshot}
+                                src={resolveScreenshot(screenshot)}
+                                alt={`${entry.title} screenshot`}
+                                className="rounded border border-gray-200 w-full h-auto"
+                              />
+                            ),
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
-
                 {entry.labs && entry.labs.length > 0 && (
                   <div className="space-y-6 pt-1">
                     {entry.labs.map((lab, index) => (
