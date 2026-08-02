@@ -7,6 +7,7 @@ export interface OwaspRisk {
   tools: string[]
   relatedDiaryVulnType?: string
   progress?: 'Not started' | 'Planned' | 'In progress' | 'Completed'
+  relatedDiaryLinks?: { label: string; entryId: string; vulnType: string }[]
 }
 
 export const owaspTop10: OwaspRisk[] = [
@@ -55,7 +56,13 @@ export const owaspTop10: OwaspRisk[] = [
       'Learn what an SBOM (Software Bill of Materials) is, and generate one for the homelab app',
     ],
     tools: ['OWASP Dependency-Check', 'Snyk', 'gitleaks', 'Syft/SBOM tooling'],
-    relatedDiaryVulnType: 'AppSec Homelab',
+    relatedDiaryLinks: [
+      {
+        label: 'AppSec Homelab',
+        entryId: 'appsec-homelab-entry-4-first-pipeline-run',
+        vulnType: 'AppSec Homelab',
+      },
+    ],
   },
   {
     rank: 'A04:2025',
@@ -92,7 +99,19 @@ export const owaspTop10: OwaspRisk[] = [
       'Semgrep',
       'sqlmap (for understanding, use ethically)',
     ],
-    relatedDiaryVulnType: 'SQL Injection',
+    relatedDiaryLinks: [
+      {
+        label: 'SQL Injection labs',
+        entryId: 'portswigger-sqli-path-complete',
+        vulnType: 'SQL Injection',
+      },
+      { label: 'XSS labs', entryId: 'portswigger-xss-labs-1', vulnType: 'XSS' },
+      {
+        label: 'AppSec Homelab',
+        entryId: 'appsec-homelab-entry-4-first-pipeline-run',
+        vulnType: 'AppSec Homelab',
+      },
+    ],
   },
   {
     rank: 'A06:2025',

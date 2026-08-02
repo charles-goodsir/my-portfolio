@@ -31,47 +31,64 @@ function formatDate(isoDate: string) {
 }
 
 interface CyberDiaryProps {
+  scrollToEntryId?: string | null
   scrollToVulnType?: string | null
   onScrollHandled?: () => void
 }
 
-function CyberDiary({ scrollToVulnType, onScrollHandled }: CyberDiaryProps) {
-  const [activeVulnType, setActiveVulnType] = useState('All')
-  const vulnTypes = useMemo(() => {
+function CyberDiary({
+  scrollToEntryId,
+  scrollToVulnType,
+  onScrollHandled,
+}: CyberDiaryProps) {
+  const [selectedVulnTypes, setSelectedVulnTypes] = useState<string[]>([])
+
+  const toggleVulnType = (vulnType: string) => {
+    if (vulnType === 'All') {
+      setSelectedVulnTypes([])
+      return
+    }
+    setSelectedVulnTypes((prev) =>
+      prev.includes(vulnType)
+        ? prev.filter((v) => v !== vulnType)
+        : [...prev, vulnType],
+    )
+  }
+  useEffect(() => {
+    if (!scrollToEntryId) return
+
+    if (scrollToVulnType) {
+      setSelectedVulnTypes([scrollToVulnType])
+    }
+
+    const timeoutId = setTimeout(() => {
+      document
+        .getElementById(scrollToEntryId)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      onScrollHandled?.()
+    }, 150)
+
+    return () => clearTimeout(timeoutId)
+  }, [scrollToEntryId, scrollToVulnType, onScrollHandled])
+  const vulnTypesList = useMemo(() => {
     const unique = [
-      ...new Set(cyberDiaryEntries.map((entry) => entry.vulnType)),
+      ...new Set(cyberDiaryEntries.flatMap((entry) => entry.vulnTypes)),
     ]
     return ['All', ...unique]
   }, [])
 
-  useEffect(() => {
-    if (!scrollToVulnType) return
-
-    const latestMatch = [...cyberDiaryEntries]
-      .filter((entry) => entry.vulnType === scrollToVulnType)
-      .sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-      )[0]
-
-    if (latestMatch) {
-      document
-        .getElementById(latestMatch.id)
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-
-    onScrollHandled?.()
-  }, [scrollToVulnType, onScrollHandled])
-
   const entries = useMemo(() => {
     const filtered =
-      activeVulnType === 'All'
+      selectedVulnTypes.length === 0
         ? cyberDiaryEntries
-        : cyberDiaryEntries.filter((entry) => entry.vulnType === activeVulnType)
+        : cyberDiaryEntries.filter((entry) =>
+            entry.vulnTypes.some((vt) => selectedVulnTypes.includes(vt)),
+          )
 
     return [...filtered].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     )
-  }, [activeVulnType])
+  }, [selectedVulnTypes])
 
   return (
     <section id="cyberdiary" className="max-w-3xl mx-auto py-12 px-4">
@@ -85,19 +102,26 @@ function CyberDiary({ scrollToVulnType, onScrollHandled }: CyberDiaryProps) {
       </header>
 
       <div className="flex flex-wrap gap-2 mb-10">
-        {vulnTypes.map((vulnType) => (
-          <button
-            key={vulnType}
-            onClick={() => setActiveVulnType(vulnType)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
-              activeVulnType === vulnType
-                ? 'bg-violet-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {vulnType}
-          </button>
-        ))}
+        {vulnTypesList.map((vulnType) => {
+          const isActive =
+            vulnType === 'All'
+              ? selectedVulnTypes.length === 0
+              : selectedVulnTypes.includes(vulnType)
+
+          return (
+            <button
+              key={vulnType}
+              onClick={() => toggleVulnType(vulnType)}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
+                isActive
+                  ? 'bg-violet-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {vulnType}
+            </button>
+          )
+        })}
       </div>
 
       <div className="space-y-10">
@@ -110,7 +134,7 @@ function CyberDiary({ scrollToVulnType, onScrollHandled }: CyberDiaryProps) {
             <article
               key={entry.id}
               id={entry.id}
-              className="bg-white rounded-lg shadow-lg overflow-hidden"
+              className="bg-white rounded-lg shadow-lg overflow-hidden scroll-mt-24"
             >
               <div className="bg-violet-50 border-b border-violet-100 px-6 py-4">
                 <time
@@ -162,20 +186,29 @@ function CyberDiary({ scrollToVulnType, onScrollHandled }: CyberDiaryProps) {
                         {paragraph}
                       </p>
                     ))}
-                    {entry.screenshots && entry.screenshots.length > 0 && (
-                      <div className="space-y-3">
-                        {entry.screenshots.map(
-                          (screenshot) =>
-                            resolveScreenshot(screenshot) && (
-                              <img
-                                key={screenshot}
-                                src={resolveScreenshot(screenshot)}
-                                alt={`${entry.title} screenshot`}
-                                className="rounded border border-gray-200 w-full h-auto"
-                              />
-                            ),
-                        )}
-                      </div>
+                  </div>
+                )}
+
+                {entry.screenshot && resolveScreenshot(entry.screenshot) && (
+                  <img
+                    src={resolveScreenshot(entry.screenshot)}
+                    alt={`${entry.title} screenshot`}
+                    className="rounded border border-gray-200 w-full h-auto"
+                  />
+                )}
+
+                {entry.screenshots && entry.screenshots.length > 0 && (
+                  <div className="space-y-3">
+                    {entry.screenshots.map(
+                      (screenshot) =>
+                        resolveScreenshot(screenshot) && (
+                          <img
+                            key={screenshot}
+                            src={resolveScreenshot(screenshot)}
+                            alt={`${entry.title} screenshot`}
+                            className="rounded border border-gray-200 w-full h-auto"
+                          />
+                        ),
                     )}
                   </div>
                 )}

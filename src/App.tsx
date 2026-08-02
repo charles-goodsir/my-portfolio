@@ -14,10 +14,12 @@ import FinanceTracker from './components/Projects/FinanceTracker'
 import OwaspTop10 from './components/OWASP'
 
 function App() {
-  const [activeSection, setActiveSection] = useState('home')
+  const [scrollToEntryId, setScrollToEntryId] = useState<string | null>(null)
   const [scrollToVulnType, setScrollToVulnType] = useState<string | null>(null)
+  const [activeSection, setActiveSection] = useState('home')
 
-  const navigateToDiary = (vulnType: string) => {
+  const navigateToDiary = (entryId: string, vulnType: string) => {
+    setScrollToEntryId(entryId)
     setScrollToVulnType(vulnType)
     setActiveSection('cyberdiary')
   }
@@ -35,8 +37,12 @@ function App() {
       case 'cyberdiary':
         return (
           <CyberDiary
+            scrollToEntryId={scrollToEntryId}
             scrollToVulnType={scrollToVulnType}
-            onScrollHandled={() => setScrollToVulnType(null)}
+            onScrollHandled={() => {
+              setScrollToEntryId(null)
+              setScrollToVulnType(null)
+            }}
           />
         )
       case 'owasptop10':

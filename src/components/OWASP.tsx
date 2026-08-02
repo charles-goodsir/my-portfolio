@@ -8,9 +8,8 @@ const progressStyles: Record<string, string> = {
 }
 
 interface OwaspTop10Props {
-  navigateToDiary: (vulnType: string) => void
+  navigateToDiary: (entryId: string, vulnType: string) => void
 }
-
 function OwaspTop10({ navigateToDiary }: OwaspTop10Props) {
   return (
     <section id="owasp-top-10" className="max-w-3xl mx-auto py-12 px-4">
@@ -100,13 +99,20 @@ function OwaspTop10({ navigateToDiary }: OwaspTop10Props) {
                 </div>
               </div>
 
-              {risk.relatedDiaryVulnType && (
-                <button
-                  onClick={() => navigateToDiary(risk.relatedDiaryVulnType!)}
-                  className="inline-block text-orange-700 hover:text-orange-900 text-sm font-medium underline underline-offset-2"
-                >
-                  See my {risk.relatedDiaryVulnType} lab write-ups →
-                </button>
+              {risk.relatedDiaryLinks && risk.relatedDiaryLinks.length > 0 && (
+                <div className="flex flex-wrap gap-4 pt-1">
+                  {risk.relatedDiaryLinks.map((link) => (
+                    <button
+                      key={link.entryId}
+                      onClick={() =>
+                        navigateToDiary(link.entryId, link.vulnType)
+                      }
+                      className="text-orange-700 hover:text-orange-900 text-sm font-medium underline underline-offset-2"
+                    >
+                      See {link.label} →
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
           </article>

@@ -16,7 +16,7 @@ export interface DiaryEntry {
   date: string
   category: string
   /** Broad vulnerability class this entry belongs to, used for filtering (e.g. 'SQL Injection', 'XSS'). */
-  vulnType: string
+  vulnTypes: string[]
   title: string
   /** What you actually did that day. */
   workedOn: string[]
@@ -41,7 +41,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'appsec-homelab-entry-4-first-pipeline-run',
     date: '2026-08-01',
     category: 'AppSec Homelab',
-    vulnType: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab', 'SQL Injection', 'XSS'],
     title:
       'AppSec Homelab Entry 4: building the vulnerable app and running the first pipeline scan',
     workedOn: [
@@ -89,7 +89,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'portswigger-xss-labs-1',
     date: '2026-07-30',
     category: 'PortSwigger Labs',
-    vulnType: 'XSS',
+    vulnTypes: ['XSS'],
     title: 'Cross-Site Scripting (XSS) Lab 1 (reflected XSS)',
     workedOn: [
       'Started the PortSwigger Cross-Site Scripting (XSS) learning path',
@@ -123,7 +123,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'portswigger-sqli-path-complete',
     date: '2026-07-30',
     category: 'PortSwigger Labs',
-    vulnType: 'SQL Injection',
+    vulnTypes: ['SQL Injection'],
     milestone: true,
     title: 'SQL Injection learning path: complete (Community Edition)',
     workedOn: [
@@ -153,7 +153,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'portswigger-sqli-labs-13-17',
     date: '2026-07-30',
     category: 'PortSwigger Labs',
-    vulnType: 'SQL Injection',
+    vulnTypes: ['SQL Injection'],
     title:
       'SQL Injection labs 13-17 (error-based, time-based blind, WAF bypass)',
     workedOn: [
@@ -249,7 +249,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'portswigger-sqli-labs-11-12',
     date: '2026-07-29',
     category: 'PortSwigger Labs',
-    vulnType: 'SQL Injection',
+    vulnTypes: ['SQL Injection'],
     title: 'SQL Injection labs 11-12 (blind, conditional responses and errors)',
     workedOn: [
       'Completed labs 11 and 12 on the PortSwigger SQL injection path',
@@ -310,7 +310,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'portswigger-sqli-labs-1-10',
     date: '2026-07-28',
     category: 'PortSwigger Labs',
-    vulnType: 'SQL Injection',
+    vulnTypes: ['SQL Injection'],
     title: 'SQL Injection labs 1-10 (Burp Suite)',
     workedOn: [
       'Completed labs 1-10 on the PortSwigger SQL injection path',
@@ -475,14 +475,13 @@ export const cyberDiaryEntries: DiaryEntry[] = [
 
 /** Distinct vulnerability classes present in the diary, in the order they first appear. Feed this into a filter dropdown/tabs. */
 export const vulnTypes: string[] = Array.from(
-  new Set(cyberDiaryEntries.map((entry) => entry.vulnType)),
+  new Set(cyberDiaryEntries.flatMap((entry) => entry.vulnTypes)),
 )
 
-/** Returns entries matching a vulnType, or all entries when type is null/'All'. */
 export function filterEntriesByVulnType(
   entries: DiaryEntry[],
   vulnType: string | null,
 ): DiaryEntry[] {
   if (!vulnType || vulnType === 'All') return entries
-  return entries.filter((entry) => entry.vulnType === vulnType)
+  return entries.filter((entry) => entry.vulnTypes.includes(vulnType))
 }
