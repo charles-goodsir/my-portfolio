@@ -38,6 +38,68 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'appsec-homelab-entry-6-documented-false-negative',
+    date: '2026-08-06',
+    category: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab', 'SQL Injection'],
+    title:
+      'AppSec Homelab Entry 6: leaving the AuthController SQLi as a documented false negative',
+    workedOn: [
+      'Reverted AuthController.cs back to its original, realistic [FromBody] login endpoint after the Entry 5 investigation',
+      'Confirmed the SQL injection is still fully exploitable, and confirmed the pipeline still does not flag it',
+      'Documented the gap directly in the repo README rather than changing the endpoint to make the pipeline look more complete than it is',
+    ],
+    body: [
+      'Closing the loop from Entry 5. Reverted AuthController.cs back to its original [FromBody] LoginRequest shape - the realistic version of a login endpoint, not the [FromQuery] version used purely to isolate the cause.',
+      "Rebuilt, re-ran, and confirmed administrator'-- still logs in as admin. The vulnerability was never in question - only whether Semgrep would see it, and it doesn't. Same pipeline, same rule, same file: ProductsController.cs still gets flagged, AuthController.cs still doesn't.",
+      "Decided against changing the endpoint shape to force a green pipeline. The point of this repo is to show real vulnerabilities and real tool behaviour around them, not to optimise for a clean Actions run. Instead, added a note directly in the README calling out AuthController.cs as a known false negative, with a link back to the Entry 5 investigation explaining exactly why - so anyone reviewing the repo (or the pipeline output) understands it's a documented gap, not an oversight.",
+    ],
+    tools: ['Semgrep', '.NET / C#', 'GitHub Actions'],
+    tags: ['AppSec homelab', 'SQL injection', 'Semgrep', 'SAST limitations'],
+    link: {
+      label: 'appsec-homelab repo',
+      url: 'https://github.com/charles-goodsir/appsec-homelab',
+    },
+  },
+  {
+    id: 'appsec-homelab-entry-5-semgrep-frombody-gap',
+    date: '2026-08-06',
+    category: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab', 'SQL Injection'],
+    title:
+      'AppSec Homelab Entry 5: why Semgrep caught one SQLi and missed the other',
+    workedOn: [
+      'Investigated why Semgrep flagged the SQL injection in ProductsController.cs but not the structurally identical one in AuthController.cs',
+      'Ran Semgrep locally (CLI) against isolated versions of the file to test hypotheses one variable at a time',
+      'Identified the root cause: the rule does not treat [FromBody]-bound request objects as a tainted source',
+    ],
+    body: [
+      "This one's been parked since Entry 4 - Semgrep caught the SQLi in ProductsController.cs immediately but said nothing about the same pattern in AuthController.cs. Set out today to actually find out why instead of assuming it was just a coverage gap.",
+      'Installed Semgrep locally so I could test changes in seconds instead of pushing to GitHub Actions each time. First step was confirming a control: ran the same rule against ProductsController.cs alone, and it still flagged - so single-file scanning was a valid way to test this, not the cause of the mismatch itself.',
+      'Then worked through the differences between the two files one at a time, changing exactly one thing per test and re-scanning:',
+      "1. Property access - pulled request.Username/request.Password into plain local variables before interpolating them, in case Semgrep's taint tracking couldn't follow a property dereference. No change - still not flagged.",
+      '2. Variable count - reduced the query to a single interpolated value instead of two, in case a multi-variable AND clause was the issue. No change.',
+      "3. Clause style - swapped the equality check (Username = '...') for a LIKE '%...%' clause, matching ProductsController.cs's exact style. No change.",
+      '4. Record position - moved the LoginRequest record declaration outside the class body, in case a nested record type was interfering with the method analysis. No change.',
+      '5. Binding source - swapped [FromBody] LoginRequest request for two plain [FromQuery] string parameters, keeping the exact same SQL string. This one flagged immediately.',
+      "That's the answer: Semgrep's csharp-sqli rule tracks taint from [FromQuery]/[FromRoute]-style parameters, but doesn't recognise a [FromBody]-bound complex object as a tainted source at all. It's not about how the SQL string is built - it's about whether the rule ever considers the input untrusted in the first place. Since request.Username never gets marked as tainted, nothing downstream matters, which is why every SQL-string-shaped test came back negative until the binding source itself changed.",
+      "This is a real, meaningful gap rather than a quirk - POST-body JSON is the standard way virtually every modern REST API accepts login credentials, and it's exactly the shape that slipped past the default OWASP ruleset here. A GET-with-query-params endpoint doing the identical vulnerable thing gets caught instantly.",
+      'Reverted AuthController.cs back to the original [FromBody] version afterwards - the whole point of this app is to keep the vulnerabilities in their most realistic form, and that includes keeping the miss visible for now rather than quietly changing the endpoint shape to make the pipeline look more complete than it is.',
+    ],
+    tools: ['Semgrep (CLI)', '.NET / C#'],
+    tags: [
+      'AppSec homelab',
+      'SQL injection',
+      'Semgrep',
+      'SAST limitations',
+      'taint analysis',
+    ],
+    link: {
+      label: 'appsec-homelab repo',
+      url: 'https://github.com/charles-goodsir/appsec-homelab',
+    },
+  },
+  {
     id: 'appsec-homelab-entry-4-first-pipeline-run',
     date: '2026-08-01',
     category: 'AppSec Homelab',
