@@ -6,6 +6,8 @@ export interface DiaryLab {
   status?: 'completed' | 'in-progress' | 'blocked'
   /** Path to a reference screenshot, relative to src/assets, e.g. 'Burp/Lab10.png' */
   screenshot?: string
+  /** Additional reference screenshots, relative to src/assets. Rendered after `screenshot`. */
+  screenshots?: string[]
   /** Path to an accompanying automation script, relative to src/assets, e.g. 'LabScripts/sqli_solver.py' */
   script?: string
 }
@@ -37,6 +39,88 @@ export interface DiaryEntry {
  * Keep dates as YYYY-MM-DD so sorting stays correct.
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
+  {
+    id: 'portswigger-xss-labs-2-5',
+    date: '2026-09-01',
+    category: 'PortSwigger Labs',
+    vulnTypes: ['XSS'],
+    title:
+      'Cross-Site Scripting (XSS) Labs 2-5 (stored XSS + DOM XSS)',
+    workedOn: [
+      'Back into the PortSwigger XSS path after a holiday break - completed Labs 2 through 5',
+      'Lab 2: stored XSS via a blog comment field with no output encoding',
+      'Labs 3-5: DOM-based XSS through document.write and innerHTML sinks fed from location.search',
+    ],
+    body: [
+      "Back from a long holiday and easing back into the PortSwigger labs and Burp while I wait on a mini PC to arrive - that one's going to become a Cyber home lab for standing up my own exploitable apps to practice against.",
+      'Picking the XSS path back up from where I left off at Lab 1. Labs 2-5 move from a straightforward stored XSS into DOM-based XSS, where the bug lives entirely in client-side JavaScript handling the URL and the server never sees the payload.',
+      "The through-line for the DOM labs: find the sink (document.write, innerHTML), work out how the URL feeds into it, then shape the payload to break out of whatever HTML context it lands in. innerHTML has its own quirk on top of that - a <script> tag assigned through it shows up in the DOM but never executes, so event handlers like onerror/onload have to do the work instead.",
+    ],
+    labs: [
+      {
+        title: 'Lab 2: Stored XSS into HTML context with nothing encoded',
+        notes: [
+          'The blog comment form stores input and renders it straight back into the page with nothing encoded.',
+          'Tested with a plain <h1> tag first - refreshed the blog and the comment came back as a styled header, confirming HTML injection works here.',
+          "Because it's stored, the <script> payload doesn't fire on submit - it triggers when the comments page is reloaded and the stored markup is served back.",
+        ],
+        solution:
+          '<script>alert()</script>\n\nPosted as a blog comment; alert fires on reloading the comments page.',
+        status: 'completed',
+      },
+      {
+        title:
+          'Lab 3: DOM XSS in document.write sink using source location.search',
+        notes: [
+          'First DOM-based lab - the payload never touches the server, the vulnerability is entirely in the client-side JS that handles the URL.',
+          "Searching 'cake' returned no results, but the search term still got written into the page by trackSearch() via document.write().",
+          'The sink: document.write(\'<img src="/resources/images/tracker.gif?searchTerms=\'+query+\'">\') with query pulled straight from location.search.',
+          "Breaking out of the src attribute with a double quote lets me add my own onload handler - the trailing quote isn't needed because the sink appends the closing \"> itself.",
+        ],
+        solution: 'cake" onload="alert()',
+        status: 'completed',
+      },
+      {
+        title:
+          'Lab 4: DOM XSS in document.write sink using source location.search inside a select element',
+        notes: [
+          'Same document.write sink as Lab 3, but the injection point is inside a <select> stock-checker, so the payload has to break out of the select/option elements first.',
+          'The script reads storeId from the query string and writes it into <option selected>...</option>.',
+          "Generic words like 'cake' didn't visibly register - used a unique value (p3p) so I could clearly see it land as the selected option in both the rendered dropdown and the DOM.",
+          'Closed the select with </select>, then added an <img> with a broken src so onerror fires the alert. URL-encoded the whole thing so it survives in the query string.',
+        ],
+        solution:
+          "?productId=1&storeId=p3p</select><img src='1' onerror='alert()'>\n\nURL-encoded:\n?productId=1&storeId=p3p%3C/select%3E%3Cimg%20src=%271%27%20onerror=%27alert()%27%3E",
+        status: 'completed',
+        screenshot: 'Burp/Lab4XSS.png',
+        screenshots: ['Burp/Lab4XSS2.png'],
+      },
+      {
+        title: 'Lab 5: DOM XSS in innerHTML sink using source location.search',
+        notes: [
+          'Sink is element.innerHTML = query instead of document.write - doSearchQuery() drops the search term straight into <span id="searchMessage">.',
+          "A <script> tag assigned via innerHTML shows up in the DOM but never runs - browsers don't execute script elements inserted that way.",
+          'Used an <img> with an invalid src so the onerror handler runs instead - no need to touch the URL, typing it into the search box is enough.',
+        ],
+        solution: "<img src='0' onerror='alert()'>",
+        status: 'completed',
+        screenshot: 'Burp/Lab5XSS.png',
+      },
+    ],
+    tools: ['Burp Suite', 'Web Browser', 'Chrome DevTools'],
+    tags: [
+      'XSS',
+      'stored XSS',
+      'DOM XSS',
+      'document.write',
+      'innerHTML',
+      'JavaScript',
+    ],
+    link: {
+      label: 'Cross-site scripting (XSS)',
+      url: 'https://portswigger.net/web-security/cross-site-scripting',
+    },
+  },
   {
     id: 'appsec-homelab-entry-6-documented-false-negative',
     date: '2026-08-06',

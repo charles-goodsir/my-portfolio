@@ -244,19 +244,34 @@ function CyberDiary({
                               {lab.solution}
                             </pre>
                           </div>
-                          {lab.screenshot &&
-                            resolveScreenshot(lab.screenshot) && (
-                              <div>
-                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-                                  Screenshot
-                                </p>
-                                <img
-                                  src={resolveScreenshot(lab.screenshot)}
-                                  alt={lab.title}
-                                  className="w-full h-auto rounded"
-                                />
+                          {((lab.screenshot &&
+                            resolveScreenshot(lab.screenshot)) ||
+                            (lab.screenshots &&
+                              lab.screenshots.some((s) =>
+                                resolveScreenshot(s),
+                              ))) && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Screenshot
+                              </p>
+                              <div className="space-y-3">
+                                {[
+                                  ...(lab.screenshot ? [lab.screenshot] : []),
+                                  ...(lab.screenshots ?? []),
+                                ].map(
+                                  (shot) =>
+                                    resolveScreenshot(shot) && (
+                                      <img
+                                        key={shot}
+                                        src={resolveScreenshot(shot)}
+                                        alt={lab.title}
+                                        className="w-full h-auto rounded"
+                                      />
+                                    ),
+                                )}
                               </div>
-                            )}
+                            </div>
+                          )}
                           {lab.script && scriptMap[lab.script] && (
                             <div>
                               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
