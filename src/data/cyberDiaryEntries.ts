@@ -47,14 +47,15 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     title:
       'Cross-Site Scripting (XSS) Labs 6-8 (jQuery sinks + encoded attribute)',
     workedOn: [
-      'Kept going on the PortSwigger XSS path, Labs 6 through 8',
-      'Lab 6: DOM XSS through a jQuery .attr() href sink, exploited with a javascript: URL',
-      'Lab 7: DOM XSS through a jQuery selector sink on the hashchange event, delivered via an iframe from the exploit server',
-      'Lab 8: reflected XSS into an attribute where angle brackets are HTML-encoded but quotes are not',
+      'Kept going on the PortSwigger XSS path, Labs 6 through 11',
+      'Labs 6 and 7: DOM XSS through jQuery sinks - an .attr() href sink and a hashchange selector sink',
+      'Labs 8 to 10: reflected and stored XSS where the filter encodes angle brackets, so the way in is breaking out of an attribute or a JavaScript string',
+      'Lab 11: first practitioner-level lab, DOM XSS through an AngularJS expression',
     ],
     body: [
-      'More XSS today. Labs 6 and 7 are both jQuery sinks; Lab 8 goes back to reflected XSS, but this time the server encodes angle brackets so injecting a fresh tag is off the table.',
+      'More XSS today, and the labs move from the jQuery sinks into filters that encode angle brackets. Once a fresh tag is off the table, the pattern becomes: work out exactly what context the value lands in - an href, a JavaScript string, an Angular expression - and break out of that instead.',
       'Lab 7 was the long one. Getting an alert in the console was quick. Turning that into something that fires for another user meant working out how to make the hashchange event trigger on its own, which is where the exploit-server iframe comes in.',
+      'Lab 11 is the first practitioner-level lab and the first time the target is a framework I do not use. It is an AngularJS app, and the payload works by reaching Angular\'s scope through $eval and the Function constructor. Did it as a code-along. The takeaway that stuck: moving into security means I cannot just know React and C# well, I need enough of a model of jQuery, AngularJS, and whatever else to spot where they go wrong.',
     ],
     labs: [
       {
@@ -105,13 +106,58 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         screenshot: 'Burp/Lab8XSS.png',
         screenshots: ['Burp/Lab8XSS2.png'],
       },
+      {
+        title:
+          'Lab 9: Stored XSS into anchor href attribute with double quotes HTML-encoded',
+        notes: [
+          'First stored attack in this batch. The payload gets saved and sits there until another user triggers it, rather than firing on my own request.',
+          'On the blog comment form, the website field is rendered back as the href of a link on the commenter\'s name, so other users can visit their site.',
+          'Double quotes come back HTML-encoded, so breaking out of the attribute is off the table, but a javascript: URL still works as the href value.',
+          'Put javascript:alert() in the website field. The alert fires when someone clicks the name link on the comment.',
+        ],
+        solution: 'javascript:alert()',
+        status: 'completed',
+        screenshot: 'Burp/Lab9XSS.png',
+        screenshots: ['Burp/Lab9XSS2.png'],
+      },
+      {
+        title:
+          'Lab 10: Reflected XSS into a JavaScript string with angle brackets HTML encoded',
+        notes: [
+          'The search term is reflected into a JavaScript string literal, not HTML:',
+          "var searchTerms = 'p3p'; document.write('<img src=\"/resources/images/tracker.gif?searchTerms=' + encodeURIComponent(searchTerms) + '\">');",
+          'Angle brackets are HTML-encoded so a new tag will not land, but the single quote is not encoded, so I can close the string and add my own code.',
+          "Searched p3p'; alert(); and checked the DOM. The string closed cleanly and the alert call was sitting there as its own statement.",
+          "Tidied it so the rest of the line stays valid JavaScript: p3p'; alert(); let cake = 'test re-opens a string for the trailing '; so nothing after it throws a syntax error.",
+        ],
+        solution:
+          "p3p'; alert(); let cake = 'test\n\nAlso works as a self-contained break-in: '-alert()-'",
+        status: 'completed',
+        screenshot: 'Burp/Lab10XSS.png',
+      },
+      {
+        title:
+          'Lab 11: DOM XSS in AngularJS expression with angle brackets and double quotes HTML-encoded',
+        notes: [
+          'First practitioner-level lab, and the first one on a framework I do not use.',
+          'The search box sits inside an AngularJS app. Tested {{ 1+1 }} and it rendered 2, so Angular is evaluating template expressions in the reflected value.',
+          'Angle brackets and double quotes are both encoded, so the classic tag or attribute injection is blocked. The way in is an Angular expression that reaches back out to JavaScript.',
+          "{{ $eval.constructor('alert()')() }} uses $eval's constructor (the Function constructor) to build a function that runs alert() and calls it.",
+          'Did this one as a code-along. The part worth keeping: Angular expressions run against a scope, and $eval plus the Function constructor is the bridge from that scope back to normal JS. Something to come back to when I hit more sandbox-escape labs.',
+        ],
+        solution: "{{ $eval.constructor('alert()')() }}",
+        status: 'completed',
+        screenshot: 'Burp/Lab11XSS.png',
+      },
     ],
     tools: ['Burp Suite', 'Web Browser', 'Chrome DevTools'],
     tags: [
       'XSS',
       'DOM XSS',
       'reflected XSS',
+      'stored XSS',
       'jQuery',
+      'AngularJS',
       'hashchange',
       'javascript: URI',
     ],
