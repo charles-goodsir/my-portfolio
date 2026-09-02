@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import Header from './components/Header'
 import Home from './components/Home'
 import About from './components/About'
@@ -24,6 +24,11 @@ function App() {
     setActiveSection('cyberdiary')
   }
 
+  const handleScrollHandled = useCallback(() => {
+    setScrollToEntryId(null)
+    setScrollToVulnType(null)
+  }, [])
+
   const renderSection = () => {
     switch (activeSection) {
       case 'home':
@@ -39,10 +44,7 @@ function App() {
           <CyberDiary
             scrollToEntryId={scrollToEntryId}
             scrollToVulnType={scrollToVulnType}
-            onScrollHandled={() => {
-              setScrollToEntryId(null)
-              setScrollToVulnType(null)
-            }}
+            onScrollHandled={handleScrollHandled}
           />
         )
       case 'owasptop10':

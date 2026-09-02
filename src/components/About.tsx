@@ -45,8 +45,8 @@ function About() {
                 I'm Charles Goodsir, a full-stack developer moving into
                 application security. I spent years building and shipping
                 software in enterprise environments, and that background helps
-                when the job is finding flaws in how apps are actually built,
-                not just spotting them on a checklist.
+                when the job is finding flaws in how apps get built, not
+                spotting them on a checklist.
               </p>
               <p className="text-gray-700 mb-4">
                 I'm{' '}

@@ -1,5 +1,5 @@
-import Screenshot1 from '../../assets/Airbnb/Screenshot1.png'
-import Screenshot2 from '../../assets/Airbnb/Screenshot2.png'
+import Screenshot1 from '../../assets/AirBnB/Screenshot1.png'
+import Screenshot2 from '../../assets/AirBnB/Screenshot2.png'
 
 interface AirbnbProps {
   setActiveSection: (section: string) => void

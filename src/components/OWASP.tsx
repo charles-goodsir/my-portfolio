@@ -35,7 +35,9 @@ function OwaspTop10({ navigateToDiary }: OwaspTop10Props) {
               </span>
               {risk.progress && (
                 <span
-                  className={`inline-block ml-2 px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide ${progressStyles[risk.progress]}`}
+                  className={`inline-block ml-2 px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide ${
+                    progressStyles[risk.progress] ?? progressStyles['Not started']
+                  }`}
                 >
                   {risk.progress}
                 </span>

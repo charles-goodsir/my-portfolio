@@ -288,7 +288,8 @@ function CyberDiary({
                   </div>
                 )}
 
-                {(entry.tools?.length || entry.tags?.length) && (
+                {((entry.tools?.length ?? 0) > 0 ||
+                  (entry.tags?.length ?? 0) > 0) && (
                   <div className="flex flex-wrap gap-4 pt-1">
                     {entry.tools && entry.tools.length > 0 && (
                       <div>

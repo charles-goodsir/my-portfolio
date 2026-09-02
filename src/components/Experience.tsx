@@ -18,9 +18,9 @@ const experiences: ExperienceItem[] = [
       'Built automation test suites using Gherkin/BDD scripts to validate end-to-end business logic - the same systematic verification mindset (input validation, edge cases, expected vs. actual behaviour) used in security testing',
       'Partnered with BAs, developers, configurators, product managers, and clients across cross-functional teams to turn business requirements into secure, maintainable configuration',
       'Automated manual workflows for local government councils using in-house tooling, reducing risk from manual data handling',
-      'Diagnosed and remodelled system configuration to cut runtime from 2.5 minutes to 20 seconds - root-cause analysis directly transferable to performance triage and DoS-adjacent investigation',
+      'Diagnosed and remodelled system configuration through root-cause analysis, cutting one job’s runtime from 2.5 minutes to 20 seconds',
       'Authored technical documentation in Confluence to support internal releases and onboarding, and led weekly CRM/ERP overview and training sessions',
-      'Mentored associate analysts on delivery best practice and provided ongoing guidance - an early taste of the knowledge-sharing culture central to security teams',
+      'Mentored associate analysts on delivery practice with ongoing one-on-one guidance',
     ],
     technologies: [
       'GitHub',
@@ -205,14 +205,14 @@ function Experience() {
           <div className="mt-6 p-4 bg-white rounded-lg border border-indigo-200">
             <p className="text-gray-700 text-center font-medium">
               <strong>
-                Combined with Full Stack Development training at Dev Academy
-                Aotearoa, CompTIA Security+, and a self-directed AppSec homelab
-                and Web Security Academy practice,
+                Full-stack training at Dev Academy Aotearoa, CompTIA Security+,
+                a self-directed AppSec homelab, and Web Security Academy
+                practice
               </strong>{' '}
-              this background is aimed at Application Security Engineer, Product
-              Security Engineer, and DevSecOps Engineer roles - bringing real
-              application development experience to the security side, rather
-              than security knowledge without the code background to back it up.
+              all point at the same target: Application Security Engineer,
+              Product Security Engineer, and DevSecOps Engineer roles, where
+              years of shipping production code do the work that security
+              theory on its own cannot.
             </p>
           </div>
         </div>
@@ -266,13 +266,10 @@ function Experience() {
               </div>
             </div>
             <p className="text-gray-700">
-              Intensive 17-week full-stack development bootcamp covering modern
-              web technologies including JavaScript, TypeScript, React, Node.js,
-              and database management. Gained hands-on experience in agile
-              development methodologies, pair programming, and collaborative
-              project delivery. Successfully led a team in building and
-              deploying full-stack applications, demonstrating strong technical
-              leadership and project management skills.
+              17-week full-stack bootcamp: JavaScript, TypeScript, React,
+              Node.js, and databases, taught through daily pair programming and
+              agile team projects. Led a team to build and deploy a full-stack
+              app end to end.
             </p>
           </div>
 
@@ -295,13 +292,9 @@ function Experience() {
               </div>
             </div>
             <p className="text-gray-700">
-              Comprehensive undergraduate degree combining historical analysis,
-              international relations theory, and political science methodology.
-              Developed strong critical thinking, research, and analytical
-              skills through extensive academic writing and independent research
-              projects. Gained valuable experience in presenting complex ideas,
-              conducting thorough research, and working collaboratively on group
-              projects.
+              Three years of history, international relations, and political
+              science. Heavy on research, academic writing, and building an
+              argument from primary sources under deadline.
             </p>
           </div>
         </div>

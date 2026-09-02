@@ -18,8 +18,8 @@ function Home({ setActiveSection }: HomeProps) {
           </p>
           <p className="text-lg text-gray-500 mb-12 max-w-2xl mx-auto">
             Full-stack background, application security focus. Working toward
-            DevSecOps and cloud security roles where I can combine building
-            software with breaking and fixing it properly.
+            DevSecOps and cloud security roles where building software and
+            breaking it are the same job.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button

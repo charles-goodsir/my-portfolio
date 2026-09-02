@@ -1,10 +1,10 @@
-import Accounts_1 from '../../assets/Finance-Tracker/Accounts_1.png'
-import Accounts_2 from '../../assets/Finance-Tracker/Accounts_2.png'
-import CSV_Import from '../../assets/Finance-Tracker/CSV_Import.png'
-import Goals from '../../assets/Finance-Tracker/Goals.png'
-import Main_Screen from '../../assets/Finance-Tracker/Main_Screen.png'
-import Smart_Insights from '../../assets/Finance-Tracker/Smart_Insights.png'
-import Transactions from '../../assets/Finance-Tracker/Transactions.png'
+import Accounts_1 from '../../assets/finance-tracker/Accounts_1.png'
+import Accounts_2 from '../../assets/finance-tracker/Accounts_2.png'
+import CSV_Import from '../../assets/finance-tracker/CSV_Import.png'
+import Goals from '../../assets/finance-tracker/Goals.png'
+import Main_Screen from '../../assets/finance-tracker/Main_Screen.png'
+import Smart_Insights from '../../assets/finance-tracker/Smart_Insights.png'
+import Transactions from '../../assets/finance-tracker/Transactions.png'
 interface FinanceTrackerProps {
   setActiveSection: (nextSection: string) => void
 }

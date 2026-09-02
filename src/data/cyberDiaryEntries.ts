@@ -40,6 +40,87 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'portswigger-xss-labs-6-8',
+    date: '2026-09-02',
+    category: 'PortSwigger Labs',
+    vulnTypes: ['XSS'],
+    title:
+      'Cross-Site Scripting (XSS) Labs 6-8 (jQuery sinks + encoded attribute)',
+    workedOn: [
+      'Kept going on the PortSwigger XSS path, Labs 6 through 8',
+      'Lab 6: DOM XSS through a jQuery .attr() href sink, exploited with a javascript: URL',
+      'Lab 7: DOM XSS through a jQuery selector sink on the hashchange event, delivered via an iframe from the exploit server',
+      'Lab 8: reflected XSS into an attribute where angle brackets are HTML-encoded but quotes are not',
+    ],
+    body: [
+      'More XSS today. Labs 6 and 7 are both jQuery sinks; Lab 8 goes back to reflected XSS, but this time the server encodes angle brackets so injecting a fresh tag is off the table.',
+      'Lab 7 was the long one. Getting an alert in the console was quick. Turning that into something that fires for another user meant working out how to make the hashchange event trigger on its own, which is where the exploit-server iframe comes in.',
+    ],
+    labs: [
+      {
+        title:
+          'Lab 6: DOM XSS in jQuery anchor href attribute sink using location.search source',
+        notes: [
+          'The vulnerable link is the "Back" link on the Submit Feedback form. There are a few back links around the site, but that is the only one actually labelled "back".',
+          'The sink reads the returnPath query param and drops it straight into the href: $(\'#backLink\').attr("href", (new URLSearchParams(window.location.search)).get(\'returnPath\')).',
+          'Clicking the link normally just navigates to "/" via that value.',
+          'The value lands inside the href attribute with no clean way to break out of it, so the move is to run JS inside the attribute with a javascript: URL instead.',
+          'The lab wants document.cookie in the alert, so returnPath=javascript:alert(document.cookie). Loading that URL and clicking the Back link fires the alert and shows the DOM has been manipulated.',
+        ],
+        solution:
+          '/feedback?returnPath=javascript:alert(document.cookie)\n\nSet as the returnPath param; the alert fires on clicking the Back link.',
+        status: 'completed',
+        screenshot: 'Burp/Lab6XSS.png',
+      },
+      {
+        title:
+          'Lab 7: DOM XSS in jQuery selector sink using a hashchange event',
+        notes: [
+          'On the blog. The hashchange handler decodes window.location.hash and concatenates it straight into a jQuery selector:',
+          "$(window).on('hashchange', function(){ var post = $('section.blog-list h2:contains(' + decodeURIComponent(window.location.hash.slice(1)) + ')'); if (post) post.get(0).scrollIntoView(); });",
+          'Played with it in the console first. window.location.hash shows the hash; .slice(1) strips the leading #. Forgot the (1) on the first go and got an error, then it returned the raw value without the #.',
+          'The selector looks for an h2 whose text contains the hash value, so a matching value scrolls the page to that heading.',
+          'Passing an HTML string into :contains() makes jQuery build a detached element rather than match one. `$(\'section.blog-list h2:contains(<img src="0" onerror="alert()">)\')` returns a node even though nothing on the page matches it.',
+          'Confirmed the detached element is live by setting myimg.src = 0 in the console, which fired a request that timed out with a 504.',
+          'A real user will not change the hash by hand, so the payload has to trigger hashchange itself. Used the exploit server to deliver an iframe that appends to its own src after it loads:',
+          "<iframe src=\"https://LAB-ID.web-security-academy.net/#\" onload=\"this.src+='<img src=x onerror=print()>'\"></iframe>",
+          'Tested it, confirmed print() fired, then delivered it to the victim.',
+        ],
+        solution:
+          '<iframe src="https://LAB-ID.web-security-academy.net/#" onload="this.src+=\'<img src=x onerror=print()>\'"></iframe>\n\nDelivered from the exploit server.',
+        status: 'completed',
+        screenshot: 'Burp/Lab7XSS.png',
+        screenshots: ['Burp/Lab7XSS2.png'],
+      },
+      {
+        title:
+          'Lab 8: Reflected XSS into attribute with angle brackets HTML-encoded',
+        notes: [
+          'Uses the blog search box. Searching for p3p returns no results, but p3p shows up in the DOM inside the search form value attribute.',
+          'Angle brackets come back HTML-encoded, so a new tag will not work. Quotes are not encoded, so the way in is to break out of the value attribute and add an event handler.',
+          'p3p" onmouseover=\'alert()\' closes the attribute and adds an onmouseover. Hovering the search box fires the alert.',
+        ],
+        solution: 'p3p" onmouseover=\'alert()\'',
+        status: 'completed',
+        screenshot: 'Burp/Lab8XSS.png',
+        screenshots: ['Burp/Lab8XSS2.png'],
+      },
+    ],
+    tools: ['Burp Suite', 'Web Browser', 'Chrome DevTools'],
+    tags: [
+      'XSS',
+      'DOM XSS',
+      'reflected XSS',
+      'jQuery',
+      'hashchange',
+      'javascript: URI',
+    ],
+    link: {
+      label: 'Cross-site scripting (XSS)',
+      url: 'https://portswigger.net/web-security/cross-site-scripting',
+    },
+  },
+  {
     id: 'portswigger-xss-labs-2-5',
     date: '2026-09-01',
     category: 'PortSwigger Labs',
@@ -618,16 +699,3 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     },
   },
 ]
-
-/** Distinct vulnerability classes present in the diary, in the order they first appear. Feed this into a filter dropdown/tabs. */
-export const vulnTypes: string[] = Array.from(
-  new Set(cyberDiaryEntries.flatMap((entry) => entry.vulnTypes)),
-)
-
-export function filterEntriesByVulnType(
-  entries: DiaryEntry[],
-  vulnType: string | null,
-): DiaryEntry[] {
-  if (!vulnType || vulnType === 'All') return entries
-  return entries.filter((entry) => entry.vulnTypes.includes(vulnType))
-}
