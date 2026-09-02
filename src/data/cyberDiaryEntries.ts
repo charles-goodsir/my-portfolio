@@ -40,6 +40,40 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'appsec-homelab-entry-7-mini-pc-setup',
+    date: '2026-09-02',
+    category: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab'],
+    title: 'AppSec Homelab Entry 7: mini PC setup and SSH hardening',
+    workedOn: [
+      'Set up the mini PC (shipped with Linux Mint) as the base for the AppSec homelab, and decided to keep Mint rather than wipe to Ubuntu Server',
+      'Diagnosed a "no signal" display fault after boot - turned out to be the HDMI cable, not GRUB or the graphics drivers',
+      'Diagnosed SSH connection failures from my Mac - a stale IP address and the wrong username, not a network or firewall problem',
+      'Hardened SSH: key-based auth only, password and root login disabled, ufw enabled, fail2ban installed',
+      'Installed Docker on the mini PC over SSH from the Mac',
+    ],
+    body: [
+      'The mini PC arrived today. It came with Linux Mint pre-installed and I decided to keep it rather than wipe to Ubuntu Server. It is Ubuntu underneath, so apt and Docker tooling are identical, and the only cost is a bit more overhead from the desktop environment. Most of the day went into troubleshooting rather than the hardening steps themselves.',
+      'First boot got to the desktop and then the monitor lost signal entirely. I booted into the GRUB console (Shift or Esc at boot) to check for a corrupted bootloader: ls showed both partitions (hd0,gpt1 and hd0,gpt2) present and healthy, and grub.cfg was intact on gpt2, so the disk and GRUB were fine. I then suspected a graphics driver issue, since the signal dropped right as the desktop environment loaded, just after the login screen. That was also a dead end. It was the cable. Swapping HDMI for DisplayPort fixed it outright. Next time, check the cable before the drivers or GRUB.',
+      'Then set up SSH on the mini PC, tried to connect from my Mac, and got connection timeouts followed by "no route to host". I confirmed the Mac and mini PC were on the same subnet (192.168.88.x), confirmed sshd was running (systemctl status ssh showed active), and confirmed ufw was not blocking it (inactive at the time). The real problem was the IP address: I was using 192.168.88.225, which was stale, and the current address was 192.168.88.13. On DHCP, re-check ip a fresh rather than trusting an address from a few minutes earlier.',
+      'The other half of that was the username. I was trying to connect as charlesgoodsir, but the account on the mini PC is owner. Once corrected, ssh-copy-id and key-based login worked cleanly.',
+      'Hardening done today: SSH key-based authentication set up with ssh-copy-id from the Mac; password authentication and root login disabled in sshd_config (PasswordAuthentication no, PermitRootLogin no); key-only login verified in a second terminal before closing the first, so I did not lock myself out; ufw installed and enabled with OpenSSH explicitly allowed; fail2ban installed and running.',
+      'With key login working, installed Docker on the mini PC entirely over SSH from the Mac. No keyboard or monitor on the box from here.',
+      'Still to do: a DHCP reservation on the router for 192.168.88.13 so the IP stops shifting, then deploy the homelab vulnerable app on this box and point OWASP ZAP at it to complete the DAST layer of the CI/CD pipeline.',
+      'Most of today went on ruling out bootloader, driver, network, and firewall causes before landing on the simple ones: a bad cable, a stale IP, a wrong username. That is what the work usually looks like. Writing up the diagnosis path in the repo is worth more than a list of the commands that ran.',
+    ],
+    screenshot: 'Burp/HomeLab1.webp',
+    tools: ['Linux Mint', 'GRUB', 'OpenSSH', 'ufw', 'fail2ban'],
+    tags: [
+      'AppSec homelab',
+      'Linux',
+      'SSH hardening',
+      'ufw',
+      'fail2ban',
+      'troubleshooting',
+    ],
+  },
+  {
     id: 'portswigger-xss-labs-6-8',
     date: '2026-09-02',
     category: 'PortSwigger Labs',
@@ -55,7 +89,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       'More XSS today, and the labs move from the jQuery sinks into filters that encode angle brackets. Once a fresh tag is off the table, the pattern becomes: work out exactly what context the value lands in - an href, a JavaScript string, an Angular expression - and break out of that instead.',
       'Lab 7 was the long one. Getting an alert in the console was quick. Turning that into something that fires for another user meant working out how to make the hashchange event trigger on its own, which is where the exploit-server iframe comes in.',
-      'Lab 11 is the first practitioner-level lab and the first time the target is a framework I do not use. It is an AngularJS app, and the payload works by reaching Angular\'s scope through $eval and the Function constructor. Did it as a code-along. The takeaway that stuck: moving into security means I cannot just know React and C# well, I need enough of a model of jQuery, AngularJS, and whatever else to spot where they go wrong.',
+      "Lab 11 is the first practitioner-level lab and the first time the target is a framework I do not use. It is an AngularJS app, and the payload works by reaching Angular's scope through $eval and the Function constructor. Did it as a code-along. The takeaway that stuck: moving into security means I cannot just know React and C# well, I need enough of a model of jQuery, AngularJS, and whatever else to spot where they go wrong.",
     ],
     labs: [
       {
@@ -63,7 +97,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
           'Lab 6: DOM XSS in jQuery anchor href attribute sink using location.search source',
         notes: [
           'The vulnerable link is the "Back" link on the Submit Feedback form. There are a few back links around the site, but that is the only one actually labelled "back".',
-          'The sink reads the returnPath query param and drops it straight into the href: $(\'#backLink\').attr("href", (new URLSearchParams(window.location.search)).get(\'returnPath\')).',
+          "The sink reads the returnPath query param and drops it straight into the href: $('#backLink').attr(\"href\", (new URLSearchParams(window.location.search)).get('returnPath')).",
           'Clicking the link normally just navigates to "/" via that value.',
           'The value lands inside the href attribute with no clean way to break out of it, so the move is to run JS inside the attribute with a javascript: URL instead.',
           'The lab wants document.cookie in the alert, so returnPath=javascript:alert(document.cookie). Loading that URL and clicking the Back link fires the alert and shows the DOM has been manipulated.',
@@ -84,7 +118,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
           'Passing an HTML string into :contains() makes jQuery build a detached element rather than match one. `$(\'section.blog-list h2:contains(<img src="0" onerror="alert()">)\')` returns a node even though nothing on the page matches it.',
           'Confirmed the detached element is live by setting myimg.src = 0 in the console, which fired a request that timed out with a 504.',
           'A real user will not change the hash by hand, so the payload has to trigger hashchange itself. Used the exploit server to deliver an iframe that appends to its own src after it loads:',
-          "<iframe src=\"https://LAB-ID.web-security-academy.net/#\" onload=\"this.src+='<img src=x onerror=print()>'\"></iframe>",
+          '<iframe src="https://LAB-ID.web-security-academy.net/#" onload="this.src+=\'<img src=x onerror=print()>\'"></iframe>',
           'Tested it, confirmed print() fired, then delivered it to the victim.',
         ],
         solution:
@@ -99,9 +133,9 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         notes: [
           'Uses the blog search box. Searching for p3p returns no results, but p3p shows up in the DOM inside the search form value attribute.',
           'Angle brackets come back HTML-encoded, so a new tag will not work. Quotes are not encoded, so the way in is to break out of the value attribute and add an event handler.',
-          'p3p" onmouseover=\'alert()\' closes the attribute and adds an onmouseover. Hovering the search box fires the alert.',
+          "p3p\" onmouseover='alert()' closes the attribute and adds an onmouseover. Hovering the search box fires the alert.",
         ],
-        solution: 'p3p" onmouseover=\'alert()\'',
+        solution: "p3p\" onmouseover='alert()'",
         status: 'completed',
         screenshot: 'Burp/Lab8XSS.png',
         screenshots: ['Burp/Lab8XSS2.png'],
@@ -111,7 +145,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
           'Lab 9: Stored XSS into anchor href attribute with double quotes HTML-encoded',
         notes: [
           'First stored attack in this batch. The payload gets saved and sits there until another user triggers it, rather than firing on my own request.',
-          'On the blog comment form, the website field is rendered back as the href of a link on the commenter\'s name, so other users can visit their site.',
+          "On the blog comment form, the website field is rendered back as the href of a link on the commenter's name, so other users can visit their site.",
           'Double quotes come back HTML-encoded, so breaking out of the attribute is off the table, but a javascript: URL still works as the href value.',
           'Put javascript:alert() in the website field. The alert fires when someone clicks the name link on the comment.',
         ],
@@ -171,8 +205,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-09-01',
     category: 'PortSwigger Labs',
     vulnTypes: ['XSS'],
-    title:
-      'Cross-Site Scripting (XSS) Labs 2-5 (stored XSS + DOM XSS)',
+    title: 'Cross-Site Scripting (XSS) Labs 2-5 (stored XSS + DOM XSS)',
     workedOn: [
       'Back into the PortSwigger XSS path after a holiday break - completed Labs 2 through 5',
       'Lab 2: stored XSS via a blog comment field with no output encoding',
@@ -181,7 +214,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       "Back from a long holiday and easing back into the PortSwigger labs and Burp while I wait on a mini PC to arrive - that one's going to become a Cyber home lab for standing up my own exploitable apps to practice against.",
       'Picking the XSS path back up from where I left off at Lab 1. Labs 2-5 move from a straightforward stored XSS into DOM-based XSS, where the bug lives entirely in client-side JavaScript handling the URL and the server never sees the payload.',
-      "The through-line for the DOM labs: find the sink (document.write, innerHTML), work out how the URL feeds into it, then shape the payload to break out of whatever HTML context it lands in. innerHTML has its own quirk on top of that - a <script> tag assigned through it shows up in the DOM but never executes, so event handlers like onerror/onload have to do the work instead.",
+      'The through-line for the DOM labs: find the sink (document.write, innerHTML), work out how the URL feeds into it, then shape the payload to break out of whatever HTML context it lands in. innerHTML has its own quirk on top of that - a <script> tag assigned through it shows up in the DOM but never executes, so event handlers like onerror/onload have to do the work instead.',
     ],
     labs: [
       {
@@ -201,8 +234,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         notes: [
           'First DOM-based lab - the payload never touches the server, the vulnerability is entirely in the client-side JS that handles the URL.',
           "Searching 'cake' returned no results, but the search term still got written into the page by trackSearch() via document.write().",
-          'The sink: document.write(\'<img src="/resources/images/tracker.gif?searchTerms=\'+query+\'">\') with query pulled straight from location.search.',
-          "Breaking out of the src attribute with a double quote lets me add my own onload handler - the trailing quote isn't needed because the sink appends the closing \"> itself.",
+          "The sink: document.write('<img src=\"/resources/images/tracker.gif?searchTerms='+query+'\">') with query pulled straight from location.search.",
+          'Breaking out of the src attribute with a double quote lets me add my own onload handler - the trailing quote isn\'t needed because the sink appends the closing "> itself.',
         ],
         solution: 'cake" onload="alert()',
         status: 'completed',
