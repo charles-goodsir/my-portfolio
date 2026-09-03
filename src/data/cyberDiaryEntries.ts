@@ -44,7 +44,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-09-03',
     category: 'AppSec Homelab',
     vulnTypes: ['AppSec Homelab'],
-    title: 'AppSec Homelab Entry 8: Docker deployment and a separate GitHub key',
+    title:
+      'AppSec Homelab Entry 8: Docker deployment and a separate GitHub key',
     workedOn: [
       'Switched the mini PC to a text-only boot (multi-user.target) to free the RAM the desktop environment was using, and confirmed SSH still connects after the reboot',
       'Generated a dedicated SSH key on the mini PC for GitHub and registered it as its own key, so the mini PC and the Mac authenticate independently',
@@ -54,13 +55,13 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       'Picking up from yesterday. Three things I wanted done today: move the mini PC to a lighter headless boot, get a GitHub key set up on the box that is independent of my Mac, and get the vulnerable homelab app running in Docker on it.',
       'First, the boot target. sudo systemctl set-default multi-user.target && sudo reboot drops the desktop environment on boot and frees the RAM it was holding, which I want back for Docker and ZAP later. The thing to check afterwards was SSH, since there is no desktop to fall back on now if it does not come up. It reconnected cleanly.',
-      'Second, the GitHub key. I overwrote my Mac\'s portfolio GitHub key by accident yesterday, so I was careful here not to touch the existing key pair between the Mac and the mini PC. I generated a fresh key directly on the mini PC and added its public key to GitHub as a separate registered key. Each machine now authenticates to GitHub on its own.',
+      "Second, the GitHub key. I overwrote my Mac's portfolio GitHub key by accident yesterday, so I was careful here not to touch the existing key pair between the Mac and the mini PC. I generated a fresh key directly on the mini PC and added its public key to GitHub as a separate registered key. Each machine now authenticates to GitHub on its own.",
       'Third, the app. git clone of the appsec-homelab repo, then docker compose up -d --build to build and start the containers in one step.',
       'Then the firewall rule to reach it: sudo ufw allow from 192.168.88.0/24 to any port 8080 proto tcp. I scoped this to my home subnet rather than allowing 8080 from anywhere. The app is intentionally vulnerable, so there is no reason for that port to be reachable from outside the local network, even by accident.',
       'Where things stand: the mini PC boots headless into a text console and runs Docker, and the homelab app is containerized and reachable on port 8080 from devices on my home network. Next is to confirm the app actually loads from my Mac, then start pointing OWASP ZAP at it for the DAST layer of the pipeline.',
       'The scoped ufw rule is a small thing, but it is the kind of default worth keeping visible in the eventual writeup. Running a deliberately vulnerable app on the network means being deliberate about what can reach it.',
     ],
-    screenshot: 'Burp/HomeLab2.webp',
+    screenshot: 'Homelab/HomeLab2.webp',
     tools: ['systemd', 'OpenSSH', 'Docker Compose', 'ufw', 'Git'],
     tags: [
       'AppSec homelab',
@@ -94,7 +95,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Still to do: a DHCP reservation on the router for 192.168.88.13 so the IP stops shifting, then deploy the homelab vulnerable app on this box and point OWASP ZAP at it to complete the DAST layer of the CI/CD pipeline.',
       'Most of today went on ruling out bootloader, driver, network, and firewall causes before landing on the simple ones: a bad cable, a stale IP, a wrong username. That is what the work usually looks like. Writing up the diagnosis path in the repo is worth more than a list of the commands that ran.',
     ],
-    screenshot: 'Burp/HomeLab1.webp',
+    screenshot: 'Homelab/HomeLab1.webp',
     tools: ['Linux Mint', 'GRUB', 'OpenSSH', 'ufw', 'fail2ban'],
     tags: [
       'AppSec homelab',
