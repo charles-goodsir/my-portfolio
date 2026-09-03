@@ -29,6 +29,8 @@ export interface DiaryEntry {
   tools?: string[]
   tags?: string[]
   link?: { label: string; url: string }
+  /** Multiple external references, rendered as a list after `link`. */
+  links?: { label: string; url: string }[]
   milestone?: boolean
   screenshot?: string
   screenshots?: string[]
@@ -47,15 +49,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     title: 'First ZAP baseline scan',
     workedOn: [
       'Ran the first OWASP ZAP baseline scan against the app deployed on the mini PC, adding the DAST layer alongside Semgrep (SAST) and gitleaks (secrets)',
-      'Read the results: 59 pass, 0 fail, 8 warnings, all missing-header findings rather than active-exploit findings',
+      'Read the first report: no high-risk findings, 2 medium and 6 low, all missing or weak response headers rather than active exploits',
+      'Did a first pass at the headers in the nginx config and re-ran the same scan for a before and after: the clickjacking, content-type, and server-header findings are gone, and CSP is now present but still weak',
       'Worked through an scp mix-up caused by running the copy from inside the mini PC\'s own SSH session instead of a fresh Mac terminal',
     ],
     body: [
       'With the app deployed and running on the mini PC, I ran the first ZAP baseline scan against it: docker run -t -v $(pwd):/zap/wrk/:rw zaproxy/zap-stable zap-baseline.py -t http://192.168.88.13:8080 -r zap-report.html. That is the DAST layer, and the first time the three automated checks run end to end. Semgrep already covers SAST and gitleaks covers secrets.',
       'Getting the report back to my Mac tripped me up briefly. I ran scp from inside the mini PC\'s own SSH session rather than a fresh terminal on the Mac, so it tried to connect back to itself and write to a macOS path that does not exist on Linux. Re-running it from an actual Mac terminal pulled it through. Check hostname before running anything that depends on which machine you are actually on.',
-      'Results were 59 pass, 0 fail, 8 warnings. No active-exploit findings, which is expected for a baseline scan since it is passive only. It will not catch the SQL injection or broken access control I built into the app and already found by hand in Burp. What it flagged was a set of missing response headers: no X-Frame-Options, no X-Content-Type-Options, no Content Security Policy, no Permissions-Policy, no Cross-Origin-Embedder-Policy, a Server header leaking version info, and cacheable content with no cache-control directives. It also raised an informational flag for detecting a React SPA.',
+      'The first report came back with no high-risk findings, which is expected for a baseline scan since it is passive only. It will not catch the SQL injection or broken access control I built into the app and already found by hand in Burp. What it flagged was all response headers: 2 medium and 6 low. The medium ones were no Content-Security-Policy and no anti-clickjacking header. The low ones were the missing Cross-Origin-Embedder-Policy, Cross-Origin-Opener-Policy, and Cross-Origin-Resource-Policy headers, no Permissions-Policy, a missing X-Content-Type-Options header, and the Server header leaking its version.',
+      'I did a first pass at fixing these in the nginx config: added a Content-Security-Policy, an X-Frame-Options header, and X-Content-Type-Options, and turned off the Server version token. Then I re-ran the exact same scan. The second report is cleaner. The clickjacking, content-type, and server-header findings are gone. CSP moved from missing to two medium findings, because the policy I added leaves a directive undefined with no fallback and still allows inline styles. The three cross-origin headers and the Permissions-Policy header are still open.',
       'None of those are the injection bugs I planted. They are a different category, more about defense in depth and browser-level protections than direct exploitation, but they are still real findings and a good complement to the manual work.',
-      'Where things stand: SAST, secrets scanning, and DAST are all working against a codebase I built and can walk through in detail. Next is to fix the header issues properly in the nginx config and set server_tokens off, then re-run the same scan for a clean before and after in the repo, and write it up as a dast section there.',
+      'Where things stand: SAST, secrets scanning, and DAST are all working against a codebase I built and can walk through in detail. Both scans are in the repo now as a before and after. Next is to tighten the CSP so it has no undefined directives and drops unsafe-inline, add the cross-origin and permissions headers, and run a third pass.',
       'This is the part that ties the pipeline story together for the portfolio: manual testing in Burp plus three automated layers, all pointed at my own code. The scp mix-up was minor but it is another real troubleshooting moment worth keeping in the notes rather than smoothing over.',
     ],
     tools: ['OWASP ZAP', 'Docker', 'Semgrep', 'gitleaks'],
@@ -66,10 +70,16 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'security headers',
       'CI/CD pipeline',
     ],
-    link: {
-      label: 'View the ZAP baseline report',
-      url: '/my-portfolio/zap-report.html',
-    },
+    links: [
+      {
+        label: 'First ZAP baseline report',
+        url: '/my-portfolio/zap-report.html',
+      },
+      {
+        label: 'Second scan, after a first pass at the headers',
+        url: '/my-portfolio/zap-report-2.html',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-8-docker-deploy',

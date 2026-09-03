@@ -218,15 +218,23 @@ function DiaryArticle({
           </div>
         )}
 
-        {entry.link && (
-          <a
-            href={entry.link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block text-primary hover:text-primary text-sm font-medium underline underline-offset-2"
-          >
-            {entry.link.label} →
-          </a>
+        {(entry.link || (entry.links && entry.links.length > 0)) && (
+          <div className="flex flex-col items-start gap-1.5 pt-1">
+            {[
+              ...(entry.link ? [entry.link] : []),
+              ...(entry.links ?? []),
+            ].map((ref) => (
+              <a
+                key={ref.url}
+                href={ref.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary text-sm font-medium underline underline-offset-2"
+              >
+                {ref.label} →
+              </a>
+            ))}
+          </div>
         )}
       </div>
     </article>
