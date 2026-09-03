@@ -1,3 +1,7 @@
+import Card from './ui/Card'
+import SectionHeader from './ui/SectionHeader'
+import Tag from './ui/Tag'
+
 interface Project {
   id: string
   title: string
@@ -74,51 +78,30 @@ const projects: Project[] = [
   },
 ]
 
-interface ProjectsProps {
-  setActiveSection: (section: string) => void
-}
-
-function Projects({ setActiveSection }: ProjectsProps) {
+function Projects() {
   return (
-    <section id="projects" className="bg-gray-100 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-semibold mb-8">My Projects</h2>
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <ul className="space-y-6">
-            {projects.map((project) => (
-              <li
-                key={project.id}
-                className="border-b border-gray-200 pb-6 last:border-b-0"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">
-                      {project.title}
-                    </h3>
-                    <p className="text-gray-600 mb-3">{project.description}</p>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {project.technologies.map((tech) => (
-                        <span
-                          key={tech}
-                          className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setActiveSection(`project-${project.id}`)}
-                    className="ml-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-semibold"
-                  >
-                    View Details
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+    <section id="projects" className="max-w-[45rem] mx-auto py-16 px-4">
+      <SectionHeader title="My Projects" />
+      <ul className="space-y-4">
+        {projects.map((project) => (
+          <li key={project.id}>
+            <Card to={`/projects/${project.id}`}>
+              <h2 className="text-xl font-bold text-ink mb-2">{project.title}</h2>
+              <p className="text-ink-muted text-sm mb-4">
+                {project.description}
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {project.technologies.map((tech) => (
+                  <Tag key={tech}>{tech}</Tag>
+                ))}
+              </div>
+              <span className="text-primary text-sm font-medium">
+                View details →
+              </span>
+            </Card>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }

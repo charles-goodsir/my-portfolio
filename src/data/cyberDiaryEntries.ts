@@ -4,7 +4,7 @@ export interface DiaryLab {
   solution: string
   /** Whether the lab was fully solved. Some blind/OAST labs are blocked behind Burp Pro. */
   status?: 'completed' | 'in-progress' | 'blocked'
-  /** Path to a reference screenshot, relative to src/assets, e.g. 'Burp/Lab10.png' */
+  /** Path to a reference screenshot, relative to src/assets, e.g. 'Burp/Lab10.webp' */
   screenshot?: string
   /** Additional reference screenshots, relative to src/assets. Rendered after `screenshot`. */
   screenshots?: string[]
@@ -44,7 +44,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-09-03',
     category: 'AppSec Homelab',
     vulnTypes: ['AppSec Homelab'],
-    title: 'AppSec Homelab Entry 9: first ZAP baseline scan',
+    title: 'First ZAP baseline scan',
     workedOn: [
       'Ran the first OWASP ZAP baseline scan against the app deployed on the mini PC, adding the DAST layer alongside Semgrep (SAST) and gitleaks (secrets)',
       'Read the results: 59 pass, 0 fail, 8 warnings, all missing-header findings rather than active-exploit findings',
@@ -76,8 +76,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-09-03',
     category: 'AppSec Homelab',
     vulnTypes: ['AppSec Homelab'],
-    title:
-      'AppSec Homelab Entry 8: Docker deployment and a separate GitHub key',
+    title: 'Docker deployment and a separate GitHub key',
     workedOn: [
       'Switched the mini PC to a text-only boot (multi-user.target) to free the RAM the desktop environment was using, and confirmed SSH still connects after the reboot',
       'Generated a dedicated SSH key on the mini PC for GitHub and registered it as its own key, so the mini PC and the Mac authenticate independently',
@@ -109,7 +108,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-09-02',
     category: 'AppSec Homelab',
     vulnTypes: ['AppSec Homelab'],
-    title: 'AppSec Homelab Entry 7: mini PC setup and SSH hardening',
+    title: 'Mini PC setup and SSH hardening',
     workedOn: [
       'Set up the mini PC (shipped with Linux Mint) as the base for the AppSec homelab, and decided to keep Mint rather than wipe to Ubuntu Server',
       'Diagnosed a "no signal" display fault after boot - turned out to be the HDMI cable, not GRUB or the graphics drivers',
@@ -144,7 +143,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     category: 'PortSwigger Labs',
     vulnTypes: ['XSS'],
     title:
-      'Cross-Site Scripting (XSS) Labs 6-8 (jQuery sinks + encoded attribute)',
+      'Cross-Site Scripting (XSS) labs 6-8 (jQuery sinks + encoded attribute)',
     workedOn: [
       'Kept going on the PortSwigger XSS path, Labs 6 through 11',
       'Labs 6 and 7: DOM XSS through jQuery sinks - an .attr() href sink and a hashchange selector sink',
@@ -170,7 +169,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           '/feedback?returnPath=javascript:alert(document.cookie)\n\nSet as the returnPath param; the alert fires on clicking the Back link.',
         status: 'completed',
-        screenshot: 'Burp/Lab6XSS.png',
+        screenshot: 'Burp/Lab6XSS.webp',
       },
       {
         title:
@@ -189,8 +188,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           '<iframe src="https://LAB-ID.web-security-academy.net/#" onload="this.src+=\'<img src=x onerror=print()>\'"></iframe>\n\nDelivered from the exploit server.',
         status: 'completed',
-        screenshot: 'Burp/Lab7XSS.png',
-        screenshots: ['Burp/Lab7XSS2.png'],
+        screenshot: 'Burp/Lab7XSS.webp',
+        screenshots: ['Burp/Lab7XSS2.webp'],
       },
       {
         title:
@@ -202,8 +201,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: "p3p\" onmouseover='alert()'",
         status: 'completed',
-        screenshot: 'Burp/Lab8XSS.png',
-        screenshots: ['Burp/Lab8XSS2.png'],
+        screenshot: 'Burp/Lab8XSS.webp',
+        screenshots: ['Burp/Lab8XSS2.webp'],
       },
       {
         title:
@@ -216,8 +215,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: 'javascript:alert()',
         status: 'completed',
-        screenshot: 'Burp/Lab9XSS.png',
-        screenshots: ['Burp/Lab9XSS2.png'],
+        screenshot: 'Burp/Lab9XSS.webp',
+        screenshots: ['Burp/Lab9XSS2.webp'],
       },
       {
         title:
@@ -232,7 +231,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           "p3p'; alert(); let cake = 'test\n\nAlso works as a self-contained break-in: '-alert()-'",
         status: 'completed',
-        screenshot: 'Burp/Lab10XSS.png',
+        screenshot: 'Burp/Lab10XSS.webp',
       },
       {
         title:
@@ -246,7 +245,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: "{{ $eval.constructor('alert()')() }}",
         status: 'completed',
-        screenshot: 'Burp/Lab11XSS.png',
+        screenshot: 'Burp/Lab11XSS.webp',
       },
     ],
     tools: ['Burp Suite', 'Web Browser', 'Chrome DevTools'],
@@ -270,7 +269,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-09-01',
     category: 'PortSwigger Labs',
     vulnTypes: ['XSS'],
-    title: 'Cross-Site Scripting (XSS) Labs 2-5 (stored XSS + DOM XSS)',
+    title: 'Cross-Site Scripting (XSS) labs 2-5 (stored XSS + DOM XSS)',
     workedOn: [
       'Back into the PortSwigger XSS path after a holiday break - completed Labs 2 through 5',
       'Lab 2: stored XSS via a blog comment field with no output encoding',
@@ -317,8 +316,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           "?productId=1&storeId=p3p</select><img src='1' onerror='alert()'>\n\nURL-encoded:\n?productId=1&storeId=p3p%3C/select%3E%3Cimg%20src=%271%27%20onerror=%27alert()%27%3E",
         status: 'completed',
-        screenshot: 'Burp/Lab4XSS.png',
-        screenshots: ['Burp/Lab4XSS2.png'],
+        screenshot: 'Burp/Lab4XSS.webp',
+        screenshots: ['Burp/Lab4XSS2.webp'],
       },
       {
         title: 'Lab 5: DOM XSS in innerHTML sink using source location.search',
@@ -329,7 +328,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: "<img src='0' onerror='alert()'>",
         status: 'completed',
-        screenshot: 'Burp/Lab5XSS.png',
+        screenshot: 'Burp/Lab5XSS.webp',
       },
     ],
     tools: ['Burp Suite', 'Web Browser', 'Chrome DevTools'],
@@ -352,7 +351,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     category: 'AppSec Homelab',
     vulnTypes: ['AppSec Homelab', 'SQL Injection'],
     title:
-      'AppSec Homelab Entry 6: leaving the AuthController SQLi as a documented false negative',
+      'Leaving the AuthController SQLi as a documented false negative',
     workedOn: [
       'Reverted AuthController.cs back to its original, realistic [FromBody] login endpoint after the Entry 5 investigation',
       'Confirmed the SQL injection is still fully exploitable, and confirmed the pipeline still does not flag it',
@@ -375,8 +374,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-08-06',
     category: 'AppSec Homelab',
     vulnTypes: ['AppSec Homelab', 'SQL Injection'],
-    title:
-      'AppSec Homelab Entry 5: why Semgrep caught one SQLi and missed the other',
+    title: 'Why Semgrep caught one SQLi and missed the other',
     workedOn: [
       'Investigated why Semgrep flagged the SQL injection in ProductsController.cs but not the structurally identical one in AuthController.cs',
       'Ran Semgrep locally (CLI) against isolated versions of the file to test hypotheses one variable at a time',
@@ -414,7 +412,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     category: 'AppSec Homelab',
     vulnTypes: ['AppSec Homelab', 'SQL Injection', 'XSS'],
     title:
-      'AppSec Homelab Entry 4: building the vulnerable app and running the first pipeline scan',
+      'Building the vulnerable app and running the first pipeline scan',
     workedOn: [
       'Built a bare-bones vulnerable-by-design app (.NET/C# backend, TypeScript/React frontend) to test what I learned in the PortSwigger SQLi and XSS labs',
       'Debugged the app from first build errors through to a working login and product search',
@@ -450,10 +448,10 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       url: 'https://github.com/charles-goodsir/appsec-homelab',
     },
     screenshots: [
-      'Homelab/SQLiHomeLabDay1.png',
-      'Homelab/XSSHomeLabDay1.png',
-      'Homelab/WorkflowRunningDay1.png',
-      'Homelab/FirstWorkflowResultDay1.png',
+      'Homelab/SQLiHomeLabDay1.webp',
+      'Homelab/XSSHomeLabDay1.webp',
+      'Homelab/WorkflowRunningDay1.webp',
+      'Homelab/FirstWorkflowResultDay1.webp',
     ],
   },
   {
@@ -461,7 +459,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-07-30',
     category: 'PortSwigger Labs',
     vulnTypes: ['XSS'],
-    title: 'Cross-Site Scripting (XSS) Lab 1 (reflected XSS)',
+    title: 'Cross-Site Scripting (XSS) lab 1 (reflected XSS)',
     workedOn: [
       'Started the PortSwigger Cross-Site Scripting (XSS) learning path',
       'Completed Lab 1: reflected XSS into an HTML context with nothing encoded',
@@ -470,7 +468,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'First attempt at XSS after finishing the SQL injection path. Different mental model to SQLi - instead of manipulating a database query, the goal is getting the browser itself to execute a script that gets reflected back into the page unencoded.',
       'Went in with a rough idea from JavaScript that a <script> tag triggers execution, but the specifics of what actually fires in a browser context took a bit of trial and error.',
     ],
-    screenshot: 'Burp/Lab1XSS.png',
+    screenshot: 'Burp/Lab1XSS.webp',
     labs: [
       {
         title: 'Lab 1: Reflected XSS into HTML context with nothing encoded',
@@ -505,7 +503,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Closing out the SQL injection learning path for now. Went from basic WHERE-clause tautologies through UNION attacks on Oracle, MySQL, and PostgreSQL, blind SQLi via conditional responses, conditional errors, and time delays, and a WAF bypass using XML encoding via Hackvertor.',
       'Labs 15 and 16 need Burp Collaborator, which sits behind a Professional licence. Flagging them as blocked rather than skipping past quietly - revisiting once I upgrade or find a trial window.',
     ],
-    screenshot: 'Burp/CompletedSQLiLabs.png',
+    screenshot: 'Burp/CompletedSQLiLabs.webp',
     tools: [
       'Burp Suite',
       'Burp Proxy',
@@ -825,7 +823,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: "' UNION SELECT NULL, username || password FROM users--",
         status: 'completed',
-        screenshot: 'Burp/Lab10.png',
+        screenshot: 'Burp/Lab10.webp',
       },
     ],
     tools: ['Burp Suite', 'Burp Proxy', 'Burp Repeater'],
