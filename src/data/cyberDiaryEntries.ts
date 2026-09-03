@@ -42,6 +42,57 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'appsec-homelab-entry-10-zap-remediation-final',
+    date: '2026-09-03',
+    category: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab'],
+    title: 'ZAP remediation, final round',
+    workedOn: [
+      'Added the last batch of response headers to frontend/nginx.conf: Cross-Origin-Opener-Policy, Cross-Origin-Resource-Policy, Cross-Origin-Embedder-Policy, and a Permissions-Policy that disables geolocation, camera, and microphone',
+      "Added form-action 'self' to the CSP, which cleared the undefined-directive warning from the second scan",
+      'Rebuilt the app and ran the third ZAP baseline scan for the final before and after',
+      'Called the remediation loop finished: 3 warnings left, all documented trade-offs or informational',
+    ],
+    body: [
+      'Third and last pass at the ZAP findings. The second scan left the three cross-origin headers, the Permissions-Policy header, and a still-weak CSP open, so this round closes those out.',
+      'Added to frontend/nginx.conf: Cross-Origin-Opener-Policy: same-origin, Cross-Origin-Resource-Policy: same-origin, Cross-Origin-Embedder-Policy: require-corp, and Permissions-Policy: geolocation=(), camera=(), microphone=(). I left a comment on the COEP line noting that require-corp can break cross-origin loads. It is safe here because everything the app loads is same-origin, but it is not a header to apply blindly on a site that pulls in third-party resources.',
+      "For the CSP, adding form-action 'self' cleared the failure-to-define-directive-with-no-fallback warning from round 2.",
+      'Then rebuilt and re-ran the same scan: docker compose up -d --build, then docker run -t -v $(pwd):/zap/wrk/:rw zaproxy/zap-stable zap-baseline.py -t http://192.168.88.13:8080 -r zap-report-3.html.',
+      'The numbers across the three rounds: round 1 was 8 warnings and 59 passes, round 2 was 5 and 62, round 3 is 3 and 64. The three that are left are all deliberate. The CSP still allows unsafe-inline for styles, which I have kept for a v1 policy and noted in the nginx comments. The other two, storable and cacheable content and the modern-web-application flag, are informational only.',
+      'I am calling this the stopping point for the remediation loop. Everything fixable with a header is fixed, and what is left is either informational or a justified trade-off documented in the config itself. Chasing the last three further is diminishing returns for a homelab. The point was to show the fix-and-verify loop works, not to force a zero-warning scan.',
+      'Where things stand: SAST, secrets scanning, and DAST are all working, and the DAST side now has three full rounds documented as a clean before and after. The pipeline is proven on findings I found myself, not theoretical ones. Next is the OWASP Top 10 mapping: take the vulns from PortSwigger, manual testing, and this ZAP work and tie each one to its Top 10 category for the writeup. Then back to the PortSwigger XSS labs.',
+      'This is the strongest single artifact in the homelab so far: a real three-round fix-and-verify cycle with before and after numbers, not a one-off scan. The Cross-Origin-Embedder-Policy comment is the part worth raising in interviews. Knowing when a security header is risky to apply blindly is a better signal than knowing the headers exist.',
+    ],
+    screenshots: [
+      'Homelab/HomeLab3.webp',
+      'Homelab/HomeLab3GhAction.webp',
+      'Homelab/HomeLab4.webp',
+    ],
+    tools: ['OWASP ZAP', 'Docker', 'nginx'],
+    tags: [
+      'AppSec homelab',
+      'DAST',
+      'OWASP ZAP',
+      'security headers',
+      'CSP',
+      'CI/CD pipeline',
+    ],
+    links: [
+      {
+        label: 'First ZAP baseline report',
+        url: '/my-portfolio/zap-report.html',
+      },
+      {
+        label: 'Second scan, after a first pass at the headers',
+        url: '/my-portfolio/zap-report-2.html',
+      },
+      {
+        label: 'Third scan, final',
+        url: '/my-portfolio/zap-report-3.html',
+      },
+    ],
+  },
+  {
     id: 'appsec-homelab-entry-9-first-zap-scan',
     date: '2026-09-03',
     category: 'AppSec Homelab',
