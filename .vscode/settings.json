@@ -1,0 +1,6 @@
+{
+  "// note": "Tailwind v4 uses CSS at-rules (@theme, @utility, @custom-variant, @apply) that VS Code's built-in CSS linter does not recognise. The Vite build compiles them correctly.",
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore",
+  "less.lint.unknownAtRules": "ignore"
+}
