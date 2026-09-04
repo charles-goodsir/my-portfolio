@@ -1,5 +1,5 @@
 CHARLES GOODSIR
-Auckland, NZ • goodsirces@gmail.com • 027 814 4772 • LinkedIn • Portfolio • Detour App
+Auckland, NZ • [goodsirces@gmail.com](mailto:goodsirces@gmail.com) • +64 278144772 • [LinkedIn](https://www.linkedin.com/in/charles-goodsir-430b0b254/) • [GitHub](https://github.com/charles-goodsir) • [Portfolio](https://charles-goodsir.github.io/my-portfolio/) • [Detour App](https://apps.apple.com/us/app/detour/id6743507600)
 
 PROFESSIONAL SUMMARY
 Software application engineer with 4+ years building enterprise CRM/ERP systems, moving into application
