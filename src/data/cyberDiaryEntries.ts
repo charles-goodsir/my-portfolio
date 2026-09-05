@@ -26,6 +26,8 @@ export interface DiaryEntry {
   body: string[]
   /** Per-lab write-ups with solutions. */
   labs?: DiaryLab[]
+  /** Before/after (or standalone) code snippets, rendered as labelled code blocks after `body`. */
+  codeSnippets?: { label: string; code: string }[]
   tools?: string[]
   tags?: string[]
   link?: { label: string; url: string }
@@ -59,9 +61,19 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Ran npm run dev and pointed it at the same product search input from earlier. Tried <img src=x onerror="alert(document.domain)"> in the search box.',
       'It fired. The onerror handler runs as soon as the broken image tries and fails to load, popping an alert with document.domain: localhost. DevTools showed the raw img tag sitting straight in the DOM, unescaped, exactly where the search term gets echoed back.',
       "Tried a couple of variations to see what else I could get out of it beyond the alert box, but nothing more came of it - the input doesn't reach anywhere more interesting than the DOM in this app.",
-      'Fixed the display so React renders it as text instead of markup: <p>You searched for: {submittedQuery}</p>. JSX escapes anything interpolated this way by default, so a string that looks like an img tag comes out on the page as literal characters instead of parsed HTML.',
+      'Fixed the display so React renders it as text instead of markup (before/after, below). JSX escapes anything interpolated this way by default, so a string that looks like an img tag comes out on the page as literal characters instead of parsed HTML.',
       'Retested and thought I had broken the search feature entirely - no results were coming back for a normal term either. Turned out I had stopped the dotnet build for the backend earlier in the day and forgotten about it, so nothing was reaching the database. Not related to the fix at all.',
       'Restarted the backend, searched for laptop, and it worked properly - a real result back, and the earlier payload now shows up as plain text instead of executing. Three for three on the seeded vulnerabilities now: the login bypass, the product search SQLi, and this one.',
+    ],
+    codeSnippets: [
+      {
+        label: 'Product search result - before (dangerouslySetInnerHTML)',
+        code: '<p\n  dangerouslySetInnerHTML={{\n    __html: `You searched for: ${submittedQuery}`,\n  }}\n/>',
+      },
+      {
+        label: 'Product search result - after (JSX text interpolation)',
+        code: '<p>You searched for: {submittedQuery}</p>',
+      },
     ],
     screenshots: [
       'Homelab/HomeLabXSS1.webp',
@@ -88,10 +100,20 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
     body: [
       'Straight on to the next exploit fix. This one is the product search endpoint, which is the SQLi Semgrep does flag - the counterpart to the AuthController.cs login bypass from earlier today, which it does not.',
-      'The vulnerable code, commented in the repo as A05:2025 - Injection: var sql = $"SELECT Id, Name, Description FROM Products WHERE Name LIKE \'%{query}%\'". Same raw string concatenation pattern as the login query, just a LIKE clause instead of an equality check.',
-      'Fixed it the same way as AuthController.cs: created a parameter instead of interpolating it. queryParam.ParameterName = "@Query", queryParam.Value = $"%{query}%", command.Parameters.Add(queryParam). Binding the value instead of building it into the SQL string.',
+      'The vulnerable code, commented in the repo as A05:2025 - Injection, is the same raw string concatenation pattern as the login query, just a LIKE clause instead of an equality check (before, below).',
+      'Fixed it the same way as AuthController.cs: created a parameter instead of interpolating it, binding the value instead of building it into the SQL string (after, below).',
       'Tested with curl -s "http://localhost:5001/api/products/search?query=lap" first, which comes back with the real product as expected - the Laptop Stand. Then curl -s "http://localhost:5001/api/products/search?query=test\'", a query ending in a single quote, which would have broken out of the LIKE clause on the old code. It comes back as an empty array instead, so the fix holds.',
       'Two for two now on the seeded SQLi bugs, the login bypass and the product search, both fixed the same way. Next is checking whether anything else in the app needs the same treatment.',
+    ],
+    codeSnippets: [
+      {
+        label: 'ProductsController.cs - before (string interpolation)',
+        code: '// VULNERABLE: raw string concatenation into SQL (A05:2025 - Injection)\nvar sql = $"SELECT Id, Name, Description FROM Products WHERE Name LIKE \'%{query}%\'";\n\nusing var connection = _db.Database.GetDbConnection();\nconnection.Open();\nusing var command = connection.CreateCommand();\ncommand.CommandText = sql;\nusing var reader = command.ExecuteReader();',
+      },
+      {
+        label: 'ProductsController.cs - after (parameterized)',
+        code: 'var queryParam = command.CreateParameter();\nqueryParam.ParameterName = "@Query";\nqueryParam.Value = $"%{query}%";\ncommand.Parameters.Add(queryParam);\nusing var reader = command.ExecuteReader();',
+      },
     ],
     screenshots: [
       'Homelab/SQLiHomeLabProductFix.webp',
@@ -126,12 +148,22 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       "Next day in the homelab. Plan was to take what I've been drilling in PortSwigger and turn it on my own app: a manual UNION-based SQL injection against the login endpoint in appsec-homelab.",
       'First, the baseline. curl -i -X POST http://localhost:5001/api/auth/login -H \'Content-Type: application/json\' -d \'{"username":"<a seeded user>","password":"<their real password>"}\'. That is what a normal login looks like.',
       'Then the exploit, and it turned out to be simpler than the UNION attack I went in expecting. Same request, but {"username":"administrator\' --","password":"anything"}. The -- comments out the rest of the WHERE clause, so the password check never runs. Any string in the password field logs in as administrator. Same category of bug I have been practicing on PortSwigger, just the classic auth-bypass shape rather than a UNION extraction.',
-      'Finding it is one thing, fixing it in code is the actual point of this repo. The original AuthController.cs built the query by string interpolation: var sql = $"SELECT Id, Username FROM Users WHERE Username = \'{request.Username}\' AND Password = \'{request.Password}\'". Whatever comes in on those two fields lands straight in the SQL text.',
+      'Finding it is one thing, fixing it in code is the actual point of this repo. The original AuthController.cs built the query by string interpolation - whatever came in on the username and password fields landed straight in the SQL text (before, below).',
       'First fix used command.Parameters.AddWithValue("@Name", request.Username) and the same for the password, binding the values instead of interpolating them. Ran dotnet build and it failed. Rather than guess further, switched approach.',
-      'Second attempt built the parameters manually: command.CreateParameter(), set ParameterName and Value, then command.Parameters.Add() it, once for @Name and once for @Password. That built cleanly.',
+      'Second attempt built the parameters manually with CreateParameter() instead (after, below). That built cleanly.',
       'Re-ran the same curl exploit against the fixed endpoint and it no longer worked. The username value is now bound as a literal parameter instead of concatenated into the query text, so administrator\' -- just gets treated as a username string that does not exist, which is the point of parameterization.',
       "Committed the fix and pushed. The pipeline ran and Semgrep flagged ProductsController.cs's injection like it always does, but still said nothing about AuthController.cs - same false negative as Entry 5, except now it applies to a fixed endpoint instead of a vulnerable one. The tool's blind spot on [FromBody]-bound input cuts both ways: it never caught the bug and it will not confirm the fix either. Manual testing is still the only thing that actually proves either state here.",
       'Onto the next exploit and fix. Same drill on whatever the ProductsController vulnerability turns up.',
+    ],
+    codeSnippets: [
+      {
+        label: 'AuthController.cs - before (string interpolation)',
+        code: 'var sql = $"SELECT Id, Username FROM Users WHERE Username = \'{request.Username}\' AND Password = \'{request.Password}\'";\n\nusing var connection = _db.Database.GetDbConnection();\nconnection.Open();\nusing var command = connection.CreateCommand();\ncommand.CommandText = sql;\nusing var reader = command.ExecuteReader();',
+      },
+      {
+        label: 'AuthController.cs - after (parameterized)',
+        code: 'var sql = "SELECT Id, Username FROM Users WHERE Username = @Name AND Password = @Password";\n\nusing var connection = _db.Database.GetDbConnection();\nconnection.Open();\nusing var command = connection.CreateCommand();\ncommand.CommandText = sql;\nvar nameParam = command.CreateParameter();\nnameParam.ParameterName = "@Name";\nnameParam.Value = request.Username;\ncommand.Parameters.Add(nameParam);\nvar passwordParam = command.CreateParameter();\npasswordParam.ParameterName = "@Password";\npasswordParam.Value = request.Password;\ncommand.Parameters.Add(passwordParam);\nusing var reader = command.ExecuteReader();',
+      },
     ],
     screenshots: [
       'Homelab/SQLiHomeLabDay2.webp',

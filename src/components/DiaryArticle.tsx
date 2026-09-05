@@ -81,6 +81,21 @@ function DiaryArticle({
           </div>
         )}
 
+        {entry.codeSnippets && entry.codeSnippets.length > 0 && (
+          <div className="space-y-3">
+            {entry.codeSnippets.map((snippet, index) => (
+              <div key={`${entry.id}-code-${index}`}>
+                <p className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-1.5">
+                  {snippet.label}
+                </p>
+                <pre className="bg-slate-900 text-slate-100 text-xs rounded p-3 overflow-x-auto whitespace-pre font-mono leading-relaxed">
+                  <code>{snippet.code}</code>
+                </pre>
+              </div>
+            ))}
+          </div>
+        )}
+
         {entry.screenshot && resolveScreenshot(entry.screenshot) && (
           <img
             src={resolveScreenshot(entry.screenshot)}
