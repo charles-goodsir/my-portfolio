@@ -42,6 +42,40 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'appsec-homelab-entry-13-product-search-xss-fix',
+    date: '2026-09-05',
+    category: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab', 'XSS'],
+    title: 'Exploiting and fixing the product search XSS',
+    workedOn: [
+      'Tried a manual XSS against the product search input, which the codebase already showed was vulnerable',
+      "Confirmed it: <img src=x onerror=\"alert(document.domain)\"> fires an alert showing the page's own domain",
+      'Fixed it by rendering the query through JSX text interpolation ({submittedQuery}) instead of raw HTML, so React escapes it automatically',
+      'Chased a false alarm where search appeared broken after the fix - the dotnet backend was still stopped from earlier, unrelated to the fix itself',
+      'Re-tested with a real search term and confirmed the payload no longer executes',
+    ],
+    body: [
+      'Two exploits fixed, one more to try. XSS is the last of the vulnerabilities I already knew was seeded in the app, from having read the codebase.',
+      'Ran npm run dev and pointed it at the same product search input from earlier. Tried <img src=x onerror="alert(document.domain)"> in the search box.',
+      'It fired. The onerror handler runs as soon as the broken image tries and fails to load, popping an alert with document.domain: localhost. DevTools showed the raw img tag sitting straight in the DOM, unescaped, exactly where the search term gets echoed back.',
+      "Tried a couple of variations to see what else I could get out of it beyond the alert box, but nothing more came of it - the input doesn't reach anywhere more interesting than the DOM in this app.",
+      'Fixed the display so React renders it as text instead of markup: <p>You searched for: {submittedQuery}</p>. JSX escapes anything interpolated this way by default, so a string that looks like an img tag comes out on the page as literal characters instead of parsed HTML.',
+      'Retested and thought I had broken the search feature entirely - no results were coming back for a normal term either. Turned out I had stopped the dotnet build for the backend earlier in the day and forgotten about it, so nothing was reaching the database. Not related to the fix at all.',
+      'Restarted the backend, searched for laptop, and it worked properly - a real result back, and the earlier payload now shows up as plain text instead of executing. Three for three on the seeded vulnerabilities now: the login bypass, the product search SQLi, and this one.',
+    ],
+    screenshots: [
+      'Homelab/HomeLabXSS1.webp',
+      'Homelab/HomeLabXSS2.webp',
+      'Homelab/HomeLabXSSFix1.webp',
+    ],
+    tools: ['React', 'JSX', 'Chrome DevTools'],
+    tags: ['AppSec homelab', 'XSS', 'reflected XSS', 'output encoding'],
+    link: {
+      label: 'appsec-homelab repo',
+      url: 'https://github.com/charles-goodsir/appsec-homelab',
+    },
+  },
+  {
     id: 'appsec-homelab-entry-12-product-search-sqli-fix',
     date: '2026-09-05',
     category: 'AppSec Homelab',
