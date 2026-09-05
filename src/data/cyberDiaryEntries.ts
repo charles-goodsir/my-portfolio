@@ -42,6 +42,41 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'appsec-homelab-entry-12-product-search-sqli-fix',
+    date: '2026-09-05',
+    category: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab', 'SQL Injection'],
+    title: 'Fixing the ProductsController SQL injection',
+    workedOn: [
+      'Fixed the SQL injection in the product search endpoint (ProductsController.cs), the other of the two SQLi bugs seeded in the app and the one Semgrep does actually flag',
+      "Used the same fix as the AuthController.cs login bypass: bound the search term with CreateParameter instead of interpolating it into the LIKE clause",
+      "Confirmed the fix with curl: a normal search still returns real results, and a query ending in a single quote now returns an empty array instead of breaking out of the query",
+    ],
+    body: [
+      'Straight on to the next exploit fix. This one is the product search endpoint, which is the SQLi Semgrep does flag - the counterpart to the AuthController.cs login bypass from earlier today, which it does not.',
+      'The vulnerable code, commented in the repo as A05:2025 - Injection: var sql = $"SELECT Id, Name, Description FROM Products WHERE Name LIKE \'%{query}%\'". Same raw string concatenation pattern as the login query, just a LIKE clause instead of an equality check.',
+      'Fixed it the same way as AuthController.cs: created a parameter instead of interpolating it. queryParam.ParameterName = "@Query", queryParam.Value = $"%{query}%", command.Parameters.Add(queryParam). Binding the value instead of building it into the SQL string.',
+      'Tested with curl -s "http://localhost:5001/api/products/search?query=lap" first, which comes back with the real product as expected - the Laptop Stand. Then curl -s "http://localhost:5001/api/products/search?query=test\'", a query ending in a single quote, which would have broken out of the LIKE clause on the old code. It comes back as an empty array instead, so the fix holds.',
+      'Two for two now on the seeded SQLi bugs, the login bypass and the product search, both fixed the same way. Next is checking whether anything else in the app needs the same treatment.',
+    ],
+    screenshots: [
+      'Homelab/SQLiHomeLabProductFix.webp',
+      'Homelab/HomeLabProductFix2.webp',
+      'Homelab/HomeLabProductFix3.webp',
+    ],
+    tools: ['.NET / C#', 'curl'],
+    tags: [
+      'AppSec homelab',
+      'SQL injection',
+      'parameterized queries',
+      'OWASP Top 10',
+    ],
+    link: {
+      label: 'appsec-homelab repo',
+      url: 'https://github.com/charles-goodsir/appsec-homelab',
+    },
+  },
+  {
     id: 'appsec-homelab-entry-11-login-bypass-fix',
     date: '2026-09-05',
     category: 'AppSec Homelab',
