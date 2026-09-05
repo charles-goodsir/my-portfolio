@@ -42,6 +42,47 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'appsec-homelab-entry-11-login-bypass-fix',
+    date: '2026-09-05',
+    category: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab', 'SQL Injection'],
+    title: 'Exploiting and fixing a SQL injection login bypass',
+    workedOn: [
+      'Tried a manual SQL injection against the login endpoint of my own appsec-homelab app, using PortSwigger technique on a codebase I built myself',
+      "Confirmed the exploit: administrator' -- as the username with any password logs in as admin",
+      'Fixed the vulnerable query in AuthController.cs, first with EF Core parameters via AddWithValue, then properly with CreateParameter after a build error',
+      'Committed the fix and watched the pipeline run: Semgrep still does not flag AuthController.cs, matching the false negative documented in Entry 5',
+    ],
+    body: [
+      "Next day in the homelab. Plan was to take what I've been drilling in PortSwigger and turn it on my own app: a manual UNION-based SQL injection against the login endpoint in appsec-homelab.",
+      'First, the baseline. curl -i -X POST http://localhost:5001/api/auth/login -H \'Content-Type: application/json\' -d \'{"username":"<a seeded user>","password":"<their real password>"}\'. That is what a normal login looks like.',
+      'Then the exploit, and it turned out to be simpler than the UNION attack I went in expecting. Same request, but {"username":"administrator\' --","password":"anything"}. The -- comments out the rest of the WHERE clause, so the password check never runs. Any string in the password field logs in as administrator. Same category of bug I have been practicing on PortSwigger, just the classic auth-bypass shape rather than a UNION extraction.',
+      'Finding it is one thing, fixing it in code is the actual point of this repo. The original AuthController.cs built the query by string interpolation: var sql = $"SELECT Id, Username FROM Users WHERE Username = \'{request.Username}\' AND Password = \'{request.Password}\'". Whatever comes in on those two fields lands straight in the SQL text.',
+      'First fix used command.Parameters.AddWithValue("@Name", request.Username) and the same for the password, binding the values instead of interpolating them. Ran dotnet build and it failed. Rather than guess further, switched approach.',
+      'Second attempt built the parameters manually: command.CreateParameter(), set ParameterName and Value, then command.Parameters.Add() it, once for @Name and once for @Password. That built cleanly.',
+      'Re-ran the same curl exploit against the fixed endpoint and it no longer worked. The username value is now bound as a literal parameter instead of concatenated into the query text, so administrator\' -- just gets treated as a username string that does not exist, which is the point of parameterization.',
+      "Committed the fix and pushed. The pipeline ran and Semgrep flagged ProductsController.cs's injection like it always does, but still said nothing about AuthController.cs - same false negative as Entry 5, except now it applies to a fixed endpoint instead of a vulnerable one. The tool's blind spot on [FromBody]-bound input cuts both ways: it never caught the bug and it will not confirm the fix either. Manual testing is still the only thing that actually proves either state here.",
+      'Onto the next exploit and fix. Same drill on whatever the ProductsController vulnerability turns up.',
+    ],
+    screenshots: [
+      'Homelab/SQLiHomeLabDay2.webp',
+      'Homelab/SQLiHomeLabDay2.1.webp',
+      'Homelab/SQLiHomeLabLoginFix.webp',
+      'Homelab/SQLiHomeLabGrep.webp',
+    ],
+    tools: ['.NET / C#', 'curl', 'GitHub Actions', 'Semgrep'],
+    tags: [
+      'AppSec homelab',
+      'SQL injection',
+      'authentication bypass',
+      'parameterized queries',
+    ],
+    link: {
+      label: 'appsec-homelab repo',
+      url: 'https://github.com/charles-goodsir/appsec-homelab',
+    },
+  },
+  {
     id: 'appsec-homelab-entry-10-zap-remediation-final',
     date: '2026-09-03',
     category: 'AppSec Homelab',
