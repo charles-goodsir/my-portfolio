@@ -44,6 +44,85 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'portswigger-xss-labs-12-14',
+    date: '2026-09-06',
+    category: 'PortSwigger Labs',
+    vulnTypes: ['XSS'],
+    title:
+      'Cross-Site Scripting (XSS) labs 12-14 (DOM eval sink, stored DOM, tag/attribute brute-forcing)',
+    workedOn: [
+      'Back on the PortSwigger XSS path after the homelab work, Labs 12 to 14',
+      'Lab 12: reflected DOM XSS, breaking out of a string that gets passed to eval()',
+      'Lab 13: stored DOM XSS through the blog comment form',
+      'Lab 14: reflected XSS with most tags and attributes blocked, using Burp Intruder to brute-force which tag and attribute get through',
+    ],
+    body: [
+      'Switched back to PortSwigger after a couple of days finding and fixing the same bug classes in my own app. These three are all practitioner-level and all on the same blog lab I have been using.',
+      'Lab 14 was the first time I have used Burp Intruder properly. On the free version it rate-limits hard, so the tag and attribute brute-forcing is slow, but the method is the point: fire the whole PortSwigger cheatsheet of tags at the filter, watch for the 200s, then repeat for attributes on whichever tag survived.',
+      'Two of these came down to eval(). Note to self, which the labs keep reinforcing: never build a string out of user input and hand it to eval().',
+    ],
+    labs: [
+      {
+        title: 'Lab 12: Reflected DOM XSS',
+        notes: [
+          'Searched a unique random word (p3p) in the blog search and checked the DOM. The term shows up in the h1, but there is no inline script putting it there.',
+          'Found the JavaScript in the Network tab, not obfuscated. The response shows the whole search handler: it takes the JSON search-results response and runs it through eval() to parse it, so the reflected search term ends up inside a string that eval() executes.',
+          'eval() on a string built from user input is the whole vulnerability. The search term sits inside a double-quoted string in that eval call, so the goal is to break out of the string.',
+          'Intercepted the search request in Burp and tried search=p3p"-alert(). That did not break out - the original string\'s closing quote was still in the way.',
+          'Added a backslash to escape into the string and tried a few variants. Got tripped up by an extra space at one point which broke the payload; removed it and still no alert. The trailing quote from the original string kept the statement from being valid JavaScript.',
+          'Per the PortSwigger notes, commented out the rest of the line with // so the leftover " does not throw a syntax error. That made it fire.',
+          'Final payload breaks down as: \\" escapes into the string, -alert() runs, } closes the object literal, // comments out the rest of the line.',
+        ],
+        solution:
+          'p3p\\"-alert()}//\n\nFull URL: https://LAB-ID.web-security-academy.net/?search=p3p\\%22-alert()}//',
+        status: 'completed',
+        screenshot: 'Burp/Lab12XSS.webp',
+      },
+      {
+        title: 'Lab 13: Stored DOM XSS',
+        notes: [
+          'Quick recap that stuck: three types of XSS - reflected, stored, and DOM-based. Stored is the one that gets saved server-side and fires later when another user loads it.',
+          'Back on the blog, using the comment form as the input. The DOM has a script that takes the comment and inserts it into the page.',
+          'Sent plain HTML first - a couple of h1 tags - and checked the DOM. Got <h1>Hello World back with no closing tag, rendered as a heading, so the comment is not being HTML-encoded on the way in.',
+          'Tried <h1><h1 onmouseover=alert()">Hello</h1>. It did not fire - I had left the opening double quote off the handler. Fixed the quotes and the onmouseover alert worked on hover, but the lab still would not mark complete.',
+          'The lab wants the alert to fire on load, not on an interaction. Switched to an img onerror payload so it fires by itself. Fumbled it a couple of times - missing quote, missing brackets - then landed on the working one. The <> is junk that breaks the surrounding parsing, the img has a bad src so onerror runs alert(1) straight away.',
+        ],
+        solution: '<><img src=1 onerror=alert(1)>',
+        status: 'completed',
+      },
+      {
+        title:
+          'Lab 14: Reflected XSS into HTML context with most tags and attributes blocked',
+        notes: [
+          'The search input is filtered by a WAF. The usual payloads are blocked, but the angle brackets themselves are not, so a tag can still be formed - the filter is on which tags and attributes are allowed through.',
+          'First real use of Burp Intruder. Copied the full tag list from the PortSwigger XSS cheatsheet as the payload set and fired it at the search param, watching the status codes. On the free version this is slow because Intruder is throttled.',
+          'body came back 200 while the rest were blocked, so <body> gets through the filter.',
+          'Set up a second Intruder run against attributes on body: search=<body%20[attr]=1>. Waited that one out too.',
+          'onresize survived. body plus onresize means the payload needs something that actually resizes the element, which is where the exploit-server iframe comes in: load the lab in an iframe and change its width onload so the onresize handler on the injected body fires.',
+          'Delivered from the exploit server.',
+        ],
+        solution:
+          '<iframe src="https://LAB-ID.web-security-academy.net/?search=%22%3E%3Cbody%20onresize=print()%3E" onload=this.style.width=\'100px\'>\n\nDelivered from the exploit server.',
+        status: 'completed',
+      },
+    ],
+    tools: ['Burp Suite', 'Burp Intruder', 'Web Browser', 'Chrome DevTools'],
+    tags: [
+      'XSS',
+      'DOM XSS',
+      'reflected XSS',
+      'stored XSS',
+      'eval',
+      'Burp Intruder',
+      'WAF bypass',
+      'exploit server',
+    ],
+    link: {
+      label: 'Cross-site scripting (XSS)',
+      url: 'https://portswigger.net/web-security/cross-site-scripting',
+    },
+  },
+  {
     id: 'appsec-homelab-entry-13-product-search-xss-fix',
     date: '2026-09-05',
     category: 'AppSec Homelab',
