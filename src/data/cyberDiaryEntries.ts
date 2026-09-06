@@ -44,6 +44,118 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'portswigger-xss-labs-15-20',
+    date: '2026-09-06',
+    category: 'PortSwigger Labs',
+    vulnTypes: ['XSS'],
+    title:
+      'Cross-Site Scripting (XSS) labs 15-20 (custom tags, SVG, canonical link, JS string escaping, stored onclick)',
+    workedOn: [
+      'Kept going on the XSS path, Labs 15 to 20 - all filter and encoding evasion',
+      'Labs 15-16: filters that block every standard tag - a custom element with onfocus, and the SVG animatetransform / onbegin combo, both found with Intruder',
+      'Lab 17: reflected XSS into a canonical link tag with no visible input, made clickable with accesskey',
+      'Labs 18-19: reflected XSS into a JavaScript string with the quote and backslash escaped - breaking out with </script>, then with a trailing comment',
+      'Lab 20: the stored version, using the comment website field and HTML entities to get past blocked characters',
+    ],
+    body: [
+      'Second XSS session today. These six are all filter evasion: the injection point is obvious, the work is finding what the WAF or the encoding actually lets through.',
+      'Intruder came out again for 15 and 16, same method as Lab 14 - fire the cheatsheet at the filter and watch for 200s, first for tags then for event handlers. Slow on the free version but it is the only way through when the allowed set is small.',
+      'Lab 17 taught me something new. There is no search box - the value is reflected into a <link rel="canonical"> tag in the head that the user never sees. accesskey binds the injected onclick to a keypress, so the exploit works by getting the victim to press a key rather than click a visible element.',
+    ],
+    labs: [
+      {
+        title:
+          'Lab 15: Reflected XSS into HTML context with all tags blocked except custom ones',
+        notes: [
+          'The WAF blocks every standard tag - anything in the search comes back as a JSON error saying the tag is not allowed.',
+          'A custom element gets through. A custom tag with an alert works when loaded directly, but that is not the lab - it wants the alert to fire for a victim via the exploit server.',
+          'The payload shape: a custom tag with onfocus=alert(document.cookie), plus id and tabindex so the element is focusable and has a fragment target.',
+          'Sent it through the search and it was not blocked.',
+          'From the exploit server, a script that sets location to the lab search URL with the payload, ending in #x so the browser focuses the element with id x on load and fires onfocus.',
+        ],
+        solution:
+          '<script>\nlocation = "https://LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+onfocus%3Dalert%28document.cookie%29%20tabindex=1%3E#x";\n</script>\n\nDelivered from the exploit server.',
+        status: 'completed',
+        screenshot: 'Burp/Lab15XSS.webp',
+      },
+      {
+        title: 'Lab 16: Reflected XSS with some SVG markup allowed',
+        notes: [
+          'Standard tags blocked again. Back to Intruder with the tag list.',
+          'svg and animatetransform both return 200. animatetransform lives inside svg - note to self.',
+          'Then a second Intruder run over event handlers to find one the WAF allows.',
+          'onbegin returns 200. animatetransform fires onbegin when its animation starts, so no user interaction is needed.',
+        ],
+        solution: "<svg><animatetransform onbegin='alert(1)'>",
+        status: 'completed',
+      },
+      {
+        title: 'Lab 17: Reflected XSS in canonical link tag',
+        notes: [
+          'No visible input. The value is reflected into a <link rel="canonical"> tag in the head, which the user never sees.',
+          "Attacked the URL directly. Tried ?'onclick=alert(1) - nothing happened, and the DOM showed a trailing quote left over.",
+          "Used that trailing quote: ?'onclick='alert(1) closed the attribute cleanly and the onclick listener landed.",
+          'The tag is not clickable in any normal way, so the trigger is an access key - accesskey binds the onclick to a keypress.',
+        ],
+        solution:
+          "https://LAB-ID.web-security-academy.net/?'accesskey='x'onclick='alert(1)\n\nVictim presses the access key to fire it.",
+        status: 'completed',
+        screenshot: 'Burp/Lab17XSS.webp',
+      },
+      {
+        title:
+          'Lab 18: Reflected XSS into a JavaScript string with single quote and backslash escaped',
+        notes: [
+          'Ran a unique search (p3p) and checked the DOM. It appears three times, including inside a script and an img tag: var searchTerms = \'p3p\'; document.write(...).',
+          'Tried to break out of the string. Adding my own backslash to escape the escaping just gets more backslashes added - the single quote and backslash are both escaped, exactly what the title says.',
+          'Since the string cannot be broken, went for the script element instead: close the current script and open a new one with the alert.',
+        ],
+        solution: '</script><script>alert(1)</script>',
+        status: 'completed',
+      },
+      {
+        title:
+          'Lab 19: Reflected XSS into a JavaScript string with angle brackets and double quotes HTML-encoded and single quotes escaped',
+        notes: [
+          'Angle brackets and double quotes HTML-encoded, single quotes escaped. Checked the DOM and saw the backslashes being added.',
+          "Tried \\' + alert() - did not work.",
+          "Added the trailing comment: \\' + alert()// - the // swallows the rest of the line so the leftover quote does not break the syntax. That worked.",
+        ],
+        solution: "\\' + alert()//",
+        status: 'completed',
+      },
+      {
+        title:
+          'Lab 20: Stored XSS into onclick event with angle brackets and double quotes HTML-encoded and single quotes and backslash escaped',
+        notes: [
+          'Stored version of the same idea, so back to the comment section. A comment renders the website field as a hyperlink on the commenter name.',
+          'Angle brackets, double quotes, single quotes and backslash are all blocked or escaped. HTML entities are not.',
+          'Put the payload in the website field so it lands in the onclick of that link: http://foo?&apos;-alert(1)-&apos;. &apos; is the HTML entity for a single quote, which the browser decodes inside the onclick attribute, so -alert(1)- runs when the link is clicked.',
+          'First try used a colon instead of the semicolon on &apos; - fixed that and it worked.',
+        ],
+        solution:
+          'http://foo?&apos;-alert(1)-&apos;\n\nSet as the website field on a comment; fires when the name link is clicked.',
+        status: 'completed',
+      },
+    ],
+    tools: ['Burp Suite', 'Burp Intruder', 'Web Browser', 'Chrome DevTools'],
+    tags: [
+      'XSS',
+      'reflected XSS',
+      'stored XSS',
+      'WAF bypass',
+      'Burp Intruder',
+      'SVG',
+      'custom elements',
+      'HTML entities',
+      'exploit server',
+    ],
+    link: {
+      label: 'Cross-site scripting (XSS)',
+      url: 'https://portswigger.net/web-security/cross-site-scripting',
+    },
+  },
+  {
     id: 'portswigger-xss-labs-12-14',
     date: '2026-09-06',
     category: 'PortSwigger Labs',
