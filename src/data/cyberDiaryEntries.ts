@@ -44,6 +44,91 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'portswigger-xss-labs-21-24',
+    date: '2026-09-07',
+    category: 'PortSwigger Labs',
+    vulnTypes: ['XSS'],
+    title:
+      'Cross-Site Scripting (XSS) labs 21-24 (template literal, cookie/password theft, CSRF via XSS)',
+    workedOn: [
+      'Near the end of the XSS path, Labs 21 to 24 - moving from injection mechanics into what XSS is actually for',
+      'Lab 21: reflected XSS into a template literal, triggered with ${} instead of a tag or quote breakout',
+      'Labs 22-23: cookie theft and password capture - both built around Burp Collaborator (Pro). Skipped 22; attempted the Collaborator-free version of 23 and could not get it to complete. Both parked for a Burp Pro trial',
+      "Lab 24: using XSS to run a CSRF attack - reading the victim's CSRF token and changing their email. Completed",
+    ],
+    body: [
+      'These four are the turn from "can I get an alert to fire" to "what does an attacker do with that". Lab 21 is the last of the pure injection-mechanics labs; 22 to 24 are exfiltration and account takeover.',
+      'The Pro wall is real here. Labs 22 and 23 are built around Burp Collaborator for catching stolen data out of band, and that is Professional-only. 23 has a documented Collaborator-free method that drops the data into a second blog comment, but I could not get it to complete even after fixing an obvious bug in the code-along script. Parking both until I can run a Burp Pro trial rather than pretending they are done.',
+      "Lab 24 did work, and it is the one that clicked conceptually. The injected script silently GETs /my-account, pulls the CSRF token out of the response with a regex, then POSTs to /my-account/change-email with that token. It is same-origin, so the token is readable and the request is trusted. XSS bypasses CSRF protection entirely because the malicious request now comes from the site's own page.",
+    ],
+    labs: [
+      {
+        title:
+          'Lab 21: Reflected XSS into a template literal with angle brackets, single, double quotes, backslash and backticks Unicode-escaped',
+        notes: [
+          "Searched p3p and checked the DOM. It shows up twice - once in the search message and once in a script, inside a template literal: var message = `0 search results for 'p3p'`.",
+          'Every breakout character is Unicode-escaped: angle brackets, both quote types, backslash, backtick. So no closing the string and no opening a tag.',
+          'A template literal evaluates ${ } as JavaScript, and the braces are not escaped. Searching ${alert(1)} runs it directly.',
+        ],
+        solution: '${alert(1)}',
+        status: 'completed',
+      },
+      {
+        title: 'Lab 22: Exploiting cross-site scripting to steal cookies',
+        notes: [
+          "The goal is a real attack: stored XSS in the blog comments to exfiltrate another user's session cookie and reuse it.",
+          'The exfiltration step sends the cookie to an attacker-controlled endpoint, which the lab expects to be Burp Collaborator - a Professional feature.',
+          'No Collaborator-free path documented for this one, so skipped.',
+        ],
+        solution:
+          'Not attempted - requires Burp Suite Professional (Collaborator/OAST).',
+        status: 'blocked',
+      },
+      {
+        title: 'Lab 23: Exploiting cross-site scripting to capture passwords',
+        notes: [
+          'Same idea as 22 but capturing an auto-filled username and password rather than a cookie.',
+          'PortSwigger documents a Collaborator-free version: inject a script that reads the credential fields and posts them back as a new blog comment, so the data lands somewhere I can read without an external listener.',
+          'Worked through the code-along - a script that grabs the csrf token and the username/password fields, builds a FormData, and fetches POST /post/comment with them.',
+          'Could not get it to fire. Retraced it step by step and asked Claude for a tip, still nothing.',
+          'Spotted that the code-along script calls document.getElementByName, which is not a real DOM method - it is document.getElementsByName (plural). Fixed that and re-ran it, and the lab still would not complete. Something else is off, either in my payload or the lab state.',
+          'Parking this one alongside Lab 22. Both are worth coming back to on a Burp Pro trial, where the intended Collaborator-based solution removes the moving parts.',
+        ],
+        solution:
+          'Not solved. Attempted the Collaborator-free comment-drop method as a code-along, including after fixing document.getElementByName to getElementsByName; the lab did not complete. Revisit with Burp Collaborator.',
+        status: 'blocked',
+      },
+      {
+        title: 'Lab 24: Exploiting XSS to bypass CSRF defenses',
+        notes: [
+          'XSS used to carry out a CSRF attack: submit a state-changing request as the victim, from the page they already trust.',
+          'Back on the blog post, using a script tag in a comment.',
+          'The script GETs /my-account, pulls the CSRF token out of the response with a regex on name="csrf" value="(\\w+)", then POSTs to /my-account/change-email with that token and an attacker-controlled email.',
+          'Ran it as a code-along. It submitted and completed the lab. Every user who views the page now hands their email change to the address I set, and from there the attacker can trigger a password reset.',
+          'The point: CSRF tokens do not help when the attacker has XSS. A same-origin script can read the token and send the request itself.',
+        ],
+        solution:
+          "<script>\nvar req = new XMLHttpRequest();\nreq.onload = handleResponse;\nreq.open('get','/my-account',true);\nreq.send();\nfunction handleResponse() {\n    var token = this.responseText.match(/name=\"csrf\" value=\"(\\w+)\"/)[1];\n    var changeReq = new XMLHttpRequest();\n    changeReq.open('post', '/my-account/change-email', true);\n    changeReq.send('csrf='+token+'&email=test@test.com')\n};\n</script>",
+        status: 'completed',
+      },
+    ],
+    tools: ['Burp Suite', 'Web Browser', 'Chrome DevTools'],
+    tags: [
+      'XSS',
+      'reflected XSS',
+      'stored XSS',
+      'template literals',
+      'cookie theft',
+      'CSRF',
+      'exploit server',
+      'Burp Collaborator',
+    ],
+    link: {
+      label: 'Cross-site scripting (XSS)',
+      url: 'https://portswigger.net/web-security/cross-site-scripting',
+    },
+  },
+  {
     id: 'portswigger-xss-labs-15-20',
     date: '2026-09-06',
     category: 'PortSwigger Labs',
