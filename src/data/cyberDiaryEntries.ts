@@ -44,6 +44,116 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'portswigger-xss-labs-25-30',
+    date: '2026-09-07',
+    category: 'PortSwigger Labs',
+    vulnTypes: ['XSS'],
+    milestone: true,
+    title: 'Cross-Site Scripting (XSS) labs 25-30: XSS path complete',
+    workedOn: [
+      'Finished the XSS path with the expert-level labs, 25 to 30',
+      'Labs 25-26: AngularJS sandbox escapes, one straight from the URL and one via the exploit server past a CSP',
+      'Labs 27-28: an SVG animate href on a blocked-attribute lab, and a JavaScript URL with characters stripped',
+      'Lab 29 (strict CSP + dangling markup): not completed - the target email updates but the lab never marks done, even with the official solution',
+      "Lab 30 (CSP bypass): got a script past the CSP by injecting a script-src-elem 'unsafe-inline' directive through a second parameter",
+    ],
+    body: [
+      'Last XSS session. These are labelled expert, but most were quicker than the practitioner filter-evasion labs from the last couple of days - several came down to a single crafted URL.',
+      'The AngularJS ones (25 and 26) are sandbox escapes: Angular used to sandbox template expressions, and these labs use the known bypasses for specific versions. Did them as code-alongs, since the payloads are version-specific artefacts rather than something to reason out from scratch.',
+      'Lab 29 ate the time. It is a dangling-markup attack under a strict CSP: no script execution, so instead you inject an unclosed tag that captures the rest of the page into an attribute that gets sent to an attacker server. I got the email field to update to the right value, followed the community notes and the official solution, and the lab still would not register as complete. Left it unsolved. Everything else in the path is done.',
+      'That closes XSS, the biggest topic on the list, and it has been most of two weeks. Next is Authentication.',
+    ],
+    labs: [
+      {
+        title:
+          'Lab 25: Reflected XSS with AngularJS sandbox escape without strings',
+        notes: [
+          'First expert-level lab, expected a big step up.',
+          "It was not - the whole thing is one URL. The payload uses Angular's orderBy filter and String.fromCharCode to build the alert call with no string literals, since string literals are what the sandbox blocks.",
+          'Manipulating the search param directly was enough, no exploit server needed.',
+        ],
+        solution:
+          'https://LAB-ID.web-security-academy.net/?search=1&toString().constructor.prototype.charAt%3d[].join;[1]|orderBy:toString().constructor.fromCharCode(120,61,97,108,101,114,116,40,49,41)=1',
+        status: 'completed',
+      },
+      {
+        title: 'Lab 26: Reflected XSS with AngularJS sandbox escape and CSP',
+        notes: [
+          'Same class as 25 but with a CSP in place, so the payload has to come via the exploit server.',
+          'The Angular payload uses ng-focus and the orderBy filter to reach alert(document.cookie); the #x fragment focuses the injected input on load to trigger ng-focus.',
+          'Delivered as a script that sets location to the crafted lab URL.',
+        ],
+        solution:
+          "<script>\nlocation='https://LAB-ID.web-security-academy.net/?search=%3Cinput%20id=x%20ng-focus=$event.composedPath()|orderBy:%27(z=alert)(document.cookie)%27%3E#x';\n</script>\n\nDelivered from the exploit server.",
+        status: 'completed',
+      },
+      {
+        title:
+          'Lab 27: Reflected XSS with event handlers and href attributes blocked',
+        notes: [
+          'The search filter blocks event handlers and href, so onerror / onclick / javascript: href are all out.',
+          'What is allowed: svg, a, animate, and the text element. The move is an svg a with an animate that sets the anchor href to a javascript: URL, plus a text element for the victim to click.',
+          'First attempt did not work. Went back through it: attributename needed to be attributeName (SVG is case-sensitive), and the text element needed real x and y coordinates to be visible and clickable.',
+          'Fixed the casing and coordinates and the "Click me" text fired the alert.',
+        ],
+        solution:
+          'LAB-ID.web-security-academy.net/?search=<svg><a><animate attributeName=href values=javascript:alert(1) /><text x=20 y=20>Click me</text></a>\n\n(URL-encoded in the search param.)',
+        status: 'completed',
+        screenshot: 'Burp/Lab27XSS.webp',
+      },
+      {
+        title:
+          'Lab 28: Reflected XSS in a JavaScript URL with some characters blocked',
+        notes: [
+          'The value is reflected into a javascript: URL with several characters blocked, so the payload has to avoid them.',
+          'Attacked the postId param directly. The payload closes the surrounding context and uses an arrow function plus throw / onerror to reach alert without the blocked characters, then repairs the trailing syntax with toString and window+empty-string.',
+        ],
+        solution:
+          "post?postId=5&%27},x=x=%3E{throw/**/onerror=alert,1337},toString=x,window%2b%27%27,{x:%27",
+        status: 'completed',
+      },
+      {
+        title:
+          'Lab 29: Reflected XSS protected by very strict CSP, with dangling markup attack',
+        notes: [
+          'Strict CSP means no script execution at all. The attack is dangling markup: inject an unclosed tag whose attribute swallows the rest of the markup up to the next matching quote, carrying a sensitive value off to an attacker URL.',
+          'Injecting normal scripts into the email change does nothing, but appending markup to an email value and submitting is accepted - test@test.com"><img src= onerror=alert(1)> gets stored, and the page looks vulnerable even though nothing executes.',
+          'Tried delivering it via my-account?email=... directly, and via the exploit server with a formaction button that posts to the exploit server on click.',
+          "The email field updates to the injected value every time, but the lab never registers as solved. Worked through the community notes and PortSwigger's own solution and got the same result - email changes, lab stays incomplete.",
+          'Leaving this one unsolved. Possibly a lab-state or delivery-timing issue on my setup rather than the payload.',
+        ],
+        solution:
+          'Not solved. Dangling-markup payload updates the target email as expected, but the lab does not complete, including with the official solution. Revisit later.',
+        status: 'blocked',
+      },
+      {
+        title: 'Lab 30: Reflected XSS protected by CSP, with CSP bypass',
+        notes: [
+          'Final lab. The CSP is built from a request parameter, which means it can be tampered with.',
+          "Added a second parameter that injects script-src-elem 'unsafe-inline' into the policy, re-permitting inline script, then put a normal script alert(1) in the search.",
+        ],
+        solution:
+          "?search=<script>alert(1)</script>&token=;script-src-elem 'unsafe-inline'\n\n(URL-encoded.)",
+        status: 'completed',
+      },
+    ],
+    tools: ['Burp Suite', 'Web Browser', 'Chrome DevTools'],
+    tags: [
+      'XSS',
+      'reflected XSS',
+      'AngularJS',
+      'sandbox escape',
+      'CSP bypass',
+      'dangling markup',
+      'SVG',
+      'exploit server',
+    ],
+    link: {
+      label: 'Cross-site scripting (XSS)',
+      url: 'https://portswigger.net/web-security/cross-site-scripting',
+    },
+  },
+  {
     id: 'portswigger-xss-labs-21-24',
     date: '2026-09-07',
     category: 'PortSwigger Labs',
