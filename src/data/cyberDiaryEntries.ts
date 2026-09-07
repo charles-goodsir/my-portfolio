@@ -498,15 +498,15 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     links: [
       {
         label: 'First ZAP baseline report',
-        url: '/my-portfolio/zap-report.html',
+        url: '/zap-report.html',
       },
       {
         label: 'Second scan, after a first pass at the headers',
-        url: '/my-portfolio/zap-report-2.html',
+        url: '/zap-report-2.html',
       },
       {
         label: 'Third scan, final',
-        url: '/my-portfolio/zap-report-3.html',
+        url: '/zap-report-3.html',
       },
     ],
   },
@@ -542,11 +542,11 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     links: [
       {
         label: 'First ZAP baseline report',
-        url: '/my-portfolio/zap-report.html',
+        url: '/zap-report.html',
       },
       {
         label: 'Second scan, after a first pass at the headers',
-        url: '/my-portfolio/zap-report-2.html',
+        url: '/zap-report-2.html',
       },
     ],
   },

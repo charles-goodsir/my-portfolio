@@ -4,7 +4,7 @@ A personal portfolio site built with React and TypeScript, showcasing my move fr
 
 ## Live Site
 
-[charles-goodsir.github.io/my-portfolio](https://charles-goodsir.github.io/my-portfolio/)
+[charlesgoodsir.com](https://charlesgoodsir.com/)
 
 ## About
 
