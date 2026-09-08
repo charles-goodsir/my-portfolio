@@ -44,6 +44,99 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'portswigger-auth-labs-1-5',
+    date: '2026-09-08',
+    category: 'PortSwigger Labs',
+    vulnTypes: ['Authentication'],
+    title:
+      'Authentication labs 1-5 (username enumeration, 2FA bypass, password reset logic)',
+    workedOn: [
+      'Started the PortSwigger Authentication path, Labs 1 to 5',
+      'Labs 1, 4, 5: username enumeration - by response text, by a subtly different error message, and by response timing',
+      'Lab 2: 2FA bypass by navigating straight to the post-login page',
+      'Lab 3: password reset with a token that does not change, reused against another account',
+    ],
+    body: [
+      'New topic after finishing XSS. Authentication labs are less about payload craft and more about logic flaws and Burp Intruder workflow: enumerate usernames, then passwords, off small differences in the responses.',
+      'Intruder came up in almost every lab here. Lab 1 I fumbled the setup - pasted the whole username=root string into the payload position instead of just the value, so the parameter never varied. Marked the insertion point properly and the wordlist ran fine after that.',
+      'Lab 5 was the longest. Timing-based enumeration needs enough samples per request to see the signal over the noise, and then there is a second step: the account lockout. Got past it by adding an X-Forwarded-For header with a junk value so each attempt looked like it came from a new IP.',
+    ],
+    labs: [
+      {
+        title: 'Lab 1: Username enumeration via different responses',
+        notes: [
+          'Logged in with a bad username, intercepted the request in Burp, sent it to Intruder as a Sniper attack over the lab username list.',
+          'First run did nothing useful - I had pasted username=root into the payload marker instead of just the value, so the parameter never changed. Fixed the insertion point to wrap only the username value.',
+          'Looking for a response that is a different length or status from the rest. albuquerque came back longer, with an "Incorrect password" message instead of "Invalid username", so that is the valid username.',
+          'Second Intruder run with albuquerque fixed and the password list as the payload. The right password returns a 302 instead of 200.',
+        ],
+        solution: 'Username: albuquerque\nPassword: mustang',
+        status: 'completed',
+        screenshot: 'Burp/Lab1Authentication.webp',
+      },
+      {
+        title: 'Lab 2: 2FA simple bypass',
+        notes: [
+          'Logged into my own account first and noted the flow: after the login step the app goes to the 2FA code page, then to /my-account.',
+          'Logged in as the victim (carlos) with known credentials, got to the 2FA prompt, then changed the URL straight to /my-account.',
+          'The app never checks that the 2FA step was actually completed, so it lets you in.',
+        ],
+        solution: 'After reaching the 2FA prompt, navigate directly to /my-account.',
+        status: 'completed',
+        screenshot: 'Burp/Lab2Authentication.webp',
+      },
+      {
+        title: 'Lab 3: Password reset broken logic',
+        notes: [
+          'Requested a password reset for my own account and watched the flow in Burp. The reset token in the URL does not change between requests.',
+          'Requested a reset for carlos, took the reset POST into Repeater, and swapped the username to carlos while keeping a valid token, with a password of my choice.',
+          'The reset went through - the token is not tied to the account it was issued for, so a token from any reset request works for any username.',
+        ],
+        solution:
+          'POST to the reset endpoint with temp-forgot-password-token=<any valid token>&username=carlos&new-password-1=test&new-password-2=test',
+        status: 'completed',
+        screenshot: 'Burp/Lab3Authentication.webp',
+      },
+      {
+        title: 'Lab 4: Username enumeration via subtly different responses',
+        notes: [
+          'Same idea as Lab 1 but the responses are almost identical. Used the Intruder grep-extract feature to pull the error message out of each response so small differences show in the results table.',
+          'One response had a slightly longer warning message than the rest - the kind of thing that is easy to miss without the extract column. That username was valid.',
+          'Ran the password list against it to finish.',
+        ],
+        solution: 'Username: Agenda\nPassword: Access',
+        status: 'completed',
+        screenshot: 'Burp/Lab4Authentication.webp',
+      },
+      {
+        title: 'Lab 5: Username enumeration via response timing',
+        notes: [
+          'The app checks the password even for invalid usernames, but a valid username with a very long password takes measurably longer to respond. Sent an over-long password and enumerated usernames by response time.',
+          'This needs several requests per username to separate the signal from network jitter, so it was slow on the free version.',
+          'After extracting the username and password there was still an account lockout to get past. Intercepted the login, set the stolen username and password, and added X-Forwarded-For: 888 so the request looked like it came from an unblocked IP. Forwarded it, turned off intercept, and the login went through.',
+        ],
+        solution:
+          'Username: vagrant\nPassword: moon\n\nAccount lockout bypassed with an X-Forwarded-For header on the login request.',
+        status: 'completed',
+        screenshot: 'Burp/Lab5Authentication.webp',
+      },
+    ],
+    tools: ['Burp Suite', 'Burp Intruder', 'Burp Repeater', 'Web Browser'],
+    tags: [
+      'Authentication',
+      'username enumeration',
+      'Burp Intruder',
+      '2FA bypass',
+      'password reset',
+      'response timing',
+      'X-Forwarded-For',
+    ],
+    link: {
+      label: 'Authentication vulnerabilities',
+      url: 'https://portswigger.net/web-security/authentication',
+    },
+  },
+  {
     id: 'portswigger-xss-labs-25-30',
     date: '2026-09-07',
     category: 'PortSwigger Labs',
