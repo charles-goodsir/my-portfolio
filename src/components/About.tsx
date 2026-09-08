@@ -1,5 +1,6 @@
 import Me from '../assets/MyPic/me.webp'
-import CV from '../assets/CV/Charles_Goodsir_CV.pdf'
+
+const CV = `${import.meta.env.BASE_URL}Charles_Goodsir_CV.pdf`
 
 function About() {
   return (
@@ -19,6 +20,8 @@ function About() {
           <a
             href={CV}
             download="Charles_Goodsir_CV.pdf"
+            target="_blank"
+            rel="noopener"
             className="inline-flex items-center bg-ink text-card px-6 py-3 rounded-lg hover:opacity-90 transition-colors font-semibold shadow-card"
           >
             <svg
