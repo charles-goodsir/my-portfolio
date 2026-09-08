@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render src/assets/CV/CV.txt into Charles_Goodsir_CV.pdf (the downloadable CV).
+"""Render src/assets/CV/CV.txt into public/Charles_Goodsir_CV.pdf (the downloadable CV).
 
 Usage:
     pip install reportlab
@@ -20,11 +20,13 @@ from reportlab.lib.colors import HexColor
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
-from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer
+from reportlab.platypus import (
+    HRFlowable, KeepTogether, Paragraph, SimpleDocTemplate, Spacer,
+)
 
-CV_DIR = Path(__file__).resolve().parent.parent / "src" / "assets" / "CV"
-SRC = CV_DIR / "CV.txt"
-OUT = CV_DIR / "Charles_Goodsir_CV.pdf"
+ROOT = Path(__file__).resolve().parent.parent
+SRC = ROOT / "src" / "assets" / "CV" / "CV.txt"
+OUT = ROOT / "public" / "Charles_Goodsir_CV.pdf"
 
 SECTIONS = {
     "PROFESSIONAL SUMMARY", "EXPERIENCE", "APPLICATION SECURITY (SELF-DIRECTED)",
@@ -76,6 +78,16 @@ def build():
         Paragraph(esc(lines[0].strip()), name),
         Paragraph(fmt(lines[1].strip()).replace("•", "&nbsp;&nbsp;•&nbsp;&nbsp;"), contact),
     ]
+    # Each section (heading + rule + its content) is buffered and appended as a
+    # single KeepTogether, so a section never splits across the page break -
+    # if it doesn't fit in the space left, the whole thing moves to the next page.
+    current: list = []
+
+    def flush():
+        if current:
+            story.append(KeepTogether(current[:]))
+            current.clear()
+
     i = 2
     while i < len(lines):
         s = lines[i].strip()
@@ -83,10 +95,11 @@ def build():
             i += 1
             continue
         if s in SECTIONS:
-            story.append(Spacer(1, 2))
-            story.append(Paragraph(esc(s), section))
-            story.append(HRFlowable(width="100%", thickness=0.6, color=HexColor("#bbbbbb"),
-                                    spaceBefore=1, spaceAfter=3))
+            flush()
+            current.append(Spacer(1, 2))
+            current.append(Paragraph(esc(s), section))
+            current.append(HRFlowable(width="100%", thickness=0.6, color=HexColor("#bbbbbb"),
+                                      spaceBefore=1, spaceAfter=3))
             i += 1
         elif s.startswith("•"):
             text = fmt(s[1:].strip())
@@ -95,19 +108,21 @@ def build():
                    and lines[j].strip() and not lines[j].strip().startswith("•")):
                 text += " " + fmt(lines[j].strip())
                 j += 1
-            story.append(Paragraph(text, bullet, bulletText="•"))
+            current.append(Paragraph(text, bullet, bulletText="•"))
             i = j
         elif (" | " in s and i + 1 < len(lines) and "|" in lines[i + 1]
               and lines[i + 1].strip() and not lines[i + 1].strip().startswith("•")):
-            story.append(Paragraph(esc(s), role))
-            story.append(Paragraph(esc(lines[i + 1].strip()), meta))
+            current.append(Paragraph(esc(s), role))
+            current.append(Paragraph(esc(lines[i + 1].strip()), meta))
             i += 2
         elif " | " in s:
-            story.append(Paragraph(esc(s), role))
+            current.append(Paragraph(esc(s), role))
             i += 1
         else:
-            story.append(Paragraph(fmt(s), plain))
+            current.append(Paragraph(fmt(s), plain))
             i += 1
+
+    flush()
 
     SimpleDocTemplate(str(OUT), pagesize=A4,
                       leftMargin=16 * mm, rightMargin=16 * mm,
