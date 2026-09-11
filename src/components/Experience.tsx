@@ -14,7 +14,8 @@ const experiences: ExperienceItem[] = [
     location: 'Auckland, New Zealand',
     duration: 'Sept 2021 - Current',
     description: [
-      'Designed, coded/configured, tested, and delivered enterprise CRM/ERP applications across multiple NZ and Australian regions, working within Azure DevOps CI/CD pipelines from commit through to production release',
+      'Designed, coded/configured, tested, and delivered enterprise CRM/ERP applications across multiple NZ and Australian regions',
+      'Worked with C# and YAML in an Azure DevOps environment, including YAML-driven test-data generation that provisions cross-referenced data across local and cloud environments at build time',
       'Built automation test suites using Gherkin/BDD scripts to validate end-to-end business logic - the same systematic verification mindset (input validation, edge cases, expected vs. actual behaviour) used in security testing',
       'Partnered with BAs, developers, configurators, product managers, and clients across cross-functional teams to turn business requirements into secure, maintainable configuration',
       'Automated manual workflows for local government councils using in-house tooling, reducing risk from manual data handling',
@@ -172,9 +173,9 @@ function Experience() {
                 <li className="flex items-start">
                   <span className="text-primary mr-2 mt-1">•</span>
                   <span>
-                    <strong>CI/CD & release delivery:</strong> Version control,
-                    pipelines, and release management across GitHub and Azure
-                    DevOps for multi-region enterprise systems
+                    <strong>Version control & pipeline tooling:</strong> Git
+                    and Azure DevOps day to day, including YAML-driven
+                    test-data generation for multi-region enterprise systems
                   </span>
                 </li>
                 <li className="flex items-start">
