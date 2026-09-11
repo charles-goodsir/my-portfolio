@@ -45,7 +45,7 @@ function DiaryArticle({
         </span>
         {entry.milestone && (
           <span className="inline-block mt-2 ml-2 bg-success/10 text-success px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
-            ✓ Path complete
+            ✓ Milestone
           </span>
         )}
       </div>
