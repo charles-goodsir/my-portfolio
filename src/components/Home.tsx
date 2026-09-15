@@ -6,12 +6,12 @@ function Home() {
       <div className="animate-fade-in">
         <h1 className="text-display font-bold text-ink mb-6">Hi, I'm Charles</h1>
         <p className="text-lg text-ink-muted mb-6">
-          Application Security Engineer · CompTIA Security+ Certified
+          Software Engineer · Building DevSecOps Capability
         </p>
         <p className="text-base text-ink-muted mb-10 max-w-[55ch]">
-          Full-stack background, application security focus. Working toward
-          DevSecOps and cloud security roles where building software and breaking
-          it are the same job.
+          Full-stack background, now wiring security into the pipelines I
+          build in — CI/CD gates, SAST/DAST, and the application security
+          work underneath both.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <Button as="link" to="/projects" variant="primary">

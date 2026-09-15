@@ -44,6 +44,51 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'appsec-homelab-entry-15-readme-audit-xss-reverify',
+    date: '2026-09-16',
+    category: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab', 'XSS'],
+    title: 'Auditing the README against the code, and re-proving the XSS fix',
+    workedOn: [
+      "Checked the homelab README's vulnerability claims against the actual code and found it had gone stale: both seeded SQLi bugs were already fixed (in earlier sessions) but still listed as live exploits, and the reflected XSS claim didn't hold up either - the code was already safe JSX text interpolation, not the raw-HTML render the README described",
+      'Reintroduced a genuine XSS (dangerouslySetInnerHTML) to get a clean, current repro instead of relying on an old screenshot',
+      "Confirmed the exploit live: <img src=x onerror=alert('XSS')> rendered as a real <img> tag and fired the alert",
+      'Reverted to JSX text interpolation and re-tested the identical payload - renders as inert text, no execution',
+      "Rewrote the README's vulnerability table and exploit section to match what the code actually does now",
+    ],
+    body: [
+      "Before starting on anything new, went back through the README with a critical eye, since a couple of the claims in it dated from mid-fixes I'd since finished and never looped back to document. Both AuthController.cs and ProductsController.cs SQLi were already parameterized (Entries 11 and 12), but the README's 'Demonstrated exploits' section still gave working payloads for both, as if they'd still open a way in. Worse than a bug: it's a claim a technical reader could disprove in thirty seconds.",
+      "The XSS entry was similar but slightly different - the code was already back to safe {submittedQuery} interpolation, which is correct, but the README had also picked up a fabricated detail along the way: a note claiming the nginx CSP blocks the exploit payload. There was never a live bug for that CSP to be blocking - React escapes JSX text by default regardless of CSP. That line was documenting a fix for a problem that wasn't there.",
+      "Rather than just correct the wording from memory, wanted current, provable evidence instead of relying on an old screenshot. Put dangerouslySetInnerHTML back into ProductSearch.tsx, ran the app, and fired <img src=x onerror=alert('XSS')> at the search box. It rendered as a real image element in the DOM (broken-icon and all) and the onerror handler executed - confirmed both visually and in the console.",
+      "Reverted the component to plain JSX text interpolation and ran the identical payload again. This time it came back as literal text - You searched for: <img src=x onerror=alert('XSS')> - printed on the page, not parsed. Console showed no script execution on the reload. Same bug class as Entry 13, now re-verified against the current code instead of taken on faith.",
+      "Rewrote the README's vulnerability table to carry a Status column (Fixed / Open) and replaced the exploit section with an honest before -> exploit -> fix -> re-test writeup for all three bugs, dropping the incorrect CSP claim entirely. Plaintext password storage in SeedData.cs is the one item still genuinely open.",
+      "Small lesson worth keeping: a fixed vulnerability is only as credible as the docs describing it. Docs drift from code the moment you stop re-checking them against it - worth treating a README claim about security behaviour the same as a test assertion, something that can go stale and needs re-running, not just written once.",
+    ],
+    codeSnippets: [
+      {
+        label:
+          'Product search result - before (dangerouslySetInnerHTML, reintroduced for this exercise)',
+        code: '<p\n  dangerouslySetInnerHTML={{\n    __html: `You searched for: ${submittedQuery}`,\n  }}\n/>',
+      },
+      {
+        label: 'Product search result - after (JSX text interpolation)',
+        code: '<p>You searched for: {submittedQuery}</p>',
+      },
+    ],
+    tools: ['React', 'JSX', 'Chrome DevTools'],
+    tags: [
+      'AppSec homelab',
+      'XSS',
+      'reflected XSS',
+      'output encoding',
+      'documentation',
+    ],
+    link: {
+      label: 'appsec-homelab repo',
+      url: 'https://github.com/charles-goodsir/appsec-homelab',
+    },
+  },
+  {
     id: 'appsec-homelab-entry-14-cicd-pipeline',
     date: '2026-09-11',
     category: 'AppSec Homelab',
@@ -613,6 +658,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Homelab/HomeLabXSS1.webp',
       'Homelab/HomeLabXSS2.webp',
       'Homelab/HomeLabXSSFix1.webp',
+      'Homelab/HomeLabXSS3.webp',
     ],
     tools: ['React', 'JSX', 'Chrome DevTools'],
     tags: ['AppSec homelab', 'XSS', 'reflected XSS', 'output encoding'],

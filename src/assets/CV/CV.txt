@@ -3,10 +3,12 @@ Auckland, NZ • [goodsirces@gmail.com](mailto:goodsirces@gmail.com) • +64 278
 
 PROFESSIONAL SUMMARY
 Software application engineer with 4+ years building enterprise CRM/ERP systems in C#/.NET, moving
-into a dedicated Application Security or Technology Risk / GRC role. CompTIA Security+ (SY0-701)
-certified. Working through the PortSwigger Web Security Academy in Burp Suite (SQL injection complete
-including blind SQLi, XSS in progress), and running a deliberately vulnerable ASP.NET Core / React app
-with a CI security pipeline to practise finding and fixing real bugs. Background spans .NET/C#,
+into DevOps / DevSecOps, with application security as a specialty within that. CompTIA Security+
+(SY0-701) certified. Working through the PortSwigger Web Security Academy in Burp Suite (SQL injection
+complete including blind SQLi, XSS in progress), and built a multi-stage GitHub Actions security
+pipeline (SAST, secrets scanning, SCA, container scanning, DAST, staged deployment gate) around a
+deliberately vulnerable ASP.NET Core / React app to practise finding and fixing real bugs end to end.
+Background spans .NET/C#,
 TypeScript, React Native, and Azure, with hands-on experience in secure application design,
 authentication and row-level access controls, CI/CD pipelines, and standardised testing frameworks
 that reduced configuration defect rates ~30% across NZ and AU council clients. Independently designed,

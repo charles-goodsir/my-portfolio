@@ -49,11 +49,12 @@ function About() {
             </h3>
             <div className="prose prose-lg max-w-none">
               <p className="text-ink-muted mb-4">
-                I'm Charles Goodsir, a full-stack developer moving into
-                application security. I spent years building and shipping
-                software in enterprise environments, and that background helps
-                when the job is finding flaws in how apps get built, not
-                spotting them on a checklist.
+                I'm Charles Goodsir, a full-stack developer building toward
+                DevSecOps. I spent years building and shipping software in
+                enterprise environments, then years working inside CI/CD
+                pipelines to ship it — that combination is what I'm putting
+                to work now: baking security into the pipeline instead of
+                bolting it on afterward.
               </p>
               <p className="text-ink-muted mb-4">
                 I'm{' '}
@@ -68,19 +69,13 @@ function About() {
               <p className="text-ink-muted mb-4">
                 I'm targeting{' '}
                 <strong className="font-semibold text-ink">
-                  application security
+                  DevOps and DevSecOps
                 </strong>{' '}
-                roles now, and working toward{' '}
-                <strong className="font-semibold text-ink">
-                  DevSecOps
-                </strong>{' '}
-                and{' '}
-                <strong className="font-semibold text-ink">
-                  cloud security
-                </strong>{' '}
-                longer term. I want to be the person who can read the code,
-                understand the threat, and help teams fix issues before they
-                hit production.
+                roles — CI/CD, deployment gates, and the security tooling
+                that sits inside them. Application security is the specialty
+                I bring to that: I want to be the person who can read the
+                code, understand the threat, and wire the pipeline to catch
+                it before it ships.
               </p>
               <p className="text-ink-muted">
                 Outside of labs and projects, I keep up with security news, dig
@@ -99,48 +94,41 @@ function About() {
             <div className="space-y-4">
               <div className="bg-sunken p-4 rounded-lg">
                 <h4 className="font-semibold text-ink mb-2">
+                  DevOps / DevSecOps
+                </h4>
+                <p className="text-ink-muted text-sm">
+                  My main focus. Baking security into CI/CD — automated
+                  scanning, deployment gates, and working with engineers to
+                  catch issues early instead of at release time. Built and
+                  evidenced in the appsec-homelab pipeline (SAST, secrets
+                  scanning, SCA, container scanning, DAST). My background with
+                  Azure DevOps and GitHub Actions gives me a head start on the
+                  delivery side.
+                </p>
+              </div>
+
+              <div className="bg-sunken p-4 rounded-lg">
+                <h4 className="font-semibold text-ink mb-2">
                   Application Security
                 </h4>
                 <p className="text-ink-muted text-sm">
-                  My main focus. Web app testing, secure code review, threat
-                  modelling, and helping teams understand risk in software they
-                  already ship. Security+ and PortSwigger lab work are building
-                  blocks here.
-                </p>
-              </div>
-
-              <div className="bg-sunken p-4 rounded-lg">
-                <h4 className="font-semibold text-ink mb-2">DevSecOps</h4>
-                <p className="text-ink-muted text-sm">
-                  Where I want to grow next. Baking security into CI/CD,
-                  automated checks in the pipeline, and working with engineers
-                  to catch issues early instead of at release time. My
-                  background with Azure DevOps and GitHub gives me a head start
-                  on the delivery side.
+                  The specialty inside that pipeline. Web app testing, secure
+                  code review, and finding + fixing real vulnerability
+                  classes — not just spotting them on a checklist. Security+
+                  and PortSwigger lab work are the building blocks here.
                 </p>
               </div>
 
               <div className="bg-sunken p-4 rounded-lg">
                 <h4 className="font-semibold text-ink mb-2">
-                  Cloud Security
+                  Full-Stack Foundation
                 </h4>
                 <p className="text-ink-muted text-sm">
-                  Longer-term goal. Understanding misconfigurations, identity
-                  and access in cloud environments, and securing workloads I've
-                  actually deployed. I've built serverless apps on AWS and want
-                  to go deeper on securing that kind of infrastructure.
-                </p>
-              </div>
-
-              <div className="bg-sunken p-4 rounded-lg">
-                <h4 className="font-semibold text-ink mb-2">
-                  Full-Stack Developer
-                </h4>
-                <p className="text-ink-muted text-sm">
-                  Where I come from, and still relevant. React, Node.js,
-                  TypeScript, APIs, and databases. Knowing how apps are built
-                  end to end makes AppSec work more credible because I can
-                  follow a vulnerability from the browser to the backend.
+                  Where I come from, and still what makes the rest credible.
+                  React, Node.js, TypeScript, APIs, and databases. Knowing how
+                  apps are built end to end means I can follow a vulnerability
+                  from the browser to the backend, and follow the fix through
+                  a real deployment pipeline.
                 </p>
               </div>
             </div>
