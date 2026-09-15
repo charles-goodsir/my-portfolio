@@ -44,6 +44,62 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'appsec-homelab-entry-16-plaintext-password-fix',
+    date: '2026-09-16',
+    category: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab', 'Cryptographic Failures'],
+    milestone: true,
+    title: 'Fixing plaintext password storage - the last seeded vulnerability',
+    workedOn: [
+      'Fixed the last of the four seeded vulnerabilities: plaintext password storage in the User model and SeedData',
+      "Renamed the Password column to PasswordHash and switched to Microsoft.AspNetCore.Identity's PasswordHasher<User> for salted PBKDF2 hashing",
+      'Rewrote AuthController.cs login to look up by username only, then verify the submitted password against the stored hash in C# instead of comparing plaintext in SQL',
+      'Worked through three real compile/runtime errors along the way rather than getting a working version handed to me: statements nested inside an AddRange() call, a missing fallthrough return, and a stale SQLite database that still had the old schema',
+      "Re-tested: correct login still works, a wrong password now correctly fails, and the SQLi payload from the login bypass fix still fails - confirming the parameterized query wasn't affected by the password-check rewrite",
+    ],
+    body: [
+      'Last of the four seeded bugs. This one is different in kind from the other three - not an injection flaw with a clever payload, but a cryptographic failure: the User model stored Password as a raw string, and the login query checked it with Password = @Password. A leaked database would have handed over every credential in plain text, and since people reuse passwords, that kind of leak cascades well beyond this one app.',
+      "Worked through this one myself rather than having the fix handed to me, which meant hitting the errors instead of skipping past them. First one: renamed the model property to PasswordHash and started building the seed data, but put the hasher setup and hash assignments as loose statements at the top of the file, outside any method - that doesn't compile in a file that also declares a class. Moved it inside SeedData.Initialize(), inside the existing if (!db.Users.Any()) gate, right where the old plaintext User objects were built.",
+      'Second error: those same setup lines ended up nested inside the parentheses of db.Users.AddRange(...), as if they were arguments to the call. AddRange takes finished objects, not statements. Pulled the hasher/admin/wiener setup out as their own lines before the call, then AddRange(admin, wiener) just took the two ready objects.',
+      'Third one was in AuthController.cs. The old query checked username and password together in one WHERE clause, which cannot work once the password column holds a salted hash - the same password hashes differently every time, so there is no way to compare it with SQL\'s =. Rewrote the query to look up by username only, pulled the stored hash out of the reader, and used PasswordHasher<User>.VerifyHashedPassword to check the submitted password against it in C#. First pass at this still left a dangling @Password parameter bound to a query that no longer referenced it, a missing semicolon and an unbalanced Ok(...) call, and the one that stopped it compiling: no return statement for the case where reader.Read() finds no matching username at all. IActionResult has to return something on every path through the method; added a single return Unauthorized(...) after the if block, covering both "user does not exist" and "user exists but password is wrong" with one line instead of two, which also avoids leaking which case it was.',
+      'Once it compiled, the real gotcha was runtime, not code: SQLite Error 1: no such column: PasswordHash. This app creates its schema with EnsureCreated(), not EF migrations, and EnsureCreated only builds the database if the file does not already exist - it will never alter an existing database to match a changed model. The old appseclab.db was still sitting there with the original Password column, so the app kept using it. Deleting it once was not enough either, because SQLite in WAL mode keeps -shm and -wal side files alongside the main database file, and those can carry stale state back in on reconnect. Stopped the backend, deleted appseclab.db, appseclab.db-shm, and appseclab.db-wal together, and restarted - a completely fresh database built from the current model, PasswordHash column included.',
+      "Re-tested the same way as the other three fixes: correct credentials (administrator / admin123) log in, a wrong password returns 401, and the SQL injection payload from the login-bypass fix (administrator'-- with any password) still returns invalid credentials - confirming the parameterized query underneath wasn't disturbed by rewriting the password-check logic on top of it. Checked the raw data too: SELECT Username, PasswordHash FROM Users now shows long hashed blobs instead of admin123 and peter in plain text.",
+      'All four seeded vulnerabilities are fixed now, each with a before/exploit/fix/re-test story. This is the one I\'m most likely to bring up in an interview, not because the fix itself is exotic, but because of what broke along the way: a structural C# mistake, a missing-return compile error, and an EnsureCreated/WAL-file trap that had nothing to do with the security logic at all. Debugging "why does the fix not seem to be working" turned out to be as much the job as writing the fix in the first place.',
+    ],
+    codeSnippets: [
+      {
+        label: 'AuthController.cs - before (plaintext comparison in SQL)',
+        code: 'var sql = "SELECT Id, Username FROM Users WHERE Username = @Name AND Password = @Password";\n// ...\nif (reader.Read())\n{\n    return Ok(new { username = reader["Username"].ToString(), message = "Login successful" });\n}\nreturn Unauthorized(new { message = "Invalid credentials" });',
+      },
+      {
+        label: 'AuthController.cs - after (lookup by username, verify hash in C#)',
+        code: 'var sql = "SELECT Id, Username, PasswordHash FROM Users WHERE Username = @Name";\n// ... nameParam bound, no password parameter ...\nif (reader.Read())\n{\n    var storedHash = reader["PasswordHash"].ToString();\n    var hasher = new PasswordHasher<User>();\n    var result = hasher.VerifyHashedPassword(new User(), storedHash, request.Password);\n    if (result == PasswordVerificationResult.Success)\n    {\n        return Ok(new { username = reader["Username"].ToString(), message = "Login successful" });\n    }\n}\nreturn Unauthorized(new { message = "Invalid credentials" });',
+      },
+      {
+        label: 'SeedData.cs - hashing at seed time',
+        code: 'var hasher = new PasswordHasher<User>();\nvar admin = new User { Username = "administrator" };\nadmin.PasswordHash = hasher.HashPassword(admin, "admin123");\nvar wiener = new User { Username = "wiener" };\nwiener.PasswordHash = hasher.HashPassword(wiener, "peter");\ndb.Users.AddRange(admin, wiener);',
+      },
+    ],
+    screenshots: [
+      'Homelab/HomeLabPasswordFix1.webp',
+      'Homelab/HomeLabPasswordFix2.webp',
+      'Homelab/HomeLabPasswordFix3.webp',
+      'Homelab/HomeLabPasswordFix4.webp',
+    ],
+    tools: ['.NET / C#', 'ASP.NET Core Identity', 'SQLite', 'curl'],
+    tags: [
+      'AppSec homelab',
+      'cryptographic failures',
+      'password hashing',
+      'PBKDF2',
+      'OWASP Top 10',
+    ],
+    link: {
+      label: 'appsec-homelab repo',
+      url: 'https://github.com/charles-goodsir/appsec-homelab',
+    },
+  },
+  {
     id: 'appsec-homelab-entry-15-readme-audit-xss-reverify',
     date: '2026-09-16',
     category: 'AppSec Homelab',
