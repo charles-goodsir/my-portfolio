@@ -44,6 +44,42 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'appsec-homelab-entry-18-azure-terraform-setup',
+    date: '2026-09-16',
+    category: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab'],
+    title: 'Setting up Terraform and Azure CLI for the first IaC piece',
+    workedOn: [
+      'Started Phase 3 of the homelab roadmap: a small Terraform-managed Azure resource, to close the most commonly-flagged skill gap in DevOps job postings',
+      "Disabled the GitHub Actions workflow via the repo UI while this phase is in progress, so CI isn't running against a repo that isn't changing",
+      "Hit a real environment problem installing Azure CLI: discovered Homebrew was running as an Intel (x86_64) install under Rosetta on what is actually an Apple Silicon Mac, which broke from-source builds of azure-cli's dependencies",
+      'Installed native arm64 Homebrew alongside the old one, moved Terraform and Azure CLI onto it, confirmed both with file (real arm64 binaries) rather than trusting a stale build tag in terraform --version',
+      'Signed up for an Azure free-tier subscription, authenticated the CLI with az login, confirmed the subscription is active and default',
+      'Scaffolded the actual Terraform project: a providers.tf for the azurerm provider, ran terraform init, and fixed a real gitignore mistake before the first commit',
+    ],
+    body: [
+      "Picked Azure over the mini-PC/Docker option for the Terraform piece, since actual DevOps postings mean cloud infrastructure when they say Terraform, not local containers. Storage account is the target: small, free-tier friendly, and simple enough to understand every line rather than copy a template.",
+      "Before any of the Terraform work, disabled the GitHub Actions workflow from the repo's Actions tab. No reason to keep the nightly cron and push-triggered scans running against a repo that's about to sit still for a phase that has nothing to do with the app itself.",
+      'Installing Azure CLI turned into its own debugging exercise. brew install azure-cli failed compiling one of its dependencies with "C compiler cannot create executables" - looked like a broken toolchain at first, but manual clang test-compiles showed the compiler itself was fine. The real issue: Homebrew was installed at the old Intel-only location (/usr/local) and running via Rosetta on what is actually an Apple Silicon Mac, so its build scripts kept targeting x86_64 with no real x86_64 toolchain behind them. Rosetta itself turned out to be broken too - "Bad CPU type in executable" on Homebrew\'s own bundled Ruby, likely from a Command Line Tools reinstall - and fixing that with softwareupdate --install-rosetta got brew running again but left the original compile failure untouched, confirming the architecture mismatch was the real root cause, not a broken toolchain.',
+      "Fixed it properly rather than patching around it: installed native arm64 Homebrew at /opt/homebrew, pointed the shell at it via .zprofile, and reinstalled azure-cli and terraform through that instead. Confirmed with file on the actual binaries that they're real arm64 executables, since terraform --version stubbornly still prints darwin_amd64 - that turned out to be a static build tag from HashiCorp's release process, not a reflection of what's actually running.",
+      'Signed up for an Azure free-tier account, authenticated via az login, and confirmed a subscription active and set as default. Then scaffolded the Terraform project itself: providers.tf declaring the azurerm provider, terraform init to pull the provider plugin down. First .gitignore draft ignored .terraform.lock.hcl, which is backwards - that lock file pins the exact provider version for reproducibility and should be committed, only the .terraform/ cache and state files should be ignored. Fixed before the first commit rather than after.',
+      "Good reminder from this session: half the actual work in DevOps tooling is the environment underneath the tool, not the tool itself. The Terraform config is three lines so far. Getting to the point where it could even run took working through an architecture mismatch most tutorials never mention, because most people aren't running an Intel Homebrew install on Apple Silicon by accident.",
+    ],
+    tools: ['Terraform', 'Azure CLI', 'Homebrew'],
+    tags: [
+      'AppSec homelab',
+      'Terraform',
+      'Azure',
+      'DevOps',
+      'infrastructure as code',
+      'toolchain debugging',
+    ],
+    link: {
+      label: 'appsec-homelab repo',
+      url: 'https://github.com/charles-goodsir/appsec-homelab',
+    },
+  },
+  {
     id: 'appsec-homelab-entry-17-risk-assessment',
     date: '2026-09-16',
     category: 'AppSec Homelab',
