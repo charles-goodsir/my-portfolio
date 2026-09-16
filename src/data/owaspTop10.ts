@@ -29,17 +29,30 @@ export const owaspTop10: OwaspRisk[] = [
   {
     rank: 'A02:2025',
     title: 'Security Misconfiguration',
-    progress: 'Planned',
+    progress: 'In progress',
     summary:
       'Insecure default configurations, incomplete or ad hoc configurations, open cloud storage, misconfigured HTTP headers, and verbose error messages that leak information.',
     whyItMatters:
       'Easy to introduce and easy to miss - a single unhardened default (default creds, an open S3 bucket, debug mode left on in prod) can undo otherwise solid code.',
     howToLearnIt: [
-      'PortSwigger labs on information disclosure and directory listing - not started yet',
-      'Once the homelab app is built, run a config audit on it: default credentials, exposed admin panels, verbose error pages',
-      'Get familiar with CIS Benchmarks for whatever OS/cloud platform I end up deploying to',
+      'Ran three rounds of OWASP ZAP baseline scans against the homelab app, fixing missing security headers between each: 8 warnings down to 3, 59 passes up to 64',
+      'Added CSP, X-Frame-Options, X-Content-Type-Options, Permissions-Policy, and the cross-origin isolation headers to the nginx config, one round at a time, re-scanning after each fix',
+      'Left one CSP directive as a documented trade-off (unsafe-inline for styles) rather than chasing a zero-warning scan - noted directly in the nginx config comments',
+      'Still not started: information disclosure / directory listing labs, and a config audit of the mini PC itself against CIS Benchmarks',
     ],
     tools: ['OWASP ZAP', 'Nmap', 'Nikto', 'CIS-CAT'],
+    relatedDiaryLinks: [
+      {
+        label: 'First ZAP baseline scan',
+        entryId: 'appsec-homelab-entry-9-first-zap-scan',
+        vulnType: 'AppSec Homelab',
+      },
+      {
+        label: 'ZAP remediation, final round',
+        entryId: 'appsec-homelab-entry-10-zap-remediation-final',
+        vulnType: 'AppSec Homelab',
+      },
+    ],
   },
   {
     rank: 'A03:2025',
@@ -51,15 +64,21 @@ export const owaspTop10: OwaspRisk[] = [
       'Directly relevant to your homelab pipeline - this is exactly what Dependency-Check/Snyk (SCA) and gitleaks are there to catch before a bad dependency or leaked secret reaches production.',
     howToLearnIt: [
       "Ran Semgrep against my own homelab's GitHub Actions workflow and it flagged the checkout action using a mutable @v4 tag rather than a pinned commit SHA - a real, unprompted example of exactly this risk category",
-      'Fixed it by pinning to the full commit SHA (actions/checkout@8ade135a...) instead of a floating tag',
-      'Next: wire Dependency-Check or Snyk into the same pipeline to cover dependency-level supply chain risk, not just pipeline config',
-      'Learn what an SBOM (Software Bill of Materials) is, and generate one for the homelab app',
+      'Rebuilt the whole pipeline around it: every GitHub Action pinned to a full commit SHA, with Dependabot on the github-actions ecosystem so the pins still get bumped, just via a reviewed PR instead of a silent tag move',
+      'Added dependency scanning for both halves of the app - dotnet list package --vulnerable --include-transitive for NuGet, npm audit --audit-level=high for the frontend - plus Dependabot on both ecosystems',
+      'Added Trivy container scanning of both Docker images, left report-only until I have a baseline to triage against',
+      'Still open: no SBOM generated for the app yet',
     ],
-    tools: ['OWASP Dependency-Check', 'Snyk', 'gitleaks', 'Syft/SBOM tooling'],
+    tools: ['Dependabot', 'Trivy', 'gitleaks', 'Syft/SBOM tooling'],
     relatedDiaryLinks: [
       {
         label: 'AppSec Homelab',
         entryId: 'appsec-homelab-entry-4-first-pipeline-run',
+        vulnType: 'AppSec Homelab',
+      },
+      {
+        label: 'Full CI/CD security pipeline',
+        entryId: 'appsec-homelab-entry-14-cicd-pipeline',
         vulnType: 'AppSec Homelab',
       },
     ],
@@ -67,32 +86,40 @@ export const owaspTop10: OwaspRisk[] = [
   {
     rank: 'A04:2025',
     title: 'Cryptographic Failures',
-    progress: 'Planned',
+    progress: 'Completed',
     summary:
       'Sensitive data exposed due to missing or weak encryption, in transit or at rest - weak algorithms, hardcoded keys, or plaintext storage of things like passwords or tokens.',
     whyItMatters:
       "Was previously ranked #2 in 2021 (as 'Sensitive Data Exposure'/'Cryptographic Failures'). Still a top cause of major breaches when it goes wrong.",
     howToLearnIt: [
-      'PortSwigger labs on JWT attacks - not started yet, a lot of crypto failures show up in token handling',
-      'Learn the difference between encoding, hashing, and encryption, and when to use each',
-      'Once the homelab app exists, check it for hardcoded secrets or weak hashing - gitleaks can help here',
+      'Found and fixed the last of the four seeded homelab vulnerabilities: the User model stored passwords as plain strings, checked with a raw SQL equality comparison',
+      "Rewrote it around Microsoft.AspNetCore.Identity's PasswordHasher<User> for salted PBKDF2 hashing, looking up by username only and verifying the hash in C# instead of comparing plaintext in the query",
+      'Re-tested after the fix: correct login still works, a wrong password fails, and the raw table now stores hashed blobs instead of admin123 and peter in plain text',
+      'PortSwigger labs on JWT attacks are still not started - a lot of crypto failures show up in token handling, and that is the piece still missing here',
     ],
     tools: ['Burp Suite (JWT Editor extension)', 'gitleaks', 'testssl.sh'],
+    relatedDiaryLinks: [
+      {
+        label: 'Fixing plaintext password storage',
+        entryId: 'appsec-homelab-entry-16-plaintext-password-fix',
+        vulnType: 'Cryptographic Failures',
+      },
+    ],
   },
   {
     rank: 'A05:2025',
     title: 'Injection',
-    progress: 'In progress',
+    progress: 'Completed',
     summary:
       'Untrusted data is sent to an interpreter as part of a command or query, letting an attacker alter its intended behaviour - covers SQL injection, XSS, command injection, and similar.',
     whyItMatters:
-      'The category you already have the most hands-on depth in from the PortSwigger SQL injection path and the XSS path you just started - this is your strongest talking point in interviews right now.',
+      'The category I have the most hands-on depth in, from the PortSwigger SQL injection and XSS paths and from finding and fixing both bug classes in my own app - this is my strongest talking point in interviews right now.',
     howToLearnIt: [
-      'Completed the PortSwigger SQL injection path (15 of 17 labs - 2 remain blocked behind Burp Pro)',
-      'Currently working through the PortSwigger XSS path',
-      'Built a deliberately vulnerable .NET/React app and reproduced both SQL injection (login bypass) and reflected XSS in my own code, confirming what the labs teach translates to a real codebase',
-      'Wired Semgrep into a GitHub Actions pipeline - it correctly caught the seeded SQLi but missed the seeded XSS, which is now something to dig into (rule coverage gap or payload needs adjusting)',
-      'Planning to move on to Command Injection and NoSQL Injection labs after XSS',
+      'Completed the PortSwigger SQL injection path (Community Edition - 2 labs remain blocked behind Burp Pro/Collaborator)',
+      'Completed the PortSwigger XSS path, including the expert-level AngularJS sandbox escapes and CSP bypasses (3 labs remain blocked behind Pro or a lab-state issue)',
+      'Built a deliberately vulnerable .NET/React app, reproduced the SQL injection login bypass and reflected XSS in my own code, then fixed both with parameterized queries and JSX text interpolation, and re-tested each fix against the original exploit',
+      "Wired Semgrep into a GitHub Actions pipeline - it correctly caught the seeded ProductsController.cs SQLi but not the structurally identical one in AuthController.cs, traced to the rule not treating [FromBody]-bound objects as a tainted source, documented as a known false negative",
+      'Moved on to the Authentication path next rather than Command/NoSQL injection - higher priority given how much of it maps to real login-flow bugs',
     ],
     tools: [
       'Burp Suite',
@@ -105,11 +132,20 @@ export const owaspTop10: OwaspRisk[] = [
         entryId: 'portswigger-sqli-path-complete',
         vulnType: 'SQL Injection',
       },
-      { label: 'XSS labs', entryId: 'portswigger-xss-labs-1', vulnType: 'XSS' },
       {
-        label: 'AppSec Homelab',
-        entryId: 'appsec-homelab-entry-4-first-pipeline-run',
-        vulnType: 'AppSec Homelab',
+        label: 'XSS path complete',
+        entryId: 'portswigger-xss-labs-25-30',
+        vulnType: 'XSS',
+      },
+      {
+        label: 'Homelab: login bypass exploit and fix',
+        entryId: 'appsec-homelab-entry-11-login-bypass-fix',
+        vulnType: 'SQL Injection',
+      },
+      {
+        label: 'Homelab: XSS exploit and fix',
+        entryId: 'appsec-homelab-entry-13-product-search-xss-fix',
+        vulnType: 'XSS',
       },
     ],
   },
@@ -131,17 +167,26 @@ export const owaspTop10: OwaspRisk[] = [
   {
     rank: 'A07:2025',
     title: 'Authentication Failures',
-    progress: 'Planned',
+    progress: 'In progress',
     summary:
       "Weaknesses in how an application confirms a user's identity - weak password policies, session fixation, credential stuffing exposure, missing MFA.",
     whyItMatters:
-      'Ties directly into your Security+ material on identity and access management, and is one of the highest-value areas to get hands-on with since login flows are everywhere.',
+      'Ties directly into my Security+ material on identity and access management, and is one of the highest-value areas to get hands-on with since login flows are everywhere.',
     howToLearnIt: [
-      'PortSwigger: Authentication learning path - not started yet (password reset flaws, 2FA bypass, brute-force protection)',
-      'Practice testing login flows for account lockout, rate limiting, and password reset token predictability on the labs',
-      "Once the homelab app has an auth flow, review it against OWASP's Authentication Cheat Sheet",
+      'Started the PortSwigger Authentication path: username enumeration by response text, by a subtly different error message (Intruder grep-extract), and by response timing',
+      'Bypassed a 2FA flow by navigating straight to the post-login page without completing the second factor',
+      'Exploited a password-reset flaw where the reset token was not bound to the account it was issued for, replaying it in Repeater against a different username',
+      'Defeated an account lockout by spoofing X-Forwarded-For so each login attempt looked like a new IP',
+      "Next: JWT-specific labs, and reviewing the homelab app's own auth flow against OWASP's Authentication Cheat Sheet",
     ],
     tools: ['Burp Suite (Intruder, on Pro)', 'Hydra (lab environments only)'],
+    relatedDiaryLinks: [
+      {
+        label: 'Authentication labs 1-5',
+        entryId: 'portswigger-auth-labs-1-5',
+        vulnType: 'Authentication',
+      },
+    ],
   },
   {
     rank: 'A08:2025',

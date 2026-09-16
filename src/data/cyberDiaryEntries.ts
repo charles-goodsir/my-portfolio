@@ -44,6 +44,29 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'appsec-homelab-entry-17-risk-assessment',
+    date: '2026-09-16',
+    category: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab'],
+    title: 'A lightweight risk assessment of the homelab, mapped to NIST CSF 2.0',
+    workedOn: [
+      'Wrote a lightweight risk assessment of the whole homelab environment (mini PC, vulnerable app, CI/CD pipeline, GitHub repo), structured around NIST CSF 2.0\'s five functions',
+      'Listed the actual assets and threats, rated each by likelihood and impact, and mapped the controls already built - SSH hardening, ufw, fail2ban, SAST/secrets/DAST, SHA-pinned Actions - against Identify/Protect/Detect/Respond/Recover',
+      'Flagged the real gaps rather than skipping them: no patch cadence on the mini PC, no Recover function in practice, no network segmentation',
+    ],
+    body: [
+      "Stepped back from the hands-on exploit-and-fix work today to write a lightweight risk assessment of the whole homelab: the mini PC, the vulnerable app, the CI/CD pipeline, and the GitHub repo housing it. Structured it around NIST CSF 2.0's five functions - Identify, Protect, Detect, Respond, Recover - since that's the framework most of the AppSec and GRC job specs I'm reading name directly.",
+      'The point was not to invent controls to document. Everything under Protect and Detect is stuff already built over the last few weeks - SSH key auth, ufw, fail2ban, Semgrep/gitleaks/ZAP in the pipeline, SHA-pinned Actions - mapped after the fact onto a standard structure instead of left as a loose pile of homelab tasks.',
+      'Recover came back mostly empty, and I left it that way rather than padding it out. There is no backup or disaster-recovery process for the mini PC, which is a real gap on paper and a non-issue in practice since there is no production data to lose. Writing that down as a gap felt like the more honest version of the exercise than skipping the section.',
+      'This is the part of the job I have not had much reason to practice day to day: taking real technical controls and describing them the way a risk register would, rather than the way an engineer would. Worth doing on purpose rather than meeting it for the first time in an actual GRC role.',
+    ],
+    tags: ['AppSec homelab', 'risk assessment', 'NIST CSF', 'GRC'],
+    link: {
+      label: 'appsec-homelab repo',
+      url: 'https://github.com/charles-goodsir/appsec-homelab',
+    },
+  },
+  {
     id: 'appsec-homelab-entry-16-plaintext-password-fix',
     date: '2026-09-16',
     category: 'AppSec Homelab',
