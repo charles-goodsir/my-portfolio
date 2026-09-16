@@ -48,9 +48,10 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-09-16',
     category: 'AppSec Homelab',
     vulnTypes: ['AppSec Homelab'],
-    title: 'A lightweight risk assessment of the homelab, mapped to NIST CSF 2.0',
+    title:
+      'A lightweight risk assessment of the homelab, mapped to NIST CSF 2.0',
     workedOn: [
-      'Wrote a lightweight risk assessment of the whole homelab environment (mini PC, vulnerable app, CI/CD pipeline, GitHub repo), structured around NIST CSF 2.0\'s five functions',
+      "Wrote a lightweight risk assessment of the whole homelab environment (mini PC, vulnerable app, CI/CD pipeline, GitHub repo), structured around NIST CSF 2.0's five functions",
       'Listed the actual assets and threats, rated each by likelihood and impact, and mapped the controls already built - SSH hardening, ufw, fail2ban, SAST/secrets/DAST, SHA-pinned Actions - against Identify/Protect/Detect/Respond/Recover',
       'Flagged the real gaps rather than skipping them: no patch cadence on the mini PC, no Recover function in practice, no network segmentation',
     ],
@@ -63,7 +64,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     tags: ['AppSec homelab', 'risk assessment', 'NIST CSF', 'GRC'],
     link: {
       label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
+      url: 'https://github.com/charles-goodsir/appsec-homelab/blob/main/homelab-risk-assessment.md',
     },
   },
   {
@@ -95,7 +96,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         code: 'var sql = "SELECT Id, Username FROM Users WHERE Username = @Name AND Password = @Password";\n// ...\nif (reader.Read())\n{\n    return Ok(new { username = reader["Username"].ToString(), message = "Login successful" });\n}\nreturn Unauthorized(new { message = "Invalid credentials" });',
       },
       {
-        label: 'AuthController.cs - after (lookup by username, verify hash in C#)',
+        label:
+          'AuthController.cs - after (lookup by username, verify hash in C#)',
         code: 'var sql = "SELECT Id, Username, PasswordHash FROM Users WHERE Username = @Name";\n// ... nameParam bound, no password parameter ...\nif (reader.Read())\n{\n    var storedHash = reader["PasswordHash"].ToString();\n    var hasher = new PasswordHasher<User>();\n    var result = hasher.VerifyHashedPassword(new User(), storedHash, request.Password);\n    if (result == PasswordVerificationResult.Success)\n    {\n        return Ok(new { username = reader["Username"].ToString(), message = "Login successful" });\n    }\n}\nreturn Unauthorized(new { message = "Invalid credentials" });',
       },
       {
@@ -141,7 +143,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       "Rather than just correct the wording from memory, wanted current, provable evidence instead of relying on an old screenshot. Put dangerouslySetInnerHTML back into ProductSearch.tsx, ran the app, and fired <img src=x onerror=alert('XSS')> at the search box. It rendered as a real image element in the DOM (broken-icon and all) and the onerror handler executed - confirmed both visually and in the console.",
       "Reverted the component to plain JSX text interpolation and ran the identical payload again. This time it came back as literal text - You searched for: <img src=x onerror=alert('XSS')> - printed on the page, not parsed. Console showed no script execution on the reload. Same bug class as Entry 13, now re-verified against the current code instead of taken on faith.",
       "Rewrote the README's vulnerability table to carry a Status column (Fixed / Open) and replaced the exploit section with an honest before -> exploit -> fix -> re-test writeup for all three bugs, dropping the incorrect CSP claim entirely. Plaintext password storage in SeedData.cs is the one item still open.",
-      "Small lesson worth keeping: a fixed vulnerability is only as credible as the docs describing it. Docs drift from code the moment you stop re-checking them against it - worth treating a README claim about security behaviour the same as a test assertion, something that can go stale and needs re-running, not just written once.",
+      'Small lesson worth keeping: a fixed vulnerability is only as credible as the docs describing it. Docs drift from code the moment you stop re-checking them against it - worth treating a README claim about security behaviour the same as a test assertion, something that can go stale and needs re-running, not just written once.',
     ],
     codeSnippets: [
       {
@@ -184,15 +186,15 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       "Added a nightly cron run, a summary job that reads every other job's result into one pass/fail table, and a Mermaid pipeline diagram in the README",
     ],
     body: [
-      "Went into this session wanting one thing to stop being a soft spot in interviews: a true, specific answer to \"have you worked with a deployment gate\" instead of a textbook one. AppSec Homelab already had a vulnerable app and a single-job Semgrep scan. The goal was to turn that one script into something that actually behaves like a CI/CD security pipeline - staged, gated, and evidenced.",
+      'Went into this session wanting one thing to stop being a soft spot in interviews: a true, specific answer to "have you worked with a deployment gate" instead of a textbook one. AppSec Homelab already had a vulnerable app and a single-job Semgrep scan. The goal was to turn that one script into something that actually behaves like a CI/CD security pipeline - staged, gated, and evidenced.',
       'Where it started: security.yml was one job - pull the Semgrep container, run semgrep ci, done. Fine for "I ran a scanner once", not enough for "I built a pipeline".',
       "Phase 1 was structure before scope. Split the single job into named, parallel ones: secrets (gitleaks), sast (Semgrep), build, dependency-scan, test. Independent jobs run concurrently now instead of accidentally serially, and needs: encodes the actual dependency graph - test can't run until build succeeds.",
-      "Alongside that: SHA-pinned actions, since a mutable tag like actions/checkout@v4 could have its target moved if the maintainer's account were ever compromised, running malicious code with my secrets in scope on the next push - pinning to a commit SHA makes that impossible, paired with Dependabot's github-actions ecosystem (added in Phase 3) so the pins still get updated, just via a reviewed PR instead of silently. Least-privilege permissions: read-only at the workflow level by default, with only the sast job elevated to security-events: write because it needs to upload SARIF - the same principle as scoping an IAM role, so a compromised step's blast radius is \"can read the repo\", not \"can push to main\". SARIF upload to the Security tab so Semgrep findings show up as first-class, dismissible findings instead of buried log output. A concurrency group so a second push cancels a stale run in flight.",
+      'Alongside that: SHA-pinned actions, since a mutable tag like actions/checkout@v4 could have its target moved if the maintainer\'s account were ever compromised, running malicious code with my secrets in scope on the next push - pinning to a commit SHA makes that impossible, paired with Dependabot\'s github-actions ecosystem (added in Phase 3) so the pins still get updated, just via a reviewed PR instead of silently. Least-privilege permissions: read-only at the workflow level by default, with only the sast job elevated to security-events: write because it needs to upload SARIF - the same principle as scoping an IAM role, so a compromised step\'s blast radius is "can read the repo", not "can push to main". SARIF upload to the Security tab so Semgrep findings show up as first-class, dismissible findings instead of buried log output. A concurrency group so a second push cancels a stale run in flight.',
       "Phase 2 was the part I actually wanted: build -> deploy-staging -> deploy-prod, with deploy-prod tied to a GitHub production Environment that has a required-reviewer protection rule. When the pipeline reaches that job it pauses - nothing ships to production until a human clicks approve in the UI. That pause is the deployment gate, the same mechanism Azure DevOps release pipelines are built around, just GitHub's version of it, and now I have a working one I can screenshot rather than describe in the abstract. deploy-staging SSHes into the mini PC and runs docker compose up -d --build, reusing the infrastructure already built for the DAST target rather than standing up a second environment from scratch.",
       "Getting the SSH key wired up ate the most time, and the reason was a good lesson on its own. The mini PC's Wi-Fi adapter doesn't have a fixed IP, and DHCP was re-leasing a different address between the moment I checked sshd status and the moment I tried to connect. Chased \"connection refused\" through firewall rules, fail2ban ban lists, and iptables tables that were all completely correct, because the real problem was one layer up - I was connecting to an address the machine wasn't on anymore. The fix was dumb in hindsight: ip addr show on the target, twice, a few minutes apart, showed two different IPs. Stopped trusting the IP written down in DEPLOY.md, re-checked it live, and the SSH connection worked first try with no firewall or fail2ban change needed.",
       "The proper fix is a DHCP reservation on the router so the mini PC always gets the same lease. I don't have router admin access right now, so that's parked as a known gap with a documented workaround (a static IP set with nmcli on the host itself) rather than something forced through. Worth keeping as a general debugging habit: when every layer you check comes back clean, check whether you're even checking the right target.",
       'Secrets went into the staging GitHub Environment specifically, not the repo-wide secrets store - environment-scoped secrets are only visible to jobs that declare environment: staging, so the production approval gate actually protects something. A repo-level secret would be visible to deploy-prod regardless of whether anyone approved it, which defeats the point of having the gate at all.',
-      'Phase 3 added depth. Dependency scanning: dotnet list package --vulnerable --include-transitive for NuGet, npm audit --audit-level=high for the frontend, plus Dependabot enabled on both ecosystems and on the pinned GitHub Actions, so vulnerable dependencies surface as PRs instead of silent drift. Container scanning with Trivy builds both Docker images fresh and scans the filesystem inside each - OS packages and dependencies baked into the final layer, which source-level SAST and SCA structurally cannot see. Left it report-only (exit-code: 0) deliberately: I don\'t yet know this repo\'s baseline, and failing the build on an unreviewed first run would just block every deploy on noise. Triage first, tighten the gate second.',
+      "Phase 3 added depth. Dependency scanning: dotnet list package --vulnerable --include-transitive for NuGet, npm audit --audit-level=high for the frontend, plus Dependabot enabled on both ecosystems and on the pinned GitHub Actions, so vulnerable dependencies surface as PRs instead of silent drift. Container scanning with Trivy builds both Docker images fresh and scans the filesystem inside each - OS packages and dependencies baked into the final layer, which source-level SAST and SCA structurally cannot see. Left it report-only (exit-code: 0) deliberately: I don't yet know this repo's baseline, and failing the build on an unreviewed first run would just block every deploy on noise. Triage first, tighten the gate second.",
       "DAST had an interesting constraint: the mini PC is LAN-only by design, never exposed to the internet, so a GitHub-hosted runner physically can't reach it. Rather than standing up a self-hosted runner, ran ZAP through the same SSH connection used for the deploy, so the scan executes on the LAN side where the target is actually reachable, then SCP the HTML report back and attach it to the workflow run as a downloadable artifact. Good enough for now - a self-hosted runner on the mini PC is the more correct long-term answer if DAST needs to become its own independent job.",
       "Phase 4 was making results visible without digging through logs. A nightly cron run, because dependency advisories update daily and a package clean yesterday can have a new CVE today with zero code changes on my end. A summary job with if: always() that reads every other job's result via needs.* and writes a pass/fail table to the run's $GITHUB_STEP_SUMMARY, so the pipeline's outcome is one glance instead of eight job logs. A Mermaid pipeline diagram in the README, which GitHub renders natively with no image asset needed, showing the parallel gates feeding staging, DAST folded into that stage, and the required-reviewer pause before production.",
     ],
@@ -260,7 +262,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
           'Logged in as the victim (carlos) with known credentials, got to the 2FA prompt, then changed the URL straight to /my-account.',
           'The app never checks that the 2FA step was actually completed, so it lets you in.',
         ],
-        solution: 'After reaching the 2FA prompt, navigate directly to /my-account.',
+        solution:
+          'After reaching the 2FA prompt, navigate directly to /my-account.',
         status: 'completed',
         screenshot: 'Burp/Lab2Authentication.webp',
       },
@@ -381,7 +384,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
           'Attacked the postId param directly. The payload closes the surrounding context and uses an arrow function plus throw / onerror to reach alert without the blocked characters, then repairs the trailing syntax with toString and window+empty-string.',
         ],
         solution:
-          "post?postId=5&%27},x=x=%3E{throw/**/onerror=alert,1337},toString=x,window%2b%27%27,{x:%27",
+          'post?postId=5&%27},x=x=%3E{throw/**/onerror=alert,1337},toString=x,window%2b%27%27,{x:%27',
         status: 'completed',
       },
       {
@@ -573,7 +576,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         title:
           'Lab 18: Reflected XSS into a JavaScript string with single quote and backslash escaped',
         notes: [
-          'Ran a unique search (p3p) and checked the DOM. It appears three times, including inside a script and an img tag: var searchTerms = \'p3p\'; document.write(...).',
+          "Ran a unique search (p3p) and checked the DOM. It appears three times, including inside a script and an img tag: var searchTerms = 'p3p'; document.write(...).",
           'Tried to break out of the string. Adding my own backslash to escape the escaping just gets more backslashes added - the single quote and backslash are both escaped, exactly what the title says.',
           'Since the string cannot be broken, went for the script element instead: close the current script and open a new one with the alert.',
         ],
@@ -709,7 +712,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     title: 'Exploiting and fixing the product search XSS',
     workedOn: [
       'Tried a manual XSS against the product search input, which the codebase already showed was vulnerable',
-      "Confirmed it: <img src=x onerror=\"alert(document.domain)\"> fires an alert showing the page's own domain",
+      'Confirmed it: <img src=x onerror="alert(document.domain)"> fires an alert showing the page\'s own domain',
       'Fixed it by rendering the query through JSX text interpolation ({submittedQuery}) instead of raw HTML, so React escapes it automatically',
       'Chased a false alarm where search appeared broken after the fix - the dotnet backend was still stopped from earlier, unrelated to the fix itself',
       'Re-tested with a real search term and confirmed the payload no longer executes',
@@ -754,8 +757,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     title: 'Fixing the ProductsController SQL injection',
     workedOn: [
       'Fixed the SQL injection in the product search endpoint (ProductsController.cs), the other of the two SQLi bugs seeded in the app and the one Semgrep does flag',
-      "Used the same fix as the AuthController.cs login bypass: bound the search term with CreateParameter instead of interpolating it into the LIKE clause",
-      "Confirmed the fix with curl: a normal search still returns real results, and a query ending in a single quote now returns an empty array instead of breaking out of the query",
+      'Used the same fix as the AuthController.cs login bypass: bound the search term with CreateParameter instead of interpolating it into the LIKE clause',
+      'Confirmed the fix with curl: a normal search still returns real results, and a query ending in a single quote now returns an empty array instead of breaking out of the query',
     ],
     body: [
       'Straight on to the next exploit fix. This one is the product search endpoint, which is the SQLi Semgrep does flag - the counterpart to the AuthController.cs login bypass from earlier today, which it does not.',
@@ -810,14 +813,14 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Finding it is one thing, fixing it in code is the actual point of this repo. The original AuthController.cs built the query by string interpolation - whatever came in on the username and password fields landed straight in the SQL text (before, below).',
       'First fix used command.Parameters.AddWithValue("@Name", request.Username) and the same for the password, binding the values instead of interpolating them. Ran dotnet build and it failed. Rather than guess further, switched approach.',
       'Second attempt built the parameters manually with CreateParameter() instead (after, below). That built cleanly.',
-      'Re-ran the same curl exploit against the fixed endpoint and it no longer worked. The username value is now bound as a literal parameter instead of concatenated into the query text, so administrator\' -- just gets treated as a username string that does not exist, which is the point of parameterization.',
+      "Re-ran the same curl exploit against the fixed endpoint and it no longer worked. The username value is now bound as a literal parameter instead of concatenated into the query text, so administrator' -- just gets treated as a username string that does not exist, which is the point of parameterization.",
       "Committed the fix and pushed. The pipeline ran and Semgrep flagged ProductsController.cs's injection like it always does, but still said nothing about AuthController.cs - same false negative as Entry 5, except now it applies to a fixed endpoint instead of a vulnerable one. The tool's blind spot on [FromBody]-bound input cuts both ways: it never caught the bug and it will not confirm the fix either. Manual testing is still the only thing that actually proves either state here.",
       'Onto the next exploit and fix. Same drill on whatever the ProductsController vulnerability turns up.',
     ],
     codeSnippets: [
       {
         label: 'AuthController.cs - before (string interpolation)',
-        code: 'var sql = $"SELECT Id, Username FROM Users WHERE Username = \'{request.Username}\' AND Password = \'{request.Password}\'";\n\nusing var connection = _db.Database.GetDbConnection();\nconnection.Open();\nusing var command = connection.CreateCommand();\ncommand.CommandText = sql;\nusing var reader = command.ExecuteReader();',
+        code: "var sql = $\"SELECT Id, Username FROM Users WHERE Username = '{request.Username}' AND Password = '{request.Password}'\";\n\nusing var connection = _db.Database.GetDbConnection();\nconnection.Open();\nusing var command = connection.CreateCommand();\ncommand.CommandText = sql;\nusing var reader = command.ExecuteReader();",
       },
       {
         label: 'AuthController.cs - after (parameterized)',
@@ -903,11 +906,11 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Ran the first OWASP ZAP baseline scan against the app deployed on the mini PC, adding the DAST layer alongside Semgrep (SAST) and gitleaks (secrets)',
       'Read the first report: no high-risk findings, 2 medium and 6 low, all missing or weak response headers rather than active exploits',
       'Did a first pass at the headers in the nginx config and re-ran the same scan for a before and after: the clickjacking, content-type, and server-header findings are gone, and CSP is now present but still weak',
-      'Worked through an scp mix-up caused by running the copy from inside the mini PC\'s own SSH session instead of a fresh Mac terminal',
+      "Worked through an scp mix-up caused by running the copy from inside the mini PC's own SSH session instead of a fresh Mac terminal",
     ],
     body: [
       'With the app deployed and running on the mini PC, I ran the first ZAP baseline scan against it: docker run -t -v $(pwd):/zap/wrk/:rw zaproxy/zap-stable zap-baseline.py -t http://192.168.88.13:8080 -r zap-report.html. That is the DAST layer, and the first time the three automated checks run end to end. Semgrep already covers SAST and gitleaks covers secrets.',
-      'Getting the report back to my Mac tripped me up briefly. I ran scp from inside the mini PC\'s own SSH session rather than a fresh terminal on the Mac, so it tried to connect back to itself and write to a macOS path that does not exist on Linux. Re-running it from an actual Mac terminal pulled it through. Check hostname before running anything that depends on which machine you are actually on.',
+      "Getting the report back to my Mac tripped me up briefly. I ran scp from inside the mini PC's own SSH session rather than a fresh terminal on the Mac, so it tried to connect back to itself and write to a macOS path that does not exist on Linux. Re-running it from an actual Mac terminal pulled it through. Check hostname before running anything that depends on which machine you are actually on.",
       'The first report came back with no high-risk findings, which is expected for a baseline scan since it is passive only. It will not catch the SQL injection or broken access control I built into the app and already found by hand in Burp. What it flagged was all response headers: 2 medium and 6 low. The medium ones were no Content-Security-Policy and no anti-clickjacking header. The low ones were the missing Cross-Origin-Embedder-Policy, Cross-Origin-Opener-Policy, and Cross-Origin-Resource-Policy headers, no Permissions-Policy, a missing X-Content-Type-Options header, and the Server header leaking its version.',
       'I did a first pass at fixing these in the nginx config: added a Content-Security-Policy, an X-Frame-Options header, and X-Content-Type-Options, and turned off the Server version token. Then I re-ran the exact same scan. The second report is cleaner. The clickjacking, content-type, and server-header findings are gone. CSP moved from missing to two medium findings, because the policy I added leaves a directive undefined with no fallback and still allows inline styles. The three cross-origin headers and the Permissions-Policy header are still open.',
       'None of those are the injection bugs I planted. They are a different category, more about defense in depth and browser-level protections than direct exploitation, but they are still real findings and a good complement to the manual work.',
@@ -1212,8 +1215,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-08-06',
     category: 'AppSec Homelab',
     vulnTypes: ['AppSec Homelab', 'SQL Injection'],
-    title:
-      'Leaving the AuthController SQLi as a documented false negative',
+    title: 'Leaving the AuthController SQLi as a documented false negative',
     workedOn: [
       'Reverted AuthController.cs back to its original, realistic [FromBody] login endpoint after the Entry 5 investigation',
       'Confirmed the SQL injection is still fully exploitable, and confirmed the pipeline still does not flag it',
@@ -1273,8 +1275,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-08-01',
     category: 'AppSec Homelab',
     vulnTypes: ['AppSec Homelab', 'SQL Injection', 'XSS'],
-    title:
-      'Building the vulnerable app and running the first pipeline scan',
+    title: 'Building the vulnerable app and running the first pipeline scan',
     workedOn: [
       'Built a bare-bones vulnerable-by-design app (.NET/C# backend, TypeScript/React frontend) to test what I learned in the PortSwigger SQLi and XSS labs',
       'Debugged the app from first build errors through to a working login and product search',
