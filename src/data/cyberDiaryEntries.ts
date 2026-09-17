@@ -44,6 +44,38 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-2-validate-stage-fixed',
+    date: '2026-09-17',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    title: 'Azure DevOps pipeline: Validate stage, part 2 (install Terraform, fixed)',
+    workedOn: [
+      'Chased down two more bugs in the Install Terraform step before it finally ran clean',
+      'Fixed a second hang: unzip -o still failed because a stray directory named terraform was left in the workspace from a previous failed run, and unzip can overwrite a file but not a directory',
+      'Fixed it by explicitly wiping the workspace (rm -rf terraform terraform.zip) at the top of the script, before doing anything else',
+      'Caught a YAML formatting mistake: a pasted curl command with an accidental line break split into two broken shell commands, since line breaks in a script: | block are real command boundaries unless escaped with \\',
+      'terraform -version now prints Terraform v1.9.8 cleanly on every run, regardless of what state the agent workspace was left in',
+      'Next: terraform fmt -check and terraform init -backend=false',
+    ],
+    body: [
+      "Picked up where yesterday's Install Terraform fix left off. The unzip -o fix solved the interactive-prompt hang, but the very next run failed differently: cannot delete old terraform: Is a directory, followed by terraform: command not found.",
+      'Root cause was a previous failed run leaving behind a stray directory called terraform in the workspace. unzip -o can force-overwrite a file, but it has no equivalent for a directory sitting in the way, so it failed silently on the delete and left no terraform binary behind.',
+      'Fixed it properly this time by not trusting the workspace to be clean at all: added rm -rf terraform terraform.zip to the very top of the script, before the curl and unzip steps run. On a hosted agent that gets reused across pipeline retries, a clean slate has to be enforced, not assumed.',
+      "Also hit a smaller, dumber bug along the way: I'd pasted the curl command into the YAML script: | block and it picked up an accidental line break, which split it into two separate, broken shell commands. Useful reminder that inside a script: | block, every line break is a real command boundary unless you explicitly continue the line with a trailing \\.",
+      'With both fixes in, terraform -version now prints Terraform v1.9.8 cleanly on every run, no matter what state a previous run left the workspace in. Small step, but it is the foundation the rest of the Validate stage builds on.',
+      'Next: terraform fmt -check and terraform init -backend=false.',
+    ],
+    screenshots: ['SecureAzureLandingZone/SALZ2.webp'],
+    tools: ['Azure DevOps', 'Terraform', 'YAML'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Azure DevOps',
+      'CI/CD pipeline',
+      'Terraform',
+      'infrastructure as code',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-1-validate-stage',
     date: '2026-09-17',
     category: 'Secure Azure Landing Zone',
