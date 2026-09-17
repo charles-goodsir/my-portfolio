@@ -9,6 +9,7 @@ import CyberDiary from './components/CyberDiary'
 import DiaryEntry from './components/DiaryEntry'
 import OwaspTop10 from './components/OWASP'
 import NotFound from './components/NotFound'
+import AppSecHomelab from './components/Projects/AppSecHomelab'
 import Detour from './components/Projects/Detour'
 import FlightTracker from './components/Projects/FlightTracker'
 import NewsDashboard from './components/Projects/NewsDashboard'
@@ -25,6 +26,10 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="experience" element={<Experience />} />
           <Route path="projects" element={<Projects />} />
+          <Route
+            path="projects/appsec-homelab"
+            element={<AppSecHomelab />}
+          />
           <Route path="projects/detour" element={<Detour />} />
           <Route path="projects/finance-tracker" element={<FinanceTracker />} />
           <Route path="projects/flight-tracker" element={<FlightTracker />} />

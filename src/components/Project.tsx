@@ -11,6 +11,22 @@ interface Project {
 
 const projects: Project[] = [
   {
+    id: 'appsec-homelab',
+    title: 'AppSec Homelab (Ongoing)',
+    description:
+      'A deliberately vulnerable ASP.NET Core / React app that I built, broke, and fixed, wrapped in a real DevSecOps pipeline with a staged deployment gate and a first piece of Terraform-managed infrastructure on Azure',
+    technologies: [
+      'ASP.NET Core 8',
+      'React',
+      'Docker',
+      'GitHub Actions',
+      'Semgrep',
+      'OWASP ZAP',
+      'Terraform',
+      'Azure',
+    ],
+  },
+  {
     id: 'detour',
     title: 'Detour',
     description:
