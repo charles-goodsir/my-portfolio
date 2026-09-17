@@ -1,6 +1,6 @@
 # Charles Goodsir — Portfolio
 
-A personal portfolio site built with React and TypeScript, showcasing my move from enterprise software engineering into Application Security.
+A personal portfolio site built with React and TypeScript, showcasing my move from enterprise software engineering into DevOps/DevSecOps.
 
 ## Live Site
 
@@ -8,7 +8,7 @@ A personal portfolio site built with React and TypeScript, showcasing my move fr
 
 ## About
 
-I'm a Software Application Engineer at Datacom (Auckland, NZ) with 4+ years working in .NET/C#, TypeScript, React, and Azure on enterprise CRM/ERP systems. I'm currently pivoting toward Application Security, backed by CompTIA Security+ (SY0-701) and hands-on practice through PortSwigger's Web Security Academy and Burp Suite.
+I'm a Software Application Engineer at Datacom (Auckland, NZ) with 4+ years working in .NET/C#, TypeScript, React, and Azure on enterprise CRM/ERP systems. I'm currently pivoting toward DevOps and DevSecOps, with application security as the specialty inside that — backed by CompTIA Security+ (SY0-701), hands-on practice through PortSwigger's Web Security Academy and Burp Suite, and IaC/CI-CD work with Terraform and GitHub Actions.
 
 This site doubles as a running log of that pivot — not just a static resume, but evidence of the work.
 

@@ -44,6 +44,47 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'appsec-homelab-entry-19-terraform-azure-deploy',
+    date: '2026-09-17',
+    category: 'AppSec Homelab',
+    vulnTypes: ['AppSec Homelab'],
+    milestone: true,
+    title: 'Terraform + Azure: my first real IaC deployment',
+    workedOn: [
+      'Ran the first real Terraform deployment against Azure: terraform plan then terraform apply, standing up a resource group and a storage account for real in australiaeast',
+      'Authenticated through the Azure CLI rather than hardcoding credentials into the Terraform config',
+      "Diagnosed a second toolchain issue after yesterday's Homebrew/Rosetta fix: a text editor auto-wrapping .tf files mid-line, breaking Terraform's HCL parser",
+      'Confirmed the deployment in the Azure portal and the activity log: the storage account and resource group both created and visible',
+      "Next: document the before/after in the repo, then terraform destroy, since this was a scoped exercise and not infrastructure I need running long-term",
+    ],
+    body: [
+      "Up to now, everything in my AppSec homelab was stood up manually - clone the repo, docker compose up -d --build, done. It works, but it's the kind of setup that only exists in my shell history. Nothing tells you what's about to change before it happens, and there's no clean way to tear it down again.",
+      'For this phase I wanted a small, real example of Infrastructure as Code alongside the vulnerability work: proof that DevSecOps in my case means more than finding and fixing bugs, it also covers provisioning infrastructure properly.',
+      'Set up Terraform against a free-tier Azure subscription, authenticating through the Azure CLI rather than hardcoding any credentials into the config. The build itself was two resources: a resource group and a storage account inside it, defined declaratively in .tf files.',
+      'The Apple-Silicon-vs-Intel-Homebrew mess from yesterday was sorted, but a second, dumber issue turned up: a text editor auto-wrapping my .tf files mid-line, which broke Terraform\'s HCL parser in a way that took a couple of passes to actually spot (resource "azurerm_storage_account" and "main" { split across two lines). Small reminder that infrastructure-as-code is still just code - syntax errors and all.',
+      'Once the config was clean, terraform plan did exactly what I wanted: showed precisely what was about to be created - the resource group, then the storage account with every default and computed attribute - before I had to commit to anything. terraform apply took under two minutes to stand both resources up for real in australiaeast.',
+      "The plan/apply split is the part that sold me. In the Docker Compose world I'm used to, I just run it and see what happens. Here, I got a full diff of intended changes before Azure was touched at all, and a lockfile pinning the exact provider version so the build is reproducible on another machine.",
+      'Confirmed it in the Azure portal and the activity log: stappsechomelab5791 showing up under rg-appsec-homelab in Australia East, with the activity log listing every create and update operation Terraform ran to get there.',
+      "Next: document this before/after in the repo itself, then run terraform destroy - this was a scoped exercise for the portfolio, not infrastructure I need running long-term, so it comes straight back down once it's captured.",
+    ],
+    screenshots: [
+      'Homelab/HomeLabTerraform1.webp',
+      'Homelab/HomeLabTerraform2.webp',
+    ],
+    tools: ['Terraform', 'Azure CLI', 'Azure'],
+    tags: [
+      'AppSec homelab',
+      'Terraform',
+      'Azure',
+      'DevOps',
+      'infrastructure as code',
+    ],
+    link: {
+      label: 'appsec-homelab repo',
+      url: 'https://github.com/charles-goodsir/appsec-homelab',
+    },
+  },
+  {
     id: 'appsec-homelab-entry-18-azure-terraform-setup',
     date: '2026-09-16',
     category: 'AppSec Homelab',
