@@ -9,7 +9,11 @@ export const scriptMap: Record<string, string> = {
 }
 
 const screenshotModules = import.meta.glob(
-  ['../assets/Burp/*.webp', '../assets/Homelab/*.webp'],
+  [
+    '../assets/Burp/*.webp',
+    '../assets/Homelab/*.webp',
+    '../assets/SecureAzureLandingZone/*.webp',
+  ],
   { eager: true, import: 'default' },
 ) as Record<string, string>
 

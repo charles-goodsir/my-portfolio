@@ -44,6 +44,39 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-1-validate-stage',
+    date: '2026-09-17',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    milestone: true,
+    title: 'Azure DevOps pipeline: Validate stage, part 1',
+    workedOn: [
+      'Started a new project, secure-azure-landing-zone, with the CI pipeline before writing much Terraform: a Validate stage first, since that is the cheapest place to catch a mistake before it touches real infrastructure',
+      'Set up an Azure DevOps org from scratch, separate from the Azure Portal account the actual resources live in',
+      'Installed Terraform on the pipeline agent with a plain curl + unzip script rather than the marketplace TerraformInstaller task',
+      'Diagnosed a pipeline that hung indefinitely on the Install Terraform step: unzip was waiting on an interactive overwrite prompt with no stdin on the hosted agent',
+      'Fixed it with unzip -o to force a non-interactive overwrite',
+      'Next: terraform fmt -check and terraform init -backend=false before the actual validate step',
+    ],
+    body: [
+      'New project: secure-azure-landing-zone. Started on the CI pipeline before writing much Terraform at all, with a Validate stage first - the cheapest place to catch a mistake, before it goes anywhere near real infrastructure.',
+      'First step was just getting an Azure DevOps org set up, which turned into a useful reminder: Azure Portal (where the actual cloud resources live) and Azure DevOps (where pipelines and repos live) are separate products from the same vendor. They only connect later, through a Service Connection.',
+      'For installing Terraform on the pipeline agent, went with the plain-script approach - curl the release, unzip it - over the marketplace TerraformInstaller task. More visible, no extra dependency, and better for actually seeing what happens on the agent instead of trusting a black-box task.',
+      'Hit the first real bug straight away: the pipeline hung indefinitely on the Install Terraform step. Turned out unzip was silently waiting on an interactive overwrite prompt (replace LICENSE.txt? [y/n]) left over from a re-run, and a hosted agent has no stdin to answer it, so the job just sat there until timeout.',
+      'Fixed by adding -o to force a non-interactive overwrite. The lesson worth keeping: anything in a script step that can prompt interactively will hang a CI job silently, with no error, so it is worth grepping for before letting a step run unattended.',
+      'Next: terraform fmt -check and terraform init -backend=false before getting to the actual validate step.',
+    ],
+    screenshots: ['SecureAzureLandingZone/SALZ1.webp'],
+    tools: ['Azure DevOps', 'Terraform', 'YAML'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Azure DevOps',
+      'CI/CD pipeline',
+      'Terraform',
+      'infrastructure as code',
+    ],
+  },
+  {
     id: 'appsec-homelab-entry-19-terraform-azure-deploy',
     date: '2026-09-17',
     category: 'AppSec Homelab',
