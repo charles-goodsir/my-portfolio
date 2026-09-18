@@ -12,10 +12,20 @@ function CyberDiary() {
     return raw ? raw.split(',').filter(Boolean) : []
   }, [searchParams])
 
+  const milestoneOnly = searchParams.get('milestone') === '1'
+
   const setSelected = (next: string[]) => {
-    setSearchParams(next.length ? { vuln: next.join(',') } : {}, {
-      replace: true,
-    })
+    const params: Record<string, string> = {}
+    if (next.length) params.vuln = next.join(',')
+    if (milestoneOnly) params.milestone = '1'
+    setSearchParams(params, { replace: true })
+  }
+
+  const toggleMilestoneOnly = () => {
+    const params: Record<string, string> = {}
+    if (selectedVulnTypes.length) params.vuln = selectedVulnTypes.join(',')
+    if (!milestoneOnly) params.milestone = '1'
+    setSearchParams(params, { replace: true })
   }
 
   const toggleVulnType = (vulnType: string) => {
@@ -38,17 +48,18 @@ function CyberDiary() {
   }, [])
 
   const entries = useMemo(() => {
-    const filtered =
-      selectedVulnTypes.length === 0
-        ? cyberDiaryEntries
-        : cyberDiaryEntries.filter((entry) =>
-            entry.vulnTypes.some((vt) => selectedVulnTypes.includes(vt)),
-          )
+    const filtered = cyberDiaryEntries
+      .filter(
+        (entry) =>
+          selectedVulnTypes.length === 0 ||
+          entry.vulnTypes.some((vt) => selectedVulnTypes.includes(vt)),
+      )
+      .filter((entry) => !milestoneOnly || entry.milestone)
 
     return [...filtered].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     )
-  }, [selectedVulnTypes])
+  }, [selectedVulnTypes, milestoneOnly])
 
   return (
     <section id="cyberdiary" className="max-w-[45rem] mx-auto py-16 px-4">
@@ -78,6 +89,16 @@ function CyberDiary() {
             </button>
           )
         })}
+        <button
+          onClick={toggleMilestoneOnly}
+          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
+            milestoneOnly
+              ? 'bg-primary text-on-primary'
+              : 'bg-sunken text-ink-muted hover:opacity-80'
+          }`}
+        >
+          Milestones
+        </button>
       </div>
 
       <div className="space-y-10">
