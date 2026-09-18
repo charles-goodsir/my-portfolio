@@ -44,6 +44,41 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-4-security-scan-tfsec',
+    date: '2026-09-18',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    title: 'Azure DevOps pipeline: SecurityScan stage with tfsec',
+    workedOn: [
+      'Added a SecurityScan stage, dependsOn: Validate, so it only runs after validation passes',
+      "Chose tfsec over Checkov: a single lightweight binary, the same download-a-release-and-run pattern as the Terraform install in stage 1, and purpose-built for Azure IaC rather than Checkov's heavier multi-cloud/compliance scope",
+      'Hit one bug before it ran clean: a missing line break collapsed bash and tfsec terraform/ into a single garbled command (bashtfsec)',
+      'Same root cause as the earlier curl wrapping issue - pasted or edited YAML script blocks are plain shell text, and a lost newline merges two commands into one broken one',
+      'main.tf has no real resource blocks yet, so tfsec found nothing to flag - the stage proves the mechanism works but catches nothing real until azurerm_* resources exist',
+      "Noted for later: install uses curl | bash from tfsec's install script with no version pin or checksum - fine for a personal pipeline, but a real production setup should pin an exact tfsec release and verify a checksum rather than trust a mutable script at run time",
+    ],
+    body: [
+      'Added a SecurityScan stage, dependsOn: Validate, so it only runs once validation passes.',
+      "Chose tfsec over Checkov. tfsec is a single lightweight binary - the same download-a-release-and-run pattern as the Terraform install in stage 1 - and purpose-built for Azure IaC. Checkov is heavier, general-purpose, multi-cloud and compliance-focused, more than this pipeline needs right now.",
+      'Hit one bug before the stage ran clean: a missing line break collapsed bash and tfsec terraform/ into a single garbled command, bashtfsec. Same root cause as the earlier curl wrapping issue - pasted or edited YAML script blocks are plain shell text, and a lost newline silently merges two commands into one broken one.',
+      'main.tf still has no real resource blocks, so tfsec found nothing to flag. The stage proves the mechanism works; it will not catch anything real until actual azurerm_* resources exist.',
+      "Shortcut noted for later: install uses curl | bash from tfsec's install script, with no version pin or checksum. Fine for a personal, learning pipeline. A real production setup should pin an exact tfsec release and verify a checksum instead of trusting a mutable script at run time.",
+    ],
+    screenshots: [
+      'SecureAzureLandingZone/SALZ6.webp',
+      'SecureAzureLandingZone/SALZ7.webp',
+    ],
+    tools: ['Azure DevOps', 'Terraform', 'tfsec', 'YAML'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Azure DevOps',
+      'CI/CD pipeline',
+      'Terraform',
+      'tfsec',
+      'infrastructure as code',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-3-init-validate-complete',
     date: '2026-09-18',
     category: 'Secure Azure Landing Zone',
