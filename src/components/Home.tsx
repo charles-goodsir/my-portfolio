@@ -14,10 +14,10 @@ function Home() {
           work underneath both.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button as="link" to="/projects" variant="primary">
+          <Button to="/projects" variant="primary">
             View My Work
           </Button>
-          <Button as="link" to="/diary" variant="secondary">
+          <Button to="/diary" variant="secondary">
             Cyber Diary
           </Button>
         </div>
