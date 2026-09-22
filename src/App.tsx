@@ -10,6 +10,7 @@ import DiaryEntry from './components/DiaryEntry'
 import OwaspTop10 from './components/OWASP'
 import NotFound from './components/NotFound'
 import AppSecHomelab from './components/Projects/AppSecHomelab'
+import SecureAzureLandingZone from './components/Projects/SecureAzureLandingZone'
 import Detour from './components/Projects/Detour'
 import FlightTracker from './components/Projects/FlightTracker'
 import NewsDashboard from './components/Projects/NewsDashboard'
@@ -29,6 +30,10 @@ function App() {
           <Route
             path="projects/appsec-homelab"
             element={<AppSecHomelab />}
+          />
+          <Route
+            path="projects/secure-azure-landing-zone"
+            element={<SecureAzureLandingZone />}
           />
           <Route path="projects/detour" element={<Detour />} />
           <Route path="projects/finance-tracker" element={<FinanceTracker />} />

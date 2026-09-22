@@ -12,18 +12,32 @@ interface Project {
 const projects: Project[] = [
   {
     id: 'appsec-homelab',
-    title: 'AppSec Homelab (Ongoing)',
+    title: 'AppSec Homelab',
     description:
-      'A deliberately vulnerable ASP.NET Core / React app that I built, broke, and fixed, wrapped in a real DevSecOps pipeline with a staged deployment gate and a first piece of Terraform-managed infrastructure on Azure',
+      'A deliberately vulnerable ASP.NET Core / React app that I built, broke, and fixed, wrapped in two parallel CI/CD security pipelines (GitHub Actions and Azure Pipelines) with staged deployment gates and a piece of Terraform-managed infrastructure on Azure',
     technologies: [
       'ASP.NET Core 8',
       'React',
       'Docker',
       'GitHub Actions',
+      'Azure Pipelines',
       'Semgrep',
       'OWASP ZAP',
       'Terraform',
       'Azure',
+    ],
+  },
+  {
+    id: 'secure-azure-landing-zone',
+    title: 'Secure Azure Landing Zone',
+    description:
+      'An Azure DevOps pipeline built before the Terraform it gates - Validate and tfsec security-scan stages running clean end to end, ready to catch misconfigurations once the landing zone resources go in',
+    technologies: [
+      'Terraform',
+      'Azure DevOps',
+      'Azure',
+      'tfsec',
+      'YAML',
     ],
   },
   {

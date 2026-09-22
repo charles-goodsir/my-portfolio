@@ -43,7 +43,12 @@ function Detour() {
 
         {/* Project Header */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
-          <h1 className="text-4xl font-bold text-ink mb-4">Detour</h1>
+          <div className="flex items-center gap-3 mb-4">
+            <h1 className="text-4xl font-bold text-ink">Detour</h1>
+            <span className="inline-block bg-success/10 text-success px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+              Complete
+            </span>
+          </div>
           <p className="text-xl text-ink-muted mb-6">
             A mobile app for discovering local attractions and creating custom
             routes
@@ -68,7 +73,7 @@ function Detour() {
             ].map((tech) => (
               <span
                 key={tech}
-                className="bg-primary/10 text-primary px-4 py-2 rounded-full font-semibold"
+                className="border border-line bg-sunken text-ink-muted px-3 py-1.5 rounded-md font-mono text-xs"
               >
                 {tech}
               </span>
@@ -95,23 +100,16 @@ function Detour() {
           </h2>
           <div className="prose prose-lg max-w-none">
             <p className="text-ink-muted mb-4">
-              Detour is a mobile application designed to help users discover
-              local attractions and create custom routes for their adventures.
-              Built with React Native and TypeScript, the app provides an
-              intuitive interface for exploring new places and planning
-              memorable journeys.
-            </p>
-            <p className="text-ink-muted mb-4">
-              The app integrates with Google Maps API to provide accurate
-              location data and routing capabilities, while Firebase handles
-              user authentication and data storage. Users can save their
-              favorite locations, create custom routes, and share their
-              discoveries with friends.
+              Detour is a React Native app for discovering places nearby and
+              building a route between them, live on the App Store. I
+              designed, built, and shipped it independently, including the
+              App Store submission.
             </p>
             <p className="text-ink-muted">
-              This project showcases my skills in mobile development, API
-              integration, and creating user-friendly interfaces that solve
-              real-world problems.
+              Google Maps API handles search, location, and routing; Firebase
+              handles auth and stores each user's saved places and routes. The
+              repo is private, so the App Store listing and this page are what's
+              public.
             </p>
           </div>
         </div>
@@ -129,7 +127,6 @@ function Detour() {
               <ul className="space-y-2 text-ink-muted">
                 <li>• Browse local attractions and points of interest</li>
                 <li>• Filter by category, distance, and rating</li>
-                <li>• View detailed information and photos</li>
               </ul>
             </div>
             <div>
@@ -138,7 +135,6 @@ function Detour() {
               </h3>
               <ul className="space-y-2 text-ink-muted">
                 <li>• Create custom routes with multiple stops</li>
-                <li>• Optimize routes for efficiency</li>
                 <li>• Save and share favorite routes</li>
               </ul>
             </div>
@@ -147,7 +143,6 @@ function Detour() {
                 User Experience
               </h3>
               <ul className="space-y-2 text-ink-muted">
-                <li>• Intuitive and responsive interface</li>
                 <li>• Offline map support</li>
                 <li>• Real-time location tracking</li>
               </ul>

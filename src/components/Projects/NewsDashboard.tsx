@@ -47,9 +47,14 @@ function NewsDashboard() {
 
         {/* Project Header */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
-          <h1 className="text-4xl font-bold text-ink mb-4">
-            News Dashboard
-          </h1>
+          <div className="flex items-center gap-3 mb-4">
+            <h1 className="text-4xl font-bold text-ink">
+              News Dashboard
+            </h1>
+            <span className="inline-block bg-success/10 text-success px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+              Complete
+            </span>
+          </div>
           <p className="text-xl text-ink-muted mb-6">
             A full-stack news aggregation dashboard with Python web scraping,
             database population, and React frontend.
@@ -75,7 +80,7 @@ function NewsDashboard() {
             ].map((tech) => (
               <span
                 key={tech}
-                className="bg-primary/10 text-primary px-4 py-2 rounded-full font-semibold"
+                className="border border-line bg-sunken text-ink-muted px-3 py-1.5 rounded-md font-mono text-xs"
               >
                 {tech}
               </span>
@@ -102,23 +107,16 @@ function NewsDashboard() {
           </h2>
           <div className="prose prose-lg max-w-none">
             <p className="text-ink-muted mb-4">
-              The News Dashboard is a full-stack application that combines
-              Python backend scripting with a modern React frontend. The project
-              features custom Python scripts that scrape news websites, fetch
-              cryptocurrency data, and integrate weather APIs to populate a
-              comprehensive database.
-            </p>
-            <p className="text-ink-muted mb-4">
-              The backend includes automated data collection scripts for news
-              aggregation, crypto market data, and weather information. The
-              React frontend provides a clean, organized interface for viewing
-              this data with real-time updates, category filtering, and
-              responsive design across all devices.
+              News Dashboard pairs Python scripts that scrape news sites and
+              pull crypto and weather data with a React/TypeScript frontend
+              that reads it back out. The scripts run on a schedule, clean and
+              store what they collect, and the frontend adds category
+              filtering and a dashboard view on top.
             </p>
             <p className="text-ink-muted">
-              This project demonstrates full-stack development skills, including
-              Python web scraping, database management, API integration, and
-              modern React development with TypeScript.
+              I built it to get comfortable owning both ends of a pipeline —
+              the thing that collects the data and the thing that displays it
+              — instead of just consuming someone else's API.
             </p>
           </div>
         </div>
@@ -134,7 +132,6 @@ function NewsDashboard() {
                 Python Web Scraping
               </h3>
               <ul className="space-y-2 text-ink-muted">
-                <li>• Automated news site scraping</li>
                 <li>• Crypto market data collection</li>
                 <li>• Weather API integration</li>
                 <li>• Scheduled data updates</li>
@@ -147,8 +144,6 @@ function NewsDashboard() {
               <ul className="space-y-2 text-ink-muted">
                 <li>• Automated database population</li>
                 <li>• Data cleaning and validation</li>
-                <li>• Efficient data storage</li>
-                <li>• Data integrity maintenance</li>
               </ul>
             </div>
             <div>
@@ -156,21 +151,7 @@ function NewsDashboard() {
                 React Frontend
               </h3>
               <ul className="space-y-2 text-ink-muted">
-                <li>• Real-time data visualization</li>
                 <li>• Category filtering and search</li>
-                <li>• Responsive design</li>
-                <li>• Interactive user interface</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-ink mb-3">
-                Full-Stack Integration
-              </h3>
-              <ul className="space-y-2 text-ink-muted">
-                <li>• Python backend automation</li>
-                <li>• API data processing</li>
-                <li>• Frontend-backend communication</li>
-                <li>• End-to-end data pipeline</li>
               </ul>
             </div>
           </div>

@@ -35,9 +35,14 @@ function FinanceTracker() {
 
         {/* Project Header */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
-          <h1 className="text-4xl font-bold text-ink mb-4">
-            Finance Tracker 2.0
-          </h1>
+          <div className="flex items-center gap-3 mb-4">
+            <h1 className="text-4xl font-bold text-ink">
+              Finance Tracker 2.0
+            </h1>
+            <span className="inline-block bg-success/10 text-success px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+              Complete
+            </span>
+          </div>
           <p className="text-xl text-ink-muted mb-6">
             A desktop finance tracker for macOS that imports bank CSVs,
             auto‑classifies transactions, lets you review/commit them, manage
@@ -70,7 +75,7 @@ function FinanceTracker() {
             ].map((tech) => (
               <span
                 key={tech}
-                className="bg-primary/10 text-primary px-4 py-2 rounded-full font-semibold"
+                className="border border-line bg-sunken text-ink-muted px-3 py-1.5 rounded-md font-mono text-xs"
               >
                 {tech}
               </span>
@@ -97,30 +102,26 @@ function FinanceTracker() {
           </h2>
           <div className="prose prose-lg max-w-none">
             <p className="text-ink-muted mb-4">
-              Finance Tracker 2.0 is a native desktop app built with PyQt6 for
-              macOS. A local SQLite cache powers fast reads and offline usage,
-              while an AWS backend provides durable storage, insights, and a
-              learning system that improves from user feedback.
+              Finance Tracker 2.0 is a native macOS app built with PyQt6.
+              Transactions live in a local SQLite cache so the UI stays fast
+              and works offline; an AWS backend (FastAPI on Lambda behind API
+              Gateway, managed with SAM) handles the durable copy, monthly
+              snapshots, and the classification model.
             </p>
             <p className="text-ink-muted mb-4">
-              The backend uses FastAPI on Lambda behind API Gateway and is
-              managed with AWS SAM (template.yaml). DynamoDB stores
-              transactions, monthly snapshots, learning patterns, and stats.
-              EventBridge drives a monthly Telegram reminder. Hybrid
-              classification combines rules with a Google Gemini fallback and
-              persists user corrections for continuous improvement.
-            </p>
-            <p className="text-ink-muted mb-4">
-              Key features include CSV import with interactive review, smart
-              auto‑classification, account balances and monthly snapshots, a
-              dashboard with insights and health indicators, and Telegram
-              reminders/commit summaries.
+              CSV imports go through an interactive review step before
+              anything is committed. Auto-classification runs on a rules
+              engine first and falls back to Gemini when the rules don't
+              match, and every correction I make gets stored and reused, so
+              the classifier gets better the more I use it instead of staying
+              static. EventBridge triggers a monthly Telegram reminder with a
+              summary of what changed.
             </p>
             <p className="text-ink-muted">
-              This project demonstrates Python desktop (PyQt6), data modeling
-              with SQLite and DynamoDB, serverless architecture, hybrid
-              ML‑assisted classification, and integrations like Telegram and
-              dotenv‑based configuration.
+              It's the project I built to actually understand serverless — SAM
+              templates, DynamoDB table design, Lambda cold starts — by using
+              it for something I run every month, not a tutorial I'd abandon
+              after.
             </p>
           </div>
         </div>
@@ -170,8 +171,6 @@ function FinanceTracker() {
               </h3>
               <ul className="space-y-2 text-ink-muted">
                 <li>• Add, view, and categorize transactions</li>
-                <li>• Smart pre-defined categories</li>
-                <li>• Intelligent default categorization</li>
                 <li>• Bulk CSV import/export</li>
                 <li>• Transaction history and search</li>
               </ul>
@@ -184,7 +183,6 @@ function FinanceTracker() {
                 <li>• CSV import with interactive review & commit</li>
                 <li>• Auto‑classification (rules + Gemini fallback)</li>
                 <li>• Telegram reminders and commit summaries</li>
-                <li>• Optional cloud sync via FastAPI</li>
               </ul>
             </div>
             <div>
@@ -192,7 +190,6 @@ function FinanceTracker() {
                 Desktop Experience
               </h3>
               <ul className="space-y-2 text-ink-muted">
-                <li>• Native macOS UI with PyQt6</li>
                 <li>
                   • Tabs: Dashboard, Transactions, CSV Import, Accounts, Goals,
                   Insights
@@ -203,7 +200,6 @@ function FinanceTracker() {
                 <li>
                   • Quick insights, recent transactions, health indicators
                 </li>
-                <li>• CSV import/export workflows</li>
               </ul>
             </div>
             <div>
@@ -211,12 +207,10 @@ function FinanceTracker() {
                 Security & Reliability
               </h3>
               <ul className="space-y-2 text-ink-muted">
-                <li>• Comprehensive error handling</li>
                 <li>
                   • Data model conventions (exclude transfers/payments/ATM from
                   spend)
                 </li>
-                <li>• Data validation and sanitization</li>
                 <li>• Application logs and diagnostics</li>
                 <li>• Backup/restore of local database</li>
               </ul>

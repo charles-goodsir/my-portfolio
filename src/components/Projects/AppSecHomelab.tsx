@@ -4,12 +4,15 @@ import pipelineImg from '../../assets/Homelab/HomeLabCICD1.webp'
 import terraformImg from '../../assets/Homelab/HomeLabTerraform1.webp'
 import activityLogImg from '../../assets/Homelab/HomeLabTerraform2.webp'
 import xssImg from '../../assets/Homelab/HomeLabXSS3.webp'
+import azurePipelinesImg from '../../assets/Homelab/HomeLabAzurePipelines1.webp'
+import selfHostedAgentImg from '../../assets/Homelab/HomeLabAzurePipelines2.webp'
 
 const technologies = [
   'ASP.NET Core 8',
   'React',
   'Docker',
   'GitHub Actions',
+  'Azure Pipelines',
   'Semgrep',
   'gitleaks',
   'Trivy',
@@ -24,7 +27,21 @@ const images = [
     alt: 'GitHub Actions pipeline graph showing parallel security jobs feeding a staged deployment gate',
     width: 2854,
     height: 1566,
-    caption: 'The staged CI/CD pipeline: parallel security jobs, staging, and a required-reviewer gate before production',
+    caption: 'The GitHub Actions pipeline: parallel security jobs, staging, and a required-reviewer gate before production',
+  },
+  {
+    src: azurePipelinesImg,
+    alt: 'Azure Pipelines run showing the ported eight-job pipeline passing end to end',
+    width: 2380,
+    height: 1498,
+    caption: 'The same pipeline ported to Azure Pipelines - stages and gates rebuilt, not copy-pasted',
+  },
+  {
+    src: selfHostedAgentImg,
+    alt: 'Self-hosted Azure Pipelines agent running on the mini PC to reach the LAN-only deploy target',
+    width: 2306,
+    height: 1406,
+    caption: 'A self-hosted agent on the mini PC itself, since hosted agents can\'t reach a private LAN address',
   },
   {
     src: xssImg,
@@ -78,21 +95,25 @@ function AppSecHomelab() {
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
           <div className="flex items-center gap-3 mb-4">
             <h1 className="text-4xl font-bold text-ink">AppSec Homelab</h1>
-            <span className="inline-block bg-warn/10 text-warn px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
-              Ongoing
+            <span className="inline-block bg-success/10 text-success px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+              Complete
             </span>
           </div>
           <p className="text-xl text-ink-muted mb-6">
             A deliberately vulnerable ASP.NET Core / React app that I built,
-            broke, fixed, and wrapped in a real DevSecOps pipeline - SAST,
-            secrets scanning, SCA, container scanning, DAST, a staged
-            deployment gate, and now a first piece of Terraform-managed
+            broke, and fixed myself, wrapped in two parallel CI/CD security
+            pipelines - GitHub Actions and Azure Pipelines - each running
+            SAST, secrets scanning, SCA, container scanning, and DAST behind
+            a staged deployment gate, plus a Terraform-managed piece of
             infrastructure on Azure.
           </p>
           <p className="text-xl text-ink-muted mb-6">
-            This is still active work, not a finished case study. The CyberDiary
-            has the day-by-day version - what broke, what I got wrong first,
-            and how each fix was verified.
+            All four seeded vulnerabilities are fixed and re-verified, and
+            both pipelines run clean end to end, including a self-hosted
+            Azure Pipelines agent so DAST can reach the mini PC over the LAN.
+            I'm calling this one done for now - the CyberDiary has the full
+            day-by-day trail, bugs included, and I may come back to extend it
+            later.
           </p>
 
           {/* Technologies */}
@@ -100,7 +121,7 @@ function AppSecHomelab() {
             {technologies.map((tech) => (
               <span
                 key={tech}
-                className="bg-primary/10 text-primary px-4 py-2 rounded-full font-semibold"
+                className="border border-line bg-sunken text-ink-muted px-3 py-1.5 rounded-md font-mono text-xs"
               >
                 {tech}
               </span>
@@ -148,9 +169,10 @@ function AppSecHomelab() {
             </p>
             <p className="text-ink-muted mb-4">
               It runs on a mini PC on my home network, deployed via Docker
-              Compose and, as of this month, via a GitHub Actions pipeline
-              with a real deployment gate: a required human approval before
-              anything reaches the &quot;production&quot; environment.
+              Compose and gated behind two separate pipelines - GitHub
+              Actions and Azure Pipelines - each with a real deployment gate:
+              a required human approval before anything reaches the
+              &quot;production&quot; environment.
             </p>
             <p className="text-ink-muted">
               The goal throughout has been honesty over polish. The
@@ -213,17 +235,28 @@ function AppSecHomelab() {
                 <li>• Torn down with terraform destroy once captured for the write-up</li>
               </ul>
             </div>
+            <div>
+              <h3 className="text-lg font-semibold text-ink mb-3">
+                Dual CI/CD Platforms
+              </h3>
+              <ul className="space-y-2 text-ink-muted">
+                <li>• Full eight-job pipeline ported from GitHub Actions to Azure Pipelines, concepts rebuilt rather than copy-pasted</li>
+                <li>• Self-hosted Azure Pipelines agent on the mini PC, since hosted agents can&apos;t reach a private LAN address</li>
+                <li>• Caught a silent Dependabot permissions gap that had blocked 12 fix PRs for weeks</li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        {/* Next */}
+        {/* Status */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
-          <h2 className="text-2xl font-bold text-ink mb-6">Next</h2>
-          <ul className="space-y-2 text-ink-muted">
-            <li>• Dependency and container scanning results triaged, then Trivy tightened from report-only</li>
-            <li>• More OWASP Top 10 categories closed out against this app (see the OWASP progress page)</li>
-            <li>• A self-hosted runner on the mini PC, so DAST doesn&apos;t have to piggyback on the deploy SSH connection</li>
-          </ul>
+          <h2 className="text-2xl font-bold text-ink mb-6">Status</h2>
+          <p className="text-ink-muted">
+            Done for now. If I come back to it, the next things worth doing
+            are triaging the container scan results to tighten Trivy past
+            report-only, and closing out more OWASP Top 10 categories against
+            this app (see the OWASP progress page).
+          </p>
         </div>
 
         {/* Screenshots */}

@@ -30,7 +30,7 @@
   --shadow-card: 0 1px 3px rgb(15 23 42 / 0.08), 0 1px 2px rgb(15 23 42 / 0.04);
 
   /* accent hues */
-  --color-primary: #2563eb;
+  --color-primary: #0f766e;
   --color-on-primary: #ffffff;
   --color-success: #16a34a;
   --color-warn: #d97706;
@@ -47,7 +47,7 @@
 /* Dark mode is ONE token set: re-point the ~10 semantic tokens, nothing else. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-primary: #60a5fa;
+    --color-primary: #2dd4bf;
     --color-success: #4ade80;
     --color-warn: #fbbf24;
 

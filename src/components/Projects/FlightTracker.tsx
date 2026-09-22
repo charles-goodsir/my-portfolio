@@ -29,9 +29,14 @@ function FlightTracker() {
 
         {/* Project Header */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
-          <h1 className="text-4xl font-bold text-ink mb-4">
-            Flight Tracker
-          </h1>
+          <div className="flex items-center gap-3 mb-4">
+            <h1 className="text-4xl font-bold text-ink">
+              Flight Tracker
+            </h1>
+            <span className="inline-block bg-success/10 text-success px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+              Complete
+            </span>
+          </div>
           <p className="text-xl text-ink-muted mb-6">
             An automated flight tracking system that monitors flights and sends
             notifications via Discord and Telegram
@@ -56,7 +61,7 @@ function FlightTracker() {
             ].map((tech) => (
               <span
                 key={tech}
-                className="bg-primary/10 text-primary px-4 py-2 rounded-full font-semibold"
+                className="border border-line bg-sunken text-ink-muted px-3 py-1.5 rounded-md font-mono text-xs"
               >
                 {tech}
               </span>
@@ -83,30 +88,17 @@ function FlightTracker() {
           </h2>
           <div className="prose prose-lg max-w-none">
             <p className="text-ink-muted mb-4">
-              The Flight Tracker is an automated monitoring system designed to
-              track specific flight numbers and provide real-time updates
-              through Discord and Telegram notifications. Built with Python and
-              deployed on AWS Lightsail, this system runs continuously on a
-              Linux VM to ensure reliable flight monitoring.
-            </p>
-            <p className="text-ink-muted mb-4">
-              The system integrates with flight tracking APIs to fetch real-time
-              flight data including departure times, arrival times, delays, gate
-              information, and current status. When a flight number is added to
-              the tracking list, the system automatically begins monitoring it
-              every 3 hours using cron jobs for scheduling.
-            </p>
-            <p className="text-ink-muted mb-4">
-              Notifications are sent through both Discord and Telegram bot APIs,
-              providing users with comprehensive updates about their tracked
-              flights. The system handles various flight statuses including
-              on-time, delayed, cancelled, and completed flights, ensuring users
-              stay informed throughout their journey.
+              Flight Tracker is a Python script that runs on a cron job every 3
+              hours on an AWS Lightsail VM, checks a flight API for status
+              changes on the flights I'm tracking, and posts updates to
+              Discord and Telegram.
             </p>
             <p className="text-ink-muted">
-              This project demonstrates expertise in cloud deployment, API
-              integration, automation, and real-time data processing using
-              Python in a production environment.
+              It watches departure and arrival times, delays, gate changes,
+              and cancellations, and only notifies when something actually
+              changes rather than posting on every run. I built it because I
+              was tired of refreshing a flight-status app manually before a
+              trip — the notifications find me now instead.
             </p>
           </div>
         </div>
@@ -153,10 +145,8 @@ function FlightTracker() {
                 Flight Monitoring
               </h3>
               <ul className="space-y-2 text-ink-muted">
-                <li>• Real-time flight status tracking</li>
                 <li>• Automatic 3-hour update intervals</li>
                 <li>• Support for multiple flight numbers</li>
-                <li>• Historical flight data storage</li>
               </ul>
             </div>
             <div>
@@ -166,8 +156,6 @@ function FlightTracker() {
               <ul className="space-y-2 text-ink-muted">
                 <li>• Discord bot integration</li>
                 <li>• Telegram bot notifications</li>
-                <li>• Customizable message formatting</li>
-                <li>• Error handling and retry logic</li>
               </ul>
             </div>
             <div>
@@ -176,20 +164,8 @@ function FlightTracker() {
               </h3>
               <ul className="space-y-2 text-ink-muted">
                 <li>• JSON configuration file management</li>
-                <li>• Flight data persistence</li>
                 <li>• Log file rotation and cleanup</li>
                 <li>• Configuration hot-reloading</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-ink mb-3">
-                Reliability
-              </h3>
-              <ul className="space-y-2 text-ink-muted">
-                <li>• Error handling and recovery</li>
-                <li>• Network timeout management</li>
-                <li>• Automatic retry mechanisms</li>
-                <li>• Health monitoring and alerts</li>
               </ul>
             </div>
           </div>

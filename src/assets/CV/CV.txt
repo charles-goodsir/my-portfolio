@@ -46,11 +46,13 @@ PROJECTS
 appsec-homelab | github.com/charles-goodsir/appsec-homelab | 2026 - Present
 • Built a deliberately vulnerable ASP.NET Core 8 / React app with seeded SQL injection and reflected
   XSS as a target for hands-on testing.
-• Set up a GitHub Actions security pipeline running Semgrep (SAST) and gitleaks (secrets scanning).
+• Built and migrated a staged, gated CI/CD security pipeline to Azure Pipelines, including a
+  self-hosted agent for LAN-based deployment: parallel jobs (secrets, SAST, build, SCA, test,
+  container scanning) with a deployment gate requiring reviewer approval before production.
 • Traced a Semgrep false negative to its root cause: the rule does not treat [FromBody]-bound objects
   as a tainted source, so a structurally identical injection went unflagged.
-• Next: OWASP ZAP (DAST) against the running app on a dedicated Linux box, plus dependency and
-  container scanning.
+• Defense-in-depth scanning across the SDLC (Semgrep, gitleaks, Trivy, OWASP ZAP), including DAST
+  against the running app on a self-hosted Linux target.
 ASP.NET Core 8, React, GitHub Actions, Semgrep, gitleaks
 
 PortSwigger Web Security Academy | Burp Suite Community | 2026 - Present

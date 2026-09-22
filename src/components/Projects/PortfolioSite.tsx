@@ -25,9 +25,14 @@ function PortfolioSite() {
         </Link>
 
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
-          <h1 className="text-4xl font-bold text-ink mb-4">
-            Portfolio Website (You are here now!)
-          </h1>
+          <div className="flex items-center gap-3 mb-4">
+            <h1 className="text-4xl font-bold text-ink">
+              Portfolio Website (You are here now!)
+            </h1>
+            <span className="inline-block bg-warn/10 text-warn px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+              Ongoing
+            </span>
+          </div>
           <p className="text-xl text-ink-muted mb-6">
             A responsive portfolio website built with React and TypeScript
           </p>
@@ -36,7 +41,7 @@ function PortfolioSite() {
             {['React', 'TypeScript', 'Tailwind CSS', 'Vite'].map((tech) => (
               <span
                 key={tech}
-                className="bg-primary/10 text-primary px-4 py-2 rounded-full font-semibold"
+                className="border border-line bg-sunken text-ink-muted px-3 py-1.5 rounded-md font-mono text-xs"
               >
                 {tech}
               </span>

@@ -40,9 +40,14 @@ function Airbnb() {
 
         {/* Project Header */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
-          <h1 className="text-4xl font-bold text-ink mb-4">
-            Airbnb Clone - Homepage
-          </h1>
+          <div className="flex items-center gap-3 mb-4">
+            <h1 className="text-4xl font-bold text-ink">
+              Airbnb Clone - Homepage
+            </h1>
+            <span className="inline-block bg-success/10 text-success px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+              Complete
+            </span>
+          </div>
           <p className="text-xl text-ink-muted mb-6">
             A basic React homepage that replicates the Airbnb interface design
           </p>
@@ -64,7 +69,7 @@ function Airbnb() {
             ].map((tech) => (
               <span
                 key={tech}
-                className="bg-primary/10 text-primary px-4 py-2 rounded-full font-semibold"
+                className="border border-line bg-sunken text-ink-muted px-3 py-1.5 rounded-md font-mono text-xs"
               >
                 {tech}
               </span>
@@ -99,20 +104,15 @@ function Airbnb() {
           </h2>
           <div className="prose prose-lg max-w-none">
             <p className="text-ink-muted mb-4">
-              This is a basic Airbnb homepage clone built with React and
-              JavaScript. The project focuses on demonstrating fundamental
-              frontend development skills including component structure, state
-              management, and interactive user interface elements.
-            </p>
-            <p className="text-ink-muted mb-4">
-              The main functionality includes a working calendar component that
-              allows users to select dates, showcasing my ability to implement
-              interactive elements and handle user input in React applications.
+              An Airbnb homepage clone built early on, while I was still
+              learning React component structure and state.
             </p>
             <p className="text-ink-muted">
-              This project serves as a foundation for understanding React
-              component architecture and demonstrates practical JavaScript
-              skills in a real-world application context.
+              The interesting part is the calendar — a date-range picker built
+              from scratch rather than pulled from a library, which is what
+              forced me to actually understand how React state and event
+              handling fit together. It's not meant to be more than that: a
+              small clone, not a product.
             </p>
           </div>
         </div>
@@ -128,21 +128,8 @@ function Airbnb() {
                 Interactive Calendar
               </h3>
               <ul className="space-y-2 text-ink-muted">
-                <li>• Date selection functionality</li>
+                <li>• Date range picking, built from scratch</li>
                 <li>• Calendar navigation</li>
-                <li>• Date range picking</li>
-                <li>• User-friendly interface</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-ink mb-3">
-                React Components
-              </h3>
-              <ul className="space-y-2 text-ink-muted">
-                <li>• Component-based architecture</li>
-                <li>• State management</li>
-                <li>• Event handling</li>
-                <li>• Reusable UI elements</li>
               </ul>
             </div>
             <div>
@@ -151,20 +138,6 @@ function Airbnb() {
               </h3>
               <ul className="space-y-2 text-ink-muted">
                 <li>• Airbnb-inspired design</li>
-                <li>• Responsive layout</li>
-                <li>• Clean and modern interface</li>
-                <li>• Intuitive user experience</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-ink mb-3">
-                JavaScript Skills
-              </h3>
-              <ul className="space-y-2 text-ink-muted">
-                <li>• DOM manipulation</li>
-                <li>• Event handling</li>
-                <li>• Date object manipulation</li>
-                <li>• Interactive functionality</li>
               </ul>
             </div>
           </div>
