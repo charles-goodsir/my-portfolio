@@ -1,0 +1,22 @@
+name = "visitor-map"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# Created by `wrangler kv namespace create VISITS` - paste the id it prints
+# below. See worker/README.md.
+[[kv_namespaces]]
+binding = "VISITS"
+id = "f864889fdbfb4ab885ad28918b64fd0b"
+
+[vars]
+ALLOWED_ORIGIN = "https://charlesgoodsir.com"
+
+# Per-IP throttle on /visit and /stats - blunt but sufficient for a
+# personal-portfolio endpoint with no auth. See worker/src/index.ts.
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 10
+  period = 60

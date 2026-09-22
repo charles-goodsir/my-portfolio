@@ -8,6 +8,8 @@ import Contact from './components/Contact'
 import CyberDiary from './components/CyberDiary'
 import DiaryEntry from './components/DiaryEntry'
 import OwaspTop10 from './components/OWASP'
+import VisitorMap from './components/VisitorMap'
+import VisitorRiskAssessment from './components/VisitorRiskAssessment'
 import NotFound from './components/NotFound'
 import AppSecHomelab from './components/Projects/AppSecHomelab'
 import SecureAzureLandingZone from './components/Projects/SecureAzureLandingZone'
@@ -44,6 +46,11 @@ function App() {
           <Route path="diary" element={<CyberDiary />} />
           <Route path="diary/:entryId" element={<DiaryEntry />} />
           <Route path="owasp" element={<OwaspTop10 />} />
+          <Route path="visitors" element={<VisitorMap />} />
+          <Route
+            path="visitors/risk-assessment"
+            element={<VisitorRiskAssessment />}
+          />
           <Route path="contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Route>

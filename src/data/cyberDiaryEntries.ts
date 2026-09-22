@@ -44,6 +44,45 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'visitor-map-entry-1-build-and-rate-limit',
+    date: '2026-09-23',
+    category: 'Visitor Map',
+    vulnTypes: ['Visitor Map'],
+    milestone: true,
+    title: 'Small feature, first backend: a visitor map with a rate limit',
+    workedOn: [
+      'Added an anonymous, country-level visitor counter - a Cloudflare Worker plus a KV namespace, called from the portfolio on page load. First real backend this site has had',
+      "Fixed a CORS bug (Worker only allowed the production origin, so local dev was locked out) and a map-library bug (its color scale collapses to one flat color when only one country has data yet)",
+      'Pulled it out of the main nav in favour of a small corner badge on the homepage that links through to the full map - a whole tab felt like too much for a visitor counter',
+      'Security-reviewed the finished feature and found one real gap: POST /visit had no rate limiting, so it could be curled directly and the counter inflated regardless of CORS',
+      "Closed it with Cloudflare's native Rate Limiting binding (10 req/60s per IP) instead of hand-rolling one, and proved it works: 14 requests in a row, 429s from the 11th on",
+    ],
+    body: [
+      "This is a small feature. It's also the site's first actual backend - everything else is static. Cloudflare Worker plus KV for the counters, called from the frontend, fully separate from the GitHub Pages deploy.",
+      "Two real bugs turned up. CORS locked out local dev until the Worker started reflecting the request origin against an allowlist. The map library paints every country identically when only one has data, a min/max scale collapsing to one value, fixed with an explicit styleFunction instead of trusting the default.",
+      "Security-reviewed it even though it's small. That's what caught the actual gap: no rate limit on the write endpoint. CORS doesn't protect a POST the way it looks like it might - it's a browser-only restriction, a direct curl loop skips it entirely. Fixed with Cloudflare's own binding, then verified it actually throttles.",
+    ],
+    tools: ['Cloudflare Workers', 'Cloudflare KV', 'React', 'TypeScript', 'Wrangler'],
+    tags: [
+      'Visitor Map',
+      'Cloudflare Workers',
+      'CORS',
+      'rate limiting',
+      'privacy by design',
+      'security review',
+    ],
+    links: [
+      {
+        label: 'Live on the site',
+        url: 'https://charlesgoodsir.com/#/visitors',
+      },
+      {
+        label: 'Risk assessment for this feature',
+        url: 'https://charlesgoodsir.com/#/visitors/risk-assessment',
+      },
+    ],
+  },
+  {
     id: 'appsec-homelab-entry-21-azure-pipelines-lan-self-hosted-agent',
     date: '2026-09-19',
     category: 'AppSec Homelab',

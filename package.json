@@ -15,7 +15,8 @@
     "@tailwindcss/vite": "^4.1.13",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router": "^7.18.3"
+    "react-router": "^7.18.3",
+    "react-svg-worldmap": "^2.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",

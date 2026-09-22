@@ -1,4 +1,5 @@
 import Button from './ui/Button'
+import VisitorBadge from './ui/VisitorBadge'
 
 function Home() {
   return (
@@ -10,7 +11,7 @@ function Home() {
         </p>
         <p className="text-base text-ink-muted mb-10 max-w-[55ch]">
           Full-stack background, now wiring security into the pipelines I
-          build in — CI/CD gates, SAST/DAST, and the application security
+          build in - CI/CD gates, SAST/DAST, and the application security
           work underneath both.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
@@ -22,6 +23,7 @@ function Home() {
           </Button>
         </div>
       </div>
+      <VisitorBadge />
     </section>
   )
 }
