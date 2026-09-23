@@ -86,14 +86,7 @@ function Airbnb() {
             >
               View on GitHub
             </a>
-            <a
-              href="https://charles-goodsir.github.io/airbnb-clone/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-ink text-card px-6 py-3 rounded-lg hover:opacity-90 transition-colors font-semibold"
-            >
-              View Website
-            </a>
+            
           </div>
         </div>
 

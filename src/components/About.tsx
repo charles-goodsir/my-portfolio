@@ -49,7 +49,7 @@ function About() {
             </h3>
             <div className="prose prose-lg max-w-none">
               <p className="text-ink-muted mb-4">
-                I'm Charles Goodsir, a full-stack developer building toward
+                I'm Charles Goodsir, a Application Engineer building toward
                 DevSecOps. I spent years building and shipping software in
                 enterprise environments, then years working inside CI/CD
                 pipelines to ship it, that combination is what I'm putting

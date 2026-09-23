@@ -7,7 +7,7 @@ function Home() {
       <div className="animate-fade-in">
         <h1 className="text-display font-bold text-ink mb-6">Hi, I'm Charles</h1>
         <p className="text-lg text-ink-muted mb-6">
-          Software Engineer · Building DevSecOps Capability
+          Application Engineer · Building DevSecOps Capability
         </p>
         <p className="text-base text-ink-muted mb-10 max-w-[55ch]">
           Full-stack background, now wiring security into the pipelines I
