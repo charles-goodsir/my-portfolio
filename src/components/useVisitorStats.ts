@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 
 const WORKER_URL = 'https://visitor-map.charlesgoodsirportfolio.workers.dev'
 const VISITED_KEY = 'visitor-map-counted'
+// Matches the Worker's 14-day reset, so returning visitors count again.
+const RECOUNT_MS = 14 * 24 * 60 * 60 * 1000
 
 export interface VisitorStats {
   total: number
@@ -13,10 +15,11 @@ export function useVisitorStats() {
 
   useEffect(() => {
     async function run() {
-      if (!localStorage.getItem(VISITED_KEY)) {
+      const lastCounted = Number(localStorage.getItem(VISITED_KEY))
+      if (!lastCounted || Date.now() - lastCounted > RECOUNT_MS) {
         try {
           await fetch(`${WORKER_URL}/visit`, { method: 'POST' })
-          localStorage.setItem(VISITED_KEY, '1')
+          localStorage.setItem(VISITED_KEY, String(Date.now()))
         } catch {
           // Worker unreachable - skip silently, no user-facing error.
         }

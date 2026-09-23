@@ -20,7 +20,7 @@ function VisitorMap() {
     <section className="max-w-[45rem] mx-auto py-16 px-4">
       <SectionHeader
         title="Visitors"
-        intro="An anonymous, country-level visit counter - no IP addresses or personal data are stored, just aggregate counts per country."
+        intro="An anonymous, country-level visit counter that resets every two weeks - no IP addresses or personal data are stored, just aggregate counts per country."
       />
       <Card className="text-center">
         <p className="text-ink-muted mb-6">
@@ -29,7 +29,7 @@ function VisitorMap() {
               <span className="text-3xl font-bold text-ink">
                 {stats.total}
               </span>{' '}
-              total visits
+              visits this fortnight
             </>
           ) : (
             'Loading...'

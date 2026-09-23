@@ -44,6 +44,39 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-8-tfsec-fixes-first-apply',
+    date: '2026-09-24',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    milestone: true,
+    title: 'Fixing the tfsec findings and the first real deployment',
+    workedOn: [
+      'Fixed the CRITICAL tfsec finding by adding a network_acls block with default_action = "Deny" and bypass = "AzureServices" - public_network_access_enabled = false alone was not enough, the scanner wanted the deny rule stated explicitly',
+      'Fixed the MEDIUM finding by setting soft_delete_retention_days = 7 alongside purge_protection_enabled',
+      'Ran terraform fmt to fix a badly indented network_acls block that would have failed the fmt -check stage before the scan ran',
+      'First real Apply: Validate -> Security Scan -> Plan -> manual approval -> Apply ran green end to end, and salz-rg now exists in Azure with the VNet, subnet, deny-by-default NSG, storage account, and Key Vault',
+    ],
+    body: [
+      'Yesterday the security scan flagged two problems with my Key Vault config. Today I fixed both and got the whole pipeline green for the first time.',
+      'The CRITICAL finding needed an explicit network_acls block with default_action = "Deny" and bypass = "AzureServices". The MEDIUM finding needed soft_delete_retention_days = 7, so deleted secrets sit in a recoverable state for a week before they can be purged. The new block was badly indented, which would have failed the fmt -check stage before the scan ran; terraform fmt fixed it.',
+      'The first real Apply ran the full pipeline end to end, and salz-rg now exists in Azure. It is all code I wrote, and none of it deployed until the scanner was satisfied.',
+      'The Portal showed four resource groups where I expected two. NetworkWatcherRG is created automatically by Azure the first time a VNet appears in a region, and VisualStudioOnline-<id> comes from linking Azure DevOps to the subscription. Neither should be deleted. Terraform-managed resources should never be deleted by hand in the Portal either, since state stops matching reality; use terraform destroy.',
+      'A security gate only proves itself when it blocks something. Yesterday it blocked a deployment, and today I fixed the config instead of bypassing the check.',
+    ],
+    screenshots: [
+      'SecureAzureLandingZone/SALZ12.webp',
+      'SecureAzureLandingZone/SALZ13.webp',
+    ],
+    tools: ['Terraform', 'Azure', 'Azure DevOps', 'tfsec'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Terraform',
+      'Key Vault',
+      'tfsec',
+      'CI/CD pipeline',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-7-main-tf-resource-by-resource',
     date: '2026-09-23',
     category: 'Secure Azure Landing Zone',
