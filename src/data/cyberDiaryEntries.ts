@@ -44,6 +44,51 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-5-plan-stage-oidc-auth',
+    date: '2026-09-23',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    milestone: true,
+    title: 'Azure DevOps pipeline: Plan stage, bootstrap and OIDC auth debugging',
+    workedOn: [
+      'Built the Plan stage, the biggest stage yet and the first to touch real Azure',
+      'Bootstrapped state infra: a standalone rg-tfstate resource group, storage account, and blob container to hold Terraform state, kept separate from the landing zone resources being managed and created manually via az cli rather than by Terraform itself',
+      'Set up an Azure Resource Manager service connection (azure-landing-zone-connection) using workload identity federation, so the pipeline authenticates with a short-lived federated token instead of a stored secret',
+      'Debugged an auth failure: the real cause was buried above a vague "Backend initialization required" error - Authenticating using the Azure CLI is only supported as a User, not a Service Principal',
+      "Fixed it by exporting ARM_CLIENT_ID, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID, ARM_USE_OIDC=true, and ARM_OIDC_TOKEN explicitly, since AzureCLI@2's az login session does not carry over to Terraform's azurerm provider - they use separate auth chains",
+      'Caught a typo (misaligned artifact: under publish:) before it ran, and marked the tfsec curl | bash install as a deliberate, noted shortcut with a ponytail: comment instead of leaving it as a silent risk',
+      'End state: terraform plan -out=tfplan runs against real remote state, and the plan file publishes as a pipeline artifact for the next stage to consume unchanged',
+    ],
+    body: [
+      'Built the Plan stage today, the biggest one so far and the first to touch real Azure resources rather than just the pipeline scaffolding around them.',
+      "First came the state bootstrap: a standalone rg-tfstate resource group, storage account, and blob container to hold Terraform's state file, kept separate from the landing zone resources it will manage. Created manually via az cli, not by Terraform itself - a classic chicken-and-egg problem, since Terraform cannot create the storage it needs to track its own state.",
+      "Next, an Azure Resource Manager service connection (azure-landing-zone-connection) using workload identity federation. No long-lived secret sits anywhere; the pipeline gets a short-lived federated token minted per run instead.",
+      'The real lesson was in the auth debugging. The first run failed with a vague "Backend initialization required" error, but the actual cause sat higher in the log: Authenticating using the Azure CLI is only supported as a User, not a Service Principal. AzureCLI@2 logging in via az login does not hand its session to Terraform\'s azurerm provider or backend - they run entirely separate auth mechanisms. The fix was exporting ARM_CLIENT_ID, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID, ARM_USE_OIDC=true, and ARM_OIDC_TOKEN explicitly, from variables ADO exposes via addSpnToEnvironment: true.',
+      '"The CLI is logged in" and "the tool I\'m calling is authenticated" are different claims. Worth checking whether the SDK or library in use has its own credential-resolution chain rather than assuming it inherits an ambient session.',
+      'Also caught a typo, a misaligned artifact: under publish:, before it ever ran, and marked the tfsec curl | bash install with a ponytail: comment as a deliberate, noted shortcut rather than a silent risk.',
+      'terraform plan -out=tfplan now runs against real remote state, and the plan file publishes as a pipeline artifact for the next stage to consume unchanged.',
+    ],
+    screenshots: [
+      'SecureAzureLandingZone/SALZ8.webp',
+      'SecureAzureLandingZone/SALZ9.webp',
+    ],
+    links: [
+      {
+        label: 'terraform plan output artifact',
+        url: '/salz-plan-stage.tfplan',
+      },
+    ],
+    tools: ['Azure DevOps', 'Terraform', 'Azure CLI', 'OIDC', 'YAML'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Azure DevOps',
+      'CI/CD pipeline',
+      'Terraform',
+      'OIDC',
+      'workload identity federation',
+    ],
+  },
+  {
     id: 'visitor-map-entry-1-build-and-rate-limit',
     date: '2026-09-23',
     category: 'Visitor Map',

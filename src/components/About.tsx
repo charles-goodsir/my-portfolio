@@ -52,7 +52,7 @@ function About() {
                 I'm Charles Goodsir, a full-stack developer building toward
                 DevSecOps. I spent years building and shipping software in
                 enterprise environments, then years working inside CI/CD
-                pipelines to ship it — that combination is what I'm putting
+                pipelines to ship it, that combination is what I'm putting
                 to work now: baking security into the pipeline instead of
                 bolting it on afterward.
               </p>
@@ -114,7 +114,7 @@ function About() {
                 <p className="text-ink-muted text-sm">
                   The specialty inside that pipeline. Web app testing, secure
                   code review, and finding + fixing real vulnerability
-                  classes — not just spotting them on a checklist. Security+
+                  classes not just spotting them on a checklist. Security+
                   and PortSwigger lab work are the building blocks here.
                 </p>
               </div>
