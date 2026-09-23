@@ -44,6 +44,126 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-7-main-tf-resource-by-resource',
+    date: '2026-09-23',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    title: 'Writing the actual Terraform: main.tf, resource by resource',
+    workedOn: [
+      'Wrote the landing zone\'s real infrastructure by hand, validating after each addition rather than all at once: resource group, VNet + subnet, NSG (deny-by-default, no explicit rules, relying on Azure\'s implicit deny-all), NSG-subnet association, storage account, Key Vault',
+      'Learned the implicit dependency graph: writing azurerm_resource_group.main.name instead of a literal string tells Terraform the creation and destruction order, with zero explicit depends_on needed',
+      'Learned data sources vs resources: data "azurerm_client_config" "current" {} reads who Terraform is authenticated as (used for tenant_id on the Key Vault) without creating anything, a different mental model from a resource block',
+      'Set real security defaults instead of provider defaults: TLS 1.2 minimum, HTTPS-only, and no public network access on the storage account; RBAC authorization and purge protection on Key Vault',
+      "Learned that purge_protection_enabled is irreversible for the vault's life - a design decision, not a checkbox",
+      "Left variables.tf as a known gap for now (everything is hardcoded), flagged rather than skipped silently - a reasonable proof-of-concept tradeoff for this stage",
+      'Fixed a housekeeping bug: terraform fmt -check flagged trailing whitespace and misaligned = signs from manual editing, cleared by running terraform fmt (no -check) before commit',
+      'Ran the pipeline against the new main.tf: tfsec flagged two findings on the Key Vault, a critical missing network ACL and a medium finding for soft_delete_retention_days not explicitly set',
+    ],
+    body: [
+      "Wrote the landing zone's real infrastructure by hand, resource by resource, validating after each addition instead of writing it all at once: resource group, then VNet and subnet, then an NSG (deny-by-default, no explicit rules, relying on Azure's implicit deny-all), the NSG-subnet association, a storage account, and a Key Vault.",
+      'Two Terraform concepts clicked while writing this. First, the implicit dependency graph: writing azurerm_resource_group.main.name instead of retyping a literal string is what tells Terraform the creation and destruction order, with zero explicit depends_on needed. Second, data sources versus resources: data "azurerm_client_config" "current" {} reads information about who Terraform is authenticated as (used to grab tenant_id for the Key Vault) without creating anything, a genuinely different mental model from a resource block.',
+      'Locked in real security defaults rather than provider defaults: TLS 1.2 minimum, HTTPS-only, and no public network access on the storage account; RBAC authorization and purge protection on Key Vault. purge_protection_enabled turned out to be irreversible for the life of the vault, a real design decision rather than a checkbox to tick.',
+      "Left variables.tf as a known gap for now, everything is hardcoded, rather than refactoring immediately. A reasonable proof-of-concept tradeoff, flagged in the repo rather than left as a silent gap.",
+      'Small housekeeping bug: terraform fmt -check flagged trailing whitespace and misaligned = signs left over from manual editing. terraform fmt, without -check, fixes these automatically, worth running before every commit.',
+      'Ran the pipeline against the new main.tf and tfsec came back with two findings on the Key Vault: a critical for the missing network ACL, and a medium for soft_delete_retention_days not being explicitly set.',
+    ],
+    codeSnippets: [
+      {
+        label: 'tfsec finding: azure-keyvault-specify-network-acl',
+        code: `Result #1 CRITICAL Vault network ACL does not block access by default.
+────────────────────────────────────────────────────────────────────────────────
+  main.tf:57-66
+────────────────────────────────────────────────────────────────────────────────
+   57    resource "azurerm_key_vault" "main" {
+   58      name                          = "salz-kv-cg314214"
+   59      location                      = azurerm_resource_group.main.location
+   60      resource_group_name           = azurerm_resource_group.main.name
+   61      tenant_id                     = data.azurerm_client_config.current.tenant_id
+   62      sku_name                      = "standard"
+   63      purge_protection_enabled      = true
+   64      enable_rbac_authorization     = true
+   65      public_network_access_enabled = false
+   66  }
+────────────────────────────────────────────────────────────────────────────────
+          ID azure-keyvault-specify-network-acl
+      Impact Without a network ACL the key vault is freely accessible
+  Resolution Set a network ACL for the key vault
+
+  More Information
+  - https://aquasecurity.github.io/tfsec/v1.28.14/checks/azure/keyvault/specify-network-acl/
+  - https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault#network_acls`,
+      },
+      {
+        label: 'tfsec finding: azure-keyvault-no-purge',
+        code: `Result #2 MEDIUM Resource should have soft_delete_retention_days set between 7 and 90 days in order to enable purge protection.
+────────────────────────────────────────────────────────────────────────────────
+  main.tf:57-66
+────────────────────────────────────────────────────────────────────────────────
+   57    resource "azurerm_key_vault" "main" {
+   58      name                          = "salz-kv-cg314214"
+   59      location                      = azurerm_resource_group.main.location
+   60      resource_group_name           = azurerm_resource_group.main.name
+   61      tenant_id                     = data.azurerm_client_config.current.tenant_id
+   62      sku_name                      = "standard"
+   63      purge_protection_enabled      = true
+   64      enable_rbac_authorization     = true
+   65      public_network_access_enabled = false
+   66  }
+────────────────────────────────────────────────────────────────────────────────
+          ID azure-keyvault-no-purge
+      Impact Keys could be purged from the vault without protection
+  Resolution Enable purge protection for key vaults
+
+  More Information
+  - https://aquasecurity.github.io/tfsec/v1.28.14/checks/azure/keyvault/no-purge/
+  - https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault#purge_protection_enabled`,
+      },
+    ],
+    tools: ['Terraform', 'Azure', 'tfsec'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Terraform',
+      'Key Vault',
+      'infrastructure as code',
+      'tfsec',
+    ],
+  },
+  {
+    id: 'secure-azure-landing-zone-entry-6-apply-stage-deployment-jobs',
+    date: '2026-09-23',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    milestone: true,
+    title: 'Azure DevOps pipeline: Apply stage, deployment jobs and manual approval',
+    workedOn: [
+      'Built the final stage using a deployment: job targeting the production ADO Environment, with an approval check attached, rather than a bare job:',
+      'That deployment: job is what makes ADO pause the pipeline and wait for a human to click approve before any real infrastructure changes happen: segregation of duties as pipeline mechanics, not just policy',
+      "Hit two bugs from the same root misunderstanding: deployment jobs don't behave like regular job:s",
+      "First: deployment jobs don't auto-checkout the source repo the way regular jobs do, so terraform apply had no .tf files or backend config until an explicit - checkout: self step was added",
+      "Second: the downloaded plan artifact lands under $(Pipeline.Workspace)/<artifact-name>/, separate from the checked-out source, so apply had to run from the terraform/ source directory while pointing at the plan file by its full workspace path",
+      'Pipeline is now end-to-end: Validate -> Security Scan -> Plan (published as artifact) -> manual approval gate -> Apply, applying the exact approved plan rather than re-planning',
+    ],
+    body: [
+      "Built the final stage with a deployment: job targeting the production ADO Environment, with an approval check attached, instead of a bare job:. That's the piece that makes ADO pause the pipeline and wait for a human to click approve before any real infrastructure changes happen - segregation of duties expressed as actual pipeline mechanics, not just policy on paper.",
+      "Hit two bugs that traced back to the same misunderstanding: deployment jobs behave differently from regular job:s. First, deployment jobs don't auto-checkout the source repo the way regular jobs do. Without an explicit - checkout: self step, terraform apply had no .tf files or backend config to work with at all.",
+      'Second, the downloaded plan artifact lands under $(Pipeline.Workspace)/<artifact-name>/, separate from the checked-out source. apply had to run from the actual terraform/ source directory while pointing at the plan file by its full workspace path, rather than assuming both lived in the same place.',
+      "ADO's deployment vs job distinction reads like a naming choice, but it carries real behavioral defaults that don't show up until something silently isn't where you assumed it would be.",
+      'The pipeline is complete end to end: Validate -> Security Scan -> Plan, published as an artifact -> a manual approval gate -> Apply, of the exact approved plan rather than a re-plan. Every stage got debugged out of a real failure rather than working clean on the first try, which is more useful material for a portfolio than a pipeline that just happened to pass.',
+    ],
+    screenshots: [
+      'SecureAzureLandingZone/SALZ10.webp',
+      'SecureAzureLandingZone/SALZ11.webp',
+    ],
+    tools: ['Azure DevOps', 'Terraform', 'YAML'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Azure DevOps',
+      'CI/CD pipeline',
+      'Terraform',
+      'deployment gate',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-5-plan-stage-oidc-auth',
     date: '2026-09-23',
     category: 'Secure Azure Landing Zone',
@@ -60,11 +180,9 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'End state: terraform plan -out=tfplan runs against real remote state, and the plan file publishes as a pipeline artifact for the next stage to consume unchanged',
     ],
     body: [
-      'Built the Plan stage today, the biggest one so far and the first to touch real Azure resources rather than just the pipeline scaffolding around them.',
-      "First came the state bootstrap: a standalone rg-tfstate resource group, storage account, and blob container to hold Terraform's state file, kept separate from the landing zone resources it will manage. Created manually via az cli, not by Terraform itself - a classic chicken-and-egg problem, since Terraform cannot create the storage it needs to track its own state.",
-      "Next, an Azure Resource Manager service connection (azure-landing-zone-connection) using workload identity federation. No long-lived secret sits anywhere; the pipeline gets a short-lived federated token minted per run instead.",
-      'The real lesson was in the auth debugging. The first run failed with a vague "Backend initialization required" error, but the actual cause sat higher in the log: Authenticating using the Azure CLI is only supported as a User, not a Service Principal. AzureCLI@2 logging in via az login does not hand its session to Terraform\'s azurerm provider or backend - they run entirely separate auth mechanisms. The fix was exporting ARM_CLIENT_ID, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID, ARM_USE_OIDC=true, and ARM_OIDC_TOKEN explicitly, from variables ADO exposes via addSpnToEnvironment: true.',
-      '"The CLI is logged in" and "the tool I\'m calling is authenticated" are different claims. Worth checking whether the SDK or library in use has its own credential-resolution chain rather than assuming it inherits an ambient session.',
+      'Built the Plan stage today, the biggest one so far and the first to touch real Azure resources rather than pipeline scaffolding.',
+      "State bootstrap came first: a standalone rg-tfstate resource group, storage account, and blob container to hold Terraform's state, kept separate from the landing zone resources it will manage and created manually via az cli, not by Terraform itself - a classic chicken-and-egg problem, since Terraform cannot create the storage it needs to track its own state. Then a service connection (azure-landing-zone-connection) using workload identity federation, so the pipeline gets a short-lived federated token per run instead of a stored secret.",
+      'The real lesson was in the auth debugging. The first run failed with a vague "Backend initialization required" error, but the actual cause sat higher in the log: Authenticating using the Azure CLI is only supported as a User, not a Service Principal. AzureCLI@2 logging in via az login does not hand its session to Terraform\'s azurerm provider or backend - they run separate auth mechanisms. Fixed by exporting ARM_CLIENT_ID, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID, ARM_USE_OIDC=true, and ARM_OIDC_TOKEN explicitly, from variables ADO exposes via addSpnToEnvironment: true. "The CLI is logged in" and "the tool I\'m calling is authenticated" are different claims, worth checking rather than assumed.',
       'Also caught a typo, a misaligned artifact: under publish:, before it ever ran, and marked the tfsec curl | bash install with a ponytail: comment as a deliberate, noted shortcut rather than a silent risk.',
       'terraform plan -out=tfplan now runs against real remote state, and the plan file publishes as a pipeline artifact for the next stage to consume unchanged.',
     ],
@@ -146,11 +264,10 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
     body: [
       'Every stage of the new Azure Pipelines setup surfaced its own real failure once it actually ran.',
-      'The SAST stage broke twice. Azure\'s job-level container: mechanism choked on the semgrep/semgrep image outright, so I switched to running it via docker run, the same way gitleaks and Trivy already worked. Then Semgrep itself refused to run: newer CLI versions treat a set SEMGREP_APP_TOKEN as "logged in" mode, which conflicts with passing explicit --config rulesets. Dropped the token, since the goal is the specific OWASP/csharp/typescript rulesets, not org-managed policies.',
-      'That surfaced 72 findings, 66 of them false positives: Semgrep was scanning committed ZAP HTML reports for "plaintext http links" inside their own reference text. A .semgrepignore for dast/ cleared the noise. The remaining six were genuine: a Dockerfile running as root, a Dependabot config missing a cooldown period, an unpinned Terraform TLS setting, and an nginx Host-header finding I reviewed and suppressed with a nosemgrep comment explaining why (the backend never reads that header, so there is no live sink).',
-      'The deploy stage was the real lesson. Azure\'s hosted agents run on the public internet and cannot reach a private LAN address, no matter how the IP or SSH key is configured, because the architecture makes it impossible. The fix was a self-hosted Azure Pipelines agent installed directly on the mini PC, so the deploy job runs from inside the LAN: plain docker compose and zap-baseline.py, no more SSH/SCP or secure-file key management.',
-      'That simplification brought its own bugs, layered on top of each other: a stale manually-deployed container holding the same container names as the pipeline\'s compose project; ZAP failing to reach localhost:8080 because a container\'s localhost is its own network namespace, fixed with --network host; and the backend crash-looping on SQLite Error 14: unable to open database file, caused by an earlier hardening change of my own, where switching the container to a non-root user broke write access to the database directory.',
-      'Once everything passed, I went back through the setup with a second, security-focused pass, because a green pipeline and an explainable trust model are different bars, and this is a security portfolio piece. That pass confirmed the self-hosted agent has root-equivalent access to the mini PC (expected for any self-hosted runner, worth stating rather than glossing over), confirmed the old SSH deploy key is fully revoked on both ends, and turned up one thing still to check: whether the public repo requires my approval before a fork PR gets free compute.',
+      'The SAST stage broke twice: Azure\'s job-level container: mechanism could not run the semgrep/semgrep image, fixed by switching to a plain docker run like gitleaks and Trivy already used; then Semgrep itself refused to run, since a set SEMGREP_APP_TOKEN forces "logged in" mode, which conflicts with passing explicit --config rulesets. Dropped the token, since the goal is specific OWASP rulesets, not org-managed policies. That surfaced 72 findings, 66 of them false positives from Semgrep scanning committed ZAP HTML reports for "plaintext http links" in their own reference text - cleared with a .semgrepignore for dast/. The remaining six were genuine, including one nginx Host-header finding suppressed with a nosemgrep comment explaining why the backend never reads that header.',
+      "The deploy stage was the real lesson. Azure's hosted agents run on the public internet and cannot reach a private LAN address, full stop, regardless of IP or SSH key config. The fix was a self-hosted Azure Pipelines agent on the mini PC itself, so the deploy job runs from inside the LAN with plain docker compose and zap-baseline.py, no more SSH/SCP or secure-file key management.",
+      "That brought three more bugs: a stale manually-deployed container holding the compose project's container names; ZAP unable to reach localhost:8080 because a container's localhost is its own network namespace, fixed with --network host; and the backend crash-looping on SQLite Error 14, caused by an earlier hardening change (non-root container user) that broke write access to the database directory.",
+      'Once everything passed, I went back through with a second, security-focused pass, since a green pipeline and an explainable trust model are different bars. That confirmed the self-hosted agent has root-equivalent access to the mini PC (expected for any self-hosted runner, worth stating rather than glossing over), confirmed the old SSH deploy key is fully revoked, and turned up one thing still to check: whether the public repo requires approval before a fork PR gets free compute.',
     ],
     screenshots: [
       'Homelab/HomeLabAzurePipelines2.webp',
@@ -334,15 +451,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Next: terraform fmt -check and terraform init -backend=false',
     ],
     body: [
-      'New project: secure-azure-landing-zone. Started on the CI pipeline before writing much Terraform, with a Validate stage first - the cheapest place to catch a mistake before it reaches real infrastructure.',
-      'Setting up the Azure DevOps org was a reminder that Azure Portal (where the cloud resources live) and Azure DevOps (where pipelines and repos live) are separate products from the same vendor. They connect later, through a Service Connection.',
-      'For installing Terraform on the pipeline agent, chose the plain-script approach - curl the release, unzip it - over the marketplace TerraformInstaller task. More visible, no extra dependency, and it shows what happens on the agent instead of hiding it behind a task.',
-      'The pipeline hung on the Install Terraform step. unzip was waiting on an interactive overwrite prompt (replace LICENSE.txt? [y/n]) left over from a re-run, and a hosted agent has no stdin to answer it, so the job sat there until timeout. Fixed by adding -o to force a non-interactive overwrite.',
-      'The next run failed differently: cannot delete old terraform: Is a directory, followed by terraform: command not found. A previous failed run had left a stray directory called terraform in the workspace. unzip -o can overwrite a file, not a directory, so the delete failed silently and no terraform binary ended up in place.',
-      'Fixed it by not trusting the workspace to be clean: added rm -rf terraform terraform.zip to the top of the script, before curl and unzip run. A hosted agent gets reused across retries, so a clean slate has to be enforced, not assumed.',
-      "Also hit a smaller bug: the curl command, pasted into the YAML script: | block, picked up a stray line break and split into two broken shell commands. Inside a script: | block, every line break is a command boundary unless you continue the line with a trailing \\.",
-      'With all three fixes in, terraform -version prints Terraform v1.9.8 on every run, regardless of the state a previous run left the workspace in.',
-      'Next: terraform fmt -check and terraform init -backend=false.',
+      'New project: secure-azure-landing-zone, starting with the CI pipeline before writing much Terraform. Setting up the Azure DevOps org was a reminder that Azure Portal (where cloud resources live) and Azure DevOps (where pipelines and repos live) are separate products from the same vendor, connected later through a Service Connection.',
+      'For installing Terraform on the agent, chose the plain-script approach - curl the release, unzip it - over the marketplace TerraformInstaller task, so it is visible what actually happens on the agent.',
+      'That surfaced three bugs. First, the pipeline hung: unzip was waiting on an interactive overwrite prompt left over from a re-run, and a hosted agent has no stdin to answer it. Fixed with unzip -o.',
+      'Second, the next run failed differently: cannot delete old terraform: Is a directory. A previous failed run had left a stray terraform directory in the workspace, and unzip -o can overwrite a file, not a directory. Fixed by adding rm -rf terraform terraform.zip to the top of the script, so a hosted agent reused across retries always starts from a clean slate rather than an assumed one.',
+      "Third, a smaller one: the curl command, pasted into the YAML script: | block, picked up a stray line break and split into two broken shell commands. Inside a script: | block, every line break is a command boundary unless continued with a trailing \\.",
+      'With all three fixed, terraform -version prints Terraform v1.9.8 on every run, regardless of the state a previous run left the workspace in. Next: terraform fmt -check and terraform init -backend=false.',
     ],
     screenshots: [
       'SecureAzureLandingZone/SALZ1.webp',
