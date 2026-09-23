@@ -100,6 +100,14 @@ function SecureAzureLandingZone() {
             >
               Full write-up in the CyberDiary
             </Link>
+            <a
+              href="https://github.com/charles-goodsir/secure-azure-landing-zone"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-ink text-card px-6 py-3 rounded-lg hover:opacity-90 transition-colors duration-300 font-semibold"
+            >
+              View on GitHub
+            </a>
           </div>
         </div>
 

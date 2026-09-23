@@ -49,38 +49,34 @@ function About() {
             </h3>
             <div className="prose prose-lg max-w-none">
               <p className="text-ink-muted mb-4">
-                I'm Charles Goodsir, a Application Engineer building toward
-                DevSecOps. I spent years building and shipping software in
-                enterprise environments, then years working inside CI/CD
-                pipelines to ship it, that combination is what I'm putting
-                to work now: baking security into the pipeline instead of
-                bolting it on afterward.
+                I'm Charles Goodsir, an Application Engineer working toward
+                DevSecOps. I've spent years building enterprise software and
+                shipping it through CI/CD pipelines. Now I'm adding security
+                checks to those pipelines, so they flag problems before
+                release.
               </p>
               <p className="text-ink-muted mb-4">
                 I'm{' '}
                 <strong className="font-semibold text-ink">
                   CompTIA Security+ certified
                 </strong>{' '}
-                and working through hands-on practice like PortSwigger labs
-                with Burp Suite, which I log in my CyberDiary. On the dev side
-                I work with React, Node.js, TypeScript, and Python for
-                automation and backend tasks.
+                and I work through PortSwigger's labs in Burp Suite, logging
+                each one in my CyberDiary. On the dev side I use React,
+                Node.js, TypeScript, and Python.
               </p>
               <p className="text-ink-muted mb-4">
                 I'm targeting{' '}
                 <strong className="font-semibold text-ink">
                   DevOps and DevSecOps
                 </strong>{' '}
-                roles — CI/CD, deployment gates, and the security tooling
-                that sits inside them. Application security is the specialty
-                I bring to that: I want to be the person who can read the
-                code, understand the threat, and wire the pipeline to catch
-                it before it ships.
+                roles: CI/CD, deployment gates, and the security tools inside
+                them. Application security is my specialty within that. I
+                want to find a flaw in the code, then add the pipeline check
+                that stops it shipping.
               </p>
               <p className="text-ink-muted">
-                Outside of labs and projects, I keep up with security news, dig
-                into how real-world breaches happened, and write up what I learn
-                so I don't forget the details.
+                Outside labs and projects, I read about real breaches and
+                write notes on how they happened, so I remember the details.
               </p>
             </div>
           </div>
@@ -97,13 +93,12 @@ function About() {
                   DevOps / DevSecOps
                 </h4>
                 <p className="text-ink-muted text-sm">
-                  My main focus. Baking security into CI/CD — automated
-                  scanning, deployment gates, and working with engineers to
-                  catch issues early instead of at release time. Built and
-                  evidenced in the appsec-homelab pipeline (SAST, secrets
-                  scanning, SCA, container scanning, DAST). My background with
-                  Azure DevOps and GitHub Actions gives me a head start on the
-                  delivery side.
+                  My main focus: automated security scanning and deployment
+                  gates in CI/CD, working with engineers to catch issues
+                  before release. I built this into the appsec-homelab
+                  pipeline (SAST, secrets scanning, SCA, container scanning,
+                  DAST). I already know Azure DevOps and GitHub Actions from
+                  delivery work.
                 </p>
               </div>
 
@@ -112,10 +107,9 @@ function About() {
                   Application Security
                 </h4>
                 <p className="text-ink-muted text-sm">
-                  The specialty inside that pipeline. Web app testing, secure
-                  code review, and finding + fixing real vulnerability
-                  classes not just spotting them on a checklist. Security+
-                  and PortSwigger lab work are the building blocks here.
+                  My specialty inside the pipeline: web app testing, secure
+                  code review, and fixing the vulnerabilities I find. I back
+                  it with Security+ and PortSwigger lab work.
                 </p>
               </div>
 
@@ -124,11 +118,10 @@ function About() {
                   Full-Stack Foundation
                 </h4>
                 <p className="text-ink-muted text-sm">
-                  Where I come from, and still what makes the rest credible.
-                  React, Node.js, TypeScript, APIs, and databases. Knowing how
-                  apps are built end to end means I can follow a vulnerability
-                  from the browser to the backend, and follow the fix through
-                  a real deployment pipeline.
+                  My background: React, Node.js, TypeScript, APIs, and
+                  databases. I know how an app fits together end to end, so I
+                  can trace a vulnerability from the browser to the backend
+                  and follow the fix through deployment.
                 </p>
               </div>
             </div>
