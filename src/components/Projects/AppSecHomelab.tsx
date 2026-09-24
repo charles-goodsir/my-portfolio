@@ -136,7 +136,7 @@ function AppSecHomelab() {
               rel="noopener noreferrer"
               className="bg-ink text-card px-6 py-3 rounded-lg hover:opacity-90 transition-colors duration-300 font-semibold"
             >
-              View on GitHu
+              View on GitHub
             </a>
             <Link
               to="/diary?vuln=AppSec%20Homelab"
