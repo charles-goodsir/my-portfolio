@@ -44,6 +44,59 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-10-pr-gate-branch-protection',
+    date: '2026-09-24',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    milestone: true,
+    title: 'Gating main: PR trigger, skipped Apply, and a branch ruleset',
+    workedOn: [
+      'Added a pr: trigger so pull requests into main run Validate, Trivy, and Plan',
+      "Added ne(variables['Build.Reason'], 'PullRequest') as a condition on the Apply stage, so a PR shows what would change without deploying it",
+      'Turned off fork builds in ADO, since the repo is public and a stranger\'s PR would otherwise run their version of my pipeline YAML with my Azure credentials',
+      'Added a GitHub ruleset on main: require a PR, require the Azure Pipelines check, block force pushes, and allow no bypass, including for me as admin',
+      'Tested each control by triggering the case it should block: a direct push to main was rejected, and Apply showed as skipped on the PR',
+    ],
+    body: [
+      'Until today, anyone with push access could commit straight to main and deploy, me included. Any control I had added (the lock file, readonly init, the Trivy checksum, the #trivy:ignore comments) could be removed with a single unreviewed commit.',
+      'The fix has four parts: a pr: trigger, a condition that skips Apply on PRs, fork builds turned off, and a ruleset on main with no bypass. Fork builds mattered most because the repo is public, and a stranger\'s PR would run their pipeline YAML with my Azure credentials.',
+      "The condition line took three attempts. The first had a typo in condition, a missing bracket, and Build Reason with a space instead of a dot. The first two would have failed loudly. The space would have failed silently: the variable lookup returns an empty string, the condition is always true, and Apply would have run on every PR while the YAML looked correct.",
+      'A control that fails silently is worse than no control, because you stop looking. I test each one by triggering the case it is meant to block.',
+    ],
+    tools: ['Azure DevOps', 'GitHub', 'Terraform', 'YAML'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'branch protection',
+      'CI/CD pipeline',
+      'supply chain security',
+      'Azure DevOps',
+    ],
+  },
+  {
+    id: 'secure-azure-landing-zone-entry-9-provider-lock-file',
+    date: '2026-09-24',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    title: 'Pinning the azurerm provider with the lock file',
+    workedOn: [
+      'Found that main.tf asks for azurerm ~> 3.0, a version range, and .terraform.lock.hcl was in .gitignore, so the pipeline resolved the range fresh on every run and trusted whatever the registry returned',
+      'Removed the lock file from .gitignore and ran terraform providers lock -platform=linux_amd64 -platform=darwin_arm64, so it holds checksums for both my Mac and the pipeline\'s Linux agent',
+      'Added -lockfile=readonly to all three terraform init calls, so init fails on a mismatch instead of rewriting the lock file',
+    ],
+    body: [
+      'main.tf asks for azurerm ~> 3.0, which is a range. With the lock file in .gitignore, the pipeline resolved that range fresh on every run and trusted whatever the registry returned. That matters for azurerm, since the provider runs with the pipeline\'s Azure credentials.',
+      'I un-ignored the lock file and generated checksums for both platforms, my Mac and the pipeline\'s Linux agent. With -lockfile=readonly on every init, a mismatch fails the run, and a provider upgrade only happens when I run terraform init -upgrade locally and commit the result.',
+      'The lock file does for the provider what my SHA-256 check does for Trivy, and Terraform ships it for free. Ignoring it in .gitignore threw that protection away.',
+    ],
+    tools: ['Terraform', 'Azure DevOps'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Terraform',
+      'supply chain security',
+      'CI/CD pipeline',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-9-tfsec-to-trivy',
     date: '2026-09-24',
     category: 'Secure Azure Landing Zone',
