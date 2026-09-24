@@ -44,6 +44,41 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-9-tfsec-to-trivy',
+    date: '2026-09-24',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    title: 'Swapping tfsec for Trivy, and a replacement that half-failed',
+    workedOn: [
+      "Replaced tfsec, installed by piping a script from GitHub's master branch into bash with no version pin or checksum, with Trivy v0.74.0 downloaded from the GitHub release and verified against its SHA-256 checksum file before extracting",
+      'Added set -euo pipefail after finding the checksum check did nothing: bash kept running after the failed check, so a tampered download would have printed FAILED and been installed anyway',
+      'Pasted the storage account fixes onto the Key Vault by mistake. terraform validate flagged the unsupported settings, but not the misplaced #trivy:ignore comments',
+      'Trivy found four storage account problems tfsec had passed. Fixed two (network_rules deny default, infrastructure encryption) and accepted two (GRS replication, Storage Analytics logging) with written #trivy:ignore reasons',
+      'The infrastructure encryption change forced a replace that failed halfway: Azure rejected the new account with StorageAccountAlreadyTaken 6 seconds after Terraform deleted the old one. Renamed the empty account and deployed a fresh plan',
+    ],
+    body: [
+      "The tfsec install piped a script from GitHub's master branch straight into bash, with no version pin and no checksum. tfsec's own logs also said it's being folded into Trivy. I replaced it with Trivy v0.74.0, downloaded directly from the GitHub release and checked against the release's SHA-256 checksum file before extracting.",
+      'I made two mistakes along the way. The checksum check did nothing at first. Bash keeps running after a failed command unless you tell it otherwise, so a tampered download would have printed FAILED and then been installed and run anyway. set -euo pipefail at the top of the script turned the check into a real gate.',
+      "I also pasted the fixes onto the Key Vault instead of the storage account. terraform validate caught the settings the Key Vault doesn't support. It would not have caught the misplaced #trivy:ignore comments, because they're valid syntax attached to the wrong resource.",
+      "Trivy found four problems on the storage account that tfsec had passed. I fixed two: a network_rules deny default and infrastructure encryption. I accepted the other two with inline #trivy:ignore comments and written reasons. GRS replication is a durability and cost choice for an account holding no data. Storage Analytics logging would only cover queues, which I don't use, so the proper fix is diagnostic settings sent to Log Analytics later.",
+      "Infrastructure encryption can't be enabled on an existing account, so the plan showed a replace (-/+). Terraform deleted the account, then tried to create the new one 6 seconds later. Azure rejected it with StorageAccountAlreadyTaken, because globally unique names take time to be released after a deletion. The account was empty, so I renamed it and deployed a fresh plan.",
+      "Lesson: a replace is a delete followed by a create, and it can fail between the two. On an account holding real data, I'd plan that change as a migration.",
+    ],
+    screenshots: [
+      'SecureAzureLandingZone/SALZ14.webp',
+      'SecureAzureLandingZone/SALZ15.webp',
+      'SecureAzureLandingZone/SALZ16.webp',
+    ],
+    tools: ['Trivy', 'Terraform', 'Azure DevOps', 'Azure'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Trivy',
+      'supply chain security',
+      'checksum verification',
+      'Terraform',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-8-tfsec-fixes-first-apply',
     date: '2026-09-24',
     category: 'Secure Azure Landing Zone',

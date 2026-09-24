@@ -22,7 +22,7 @@ export const owaspTop10: OwaspRisk[] = [
     howToLearnIt: [
       "PortSwigger's Access Control and Server-Side Request Forgery learning paths - next up, not started yet",
       'Practice IDOR by tampering with object IDs directly in the PortSwigger labs via Burp Repeater',
-      'Once the homelab app exists, map out its role-based permissions and try to break out of the lowest-privilege role',
+      "Test the homelab app's two seeded accounts (administrator and wiener) against each other to see whether one can act as the other - not started yet",
     ],
     tools: ['Burp Suite', 'Burp Repeater', 'Autorize (Burp extension)'],
   },
@@ -38,9 +38,13 @@ export const owaspTop10: OwaspRisk[] = [
       'Ran three rounds of OWASP ZAP baseline scans against the homelab app, fixing missing security headers between each: 8 warnings down to 3, 59 passes up to 64',
       'Added CSP, X-Frame-Options, X-Content-Type-Options, Permissions-Policy, and the cross-origin isolation headers to the nginx config, one round at a time, re-scanning after each fix',
       'Left one CSP directive as a documented trade-off (unsafe-inline for styles) rather than chasing a zero-warning scan - noted directly in the nginx config comments',
+      'Wrote secure defaults into the landing zone Terraform instead of accepting provider defaults: TLS 1.2 minimum, HTTPS-only and no public network access on the storage account, and a deny-by-default NSG on the subnet',
+      'tfsec caught a real misconfiguration in my own Terraform: a Key Vault with no network ACL (CRITICAL). I fixed it with network_acls default_action = "Deny" instead of suppressing the finding, and the pipeline would not deploy until it passed',
+      'Semgrep flagged the homelab Dockerfile running as root, and I switched the container to a non-root user',
+      'Switching scanners to Trivy found four storage account misconfigurations tfsec had passed. I fixed two (a network_rules deny default, infrastructure encryption) and accepted two with written #trivy:ignore reasons (GRS replication on an empty account, and queue-only Storage Analytics logging)',
       'Still not started: information disclosure / directory listing labs, and a config audit of the mini PC itself against CIS Benchmarks',
     ],
-    tools: ['OWASP ZAP', 'Nmap', 'Nikto', 'CIS-CAT'],
+    tools: ['OWASP ZAP', 'Trivy', 'Semgrep', 'Nmap', 'Nikto', 'CIS-CAT'],
     relatedDiaryLinks: [
       {
         label: 'First ZAP baseline scan',
@@ -52,6 +56,26 @@ export const owaspTop10: OwaspRisk[] = [
         entryId: 'appsec-homelab-entry-10-zap-remediation-final',
         vulnType: 'AppSec Homelab',
       },
+      {
+        label: 'Landing zone Terraform: secure defaults, tfsec findings',
+        entryId: 'secure-azure-landing-zone-entry-7-main-tf-resource-by-resource',
+        vulnType: 'Secure Azure Landing Zone',
+      },
+      {
+        label: 'Fixing the tfsec findings, first deployment',
+        entryId: 'secure-azure-landing-zone-entry-8-tfsec-fixes-first-apply',
+        vulnType: 'Secure Azure Landing Zone',
+      },
+      {
+        label: 'Semgrep: Dockerfile running as root',
+        entryId: 'appsec-homelab-entry-21-azure-pipelines-lan-self-hosted-agent',
+        vulnType: 'AppSec Homelab',
+      },
+      {
+        label: 'Trivy: storage account findings tfsec missed',
+        entryId: 'secure-azure-landing-zone-entry-9-tfsec-to-trivy',
+        vulnType: 'Secure Azure Landing Zone',
+      },
     ],
   },
   {
@@ -61,12 +85,16 @@ export const owaspTop10: OwaspRisk[] = [
     summary:
       'New in 2025. Risks introduced through third-party dependencies, build pipelines, and CI/CD tooling - compromised packages, unsigned artifacts, and weak build integrity.',
     whyItMatters:
-      'Directly relevant to your homelab pipeline - this is exactly what Dependency-Check/Snyk (SCA) and gitleaks are there to catch before a bad dependency or leaked secret reaches production.',
+      'Directly relevant to my homelab pipeline: dependency scanning (dotnet list package --vulnerable, npm audit, Dependabot) and gitleaks are there to catch a bad dependency or leaked secret before it reaches production.',
     howToLearnIt: [
       "Ran Semgrep against my own homelab's GitHub Actions workflow and it flagged the checkout action using a mutable @v4 tag rather than a pinned commit SHA - a real, unprompted example of exactly this risk category",
       'Rebuilt the whole pipeline around it: every GitHub Action pinned to a full commit SHA, with Dependabot on the github-actions ecosystem so the pins still get bumped, just via a reviewed PR instead of a silent tag move',
       'Added dependency scanning for both halves of the app - dotnet list package --vulnerable --include-transitive for NuGet, npm audit --audit-level=high for the frontend - plus Dependabot on both ecosystems',
       'Added Trivy container scanning of both Docker images, left report-only until I have a baseline to triage against',
+      'The dependency scan caught a high-severity vulnerability in a transitive package, SQLitePCLRaw.lib.e_sqlite3, pulled in via Microsoft.EntityFrameworkCore.Sqlite, and I fixed it directly',
+      'Found Dependabot had been failing silently for weeks: 12 fix branches existed with no PRs, because the repo blocked Actions from creating pull requests. I fixed the permission and deleted the stale branches so Dependabot rebuilt them as real PRs',
+      'Added a Dependabot cooldown period (a Semgrep finding) and update grouping, so weekly runs open one PR per ecosystem',
+      "Closed a shortcut I'd flagged: the landing zone pipeline installed tfsec by piping an unpinned script into bash. Replaced it with Trivy pinned to v0.74.0 and verified against the release's SHA-256 checksum, with set -euo pipefail so a failed check actually stops the install",
       'Still open: no SBOM generated for the app yet',
     ],
     tools: ['Dependabot', 'Trivy', 'gitleaks', 'Syft/SBOM tooling'],
@@ -80,6 +108,16 @@ export const owaspTop10: OwaspRisk[] = [
         label: 'Full CI/CD security pipeline',
         entryId: 'appsec-homelab-entry-14-cicd-pipeline',
         vulnType: 'AppSec Homelab',
+      },
+      {
+        label: 'Dependabot gap and a transitive vulnerability',
+        entryId: 'appsec-homelab-entry-20-azure-pipelines-migration-dependabot-gap',
+        vulnType: 'AppSec Homelab',
+      },
+      {
+        label: 'Swapping tfsec for a checksum-verified Trivy',
+        entryId: 'secure-azure-landing-zone-entry-9-tfsec-to-trivy',
+        vulnType: 'Secure Azure Landing Zone',
       },
     ],
   },
@@ -95,6 +133,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Found and fixed the last of the four seeded homelab vulnerabilities: the User model stored passwords as plain strings, checked with a raw SQL equality comparison',
       "Rewrote it around Microsoft.AspNetCore.Identity's PasswordHasher<User> for salted PBKDF2 hashing, looking up by username only and verifying the hash in C# instead of comparing plaintext in the query",
       'Re-tested after the fix: correct login still works, a wrong password fails, and the raw table now stores hashed blobs instead of admin123 and peter in plain text',
+      'In the landing zone Terraform, enforced TLS 1.2 minimum and HTTPS-only on the storage account, and enabled Key Vault purge protection with 7-day soft delete so deleted secrets stay recoverable',
       'PortSwigger labs on JWT attacks are still not started - a lot of crypto failures show up in token handling, and that is the piece still missing here',
     ],
     tools: ['Burp Suite (JWT Editor extension)', 'gitleaks', 'testssl.sh'],
@@ -103,6 +142,11 @@ export const owaspTop10: OwaspRisk[] = [
         label: 'Fixing plaintext password storage',
         entryId: 'appsec-homelab-entry-16-plaintext-password-fix',
         vulnType: 'Cryptographic Failures',
+      },
+      {
+        label: 'Landing zone: TLS and Key Vault settings',
+        entryId: 'secure-azure-landing-zone-entry-7-main-tf-resource-by-resource',
+        vulnType: 'Secure Azure Landing Zone',
       },
     ],
   },
@@ -152,17 +196,29 @@ export const owaspTop10: OwaspRisk[] = [
   {
     rank: 'A06:2025',
     title: 'Insecure Design',
-    progress: 'Planned',
+    progress: 'In progress',
     summary:
       'Missing or ineffective control design at the architecture level - a flaw that exists even if implemented perfectly, because the design itself never accounted for the threat.',
     whyItMatters:
       'This is the one that separates "finding bugs" from "AppSec engineering" - it is about threat modelling before code is written, not just scanning after the fact.',
     howToLearnIt: [
-      'Learn a lightweight threat modelling method (STRIDE is a good starting point)',
-      "Read OWASP's Application Security Verification Standard (ASVS) design-level requirements",
-      'Once the homelab app is designed, practice writing a one-page threat model for it before building',
+      'Wrote a lightweight risk assessment of the whole homelab (mini PC, app, pipeline, repo) mapped to NIST CSF 2.0, listing the real gaps - no patch cadence, no network segmentation, no recovery process - instead of padding them out',
+      'For the visitor map, set the privacy boundary before writing any code: country-level aggregates only, no IP ever stored. Then wrote a risk assessment of the finished feature, which led to adding a rate limit',
+      "Still not done: a STRIDE threat model written before a build, and reading OWASP's ASVS design-level requirements",
     ],
-    tools: ['STRIDE', 'OWASP Threat Dragon', 'OWASP ASVS'],
+    tools: ['STRIDE', 'OWASP Threat Dragon', 'OWASP ASVS', 'NIST CSF 2.0'],
+    relatedDiaryLinks: [
+      {
+        label: 'Homelab risk assessment (NIST CSF)',
+        entryId: 'appsec-homelab-entry-17-risk-assessment',
+        vulnType: 'AppSec Homelab',
+      },
+      {
+        label: 'Visitor map: privacy boundary and risk assessment',
+        entryId: 'visitor-map-entry-1-build-and-rate-limit',
+        vulnType: 'Visitor Map',
+      },
+    ],
   },
   {
     rank: 'A07:2025',
@@ -177,6 +233,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Bypassed a 2FA flow by navigating straight to the post-login page without completing the second factor',
       'Exploited a password-reset flaw where the reset token was not bound to the account it was issued for, replaying it in Repeater against a different username',
       'Defeated an account lockout by spoofing X-Forwarded-For so each login attempt looked like a new IP',
+      'On the pipeline side, the landing zone authenticates to Azure with workload identity federation (OIDC): a short-lived federated token per run instead of a stored client secret',
       "Next: JWT-specific labs, and reviewing the homelab app's own auth flow against OWASP's Authentication Cheat Sheet",
     ],
     tools: ['Burp Suite (Intruder, on Pro)', 'Hydra (lab environments only)'],
@@ -186,22 +243,34 @@ export const owaspTop10: OwaspRisk[] = [
         entryId: 'portswigger-auth-labs-1-5',
         vulnType: 'Authentication',
       },
+      {
+        label: 'Landing zone: OIDC pipeline auth',
+        entryId: 'secure-azure-landing-zone-entry-5-plan-stage-oidc-auth',
+        vulnType: 'Secure Azure Landing Zone',
+      },
     ],
   },
   {
     rank: 'A08:2025',
     title: 'Software or Data Integrity Failures',
-    progress: 'Planned',
+    progress: 'In progress',
     summary:
       'Code and infrastructure that does not verify integrity - insecure deserialization, auto-update mechanisms pulling unsigned code, or CI/CD pipelines without integrity checks.',
     whyItMatters:
       'Overlaps with A03 (Supply Chain) but focuses more on runtime trust - e.g. does your app verify the things it loads or deserializes are what they claim to be.',
     howToLearnIt: [
-      'PortSwigger: Insecure Deserialization learning path - not started yet',
-      'Learn how signed commits and artifact signing (e.g. Sigstore/cosign) fit into a CI/CD pipeline',
-      'Once the homelab pipeline is built, check whether it verifies build artifacts before deployment',
+      'The landing zone pipeline publishes the terraform plan as an artifact, and Apply deploys that exact plan after a manual approval gate instead of re-planning, so what ships is what someone reviewed',
+      'Every homelab GitHub Action is pinned to a full commit SHA, so a moved tag cannot swap in different code (more under A03)',
+      'Still not started: the PortSwigger Insecure Deserialization path, and artifact signing with Sigstore/cosign',
     ],
-    tools: ['PortSwigger labs', 'Sigstore/cosign'],
+    tools: ['PortSwigger labs', 'Sigstore/cosign', 'Azure DevOps approvals'],
+    relatedDiaryLinks: [
+      {
+        label: 'Landing zone: Apply stage and approval gate',
+        entryId: 'secure-azure-landing-zone-entry-6-apply-stage-deployment-jobs',
+        vulnType: 'Secure Azure Landing Zone',
+      },
+    ],
   },
   {
     rank: 'A09:2025',
@@ -213,8 +282,9 @@ export const owaspTop10: OwaspRisk[] = [
       "Consistently under-invested in relative to prevention, but it's what determines whether an incident is caught in minutes or months.",
     howToLearnIt: [
       "Read OWASP's Logging Cheat Sheet for what should and shouldn't be logged",
-      'Once the homelab app exists, set up centralized logging for it - even something simple like a local ELK/Loki stack',
+      'Set up centralized logging for the homelab app, even something simple like a local Loki stack - not started yet',
       'Define what "suspicious" looks like for the app (failed logins, repeated 403s) and plan to alert on it',
+      'Both risk assessments so far (the homelab and the visitor map) list detection as a gap: nothing I have built alerts on unusual traffic yet',
     ],
     tools: ['ELK Stack', 'Grafana Loki', 'OWASP Logging Cheat Sheet'],
   },
@@ -228,7 +298,7 @@ export const owaspTop10: OwaspRisk[] = [
       'A newer, more precise framing of issues that used to be scattered across other categories - error messages leaking stack traces, or a failed operation leaving data half-written.',
     howToLearnIt: [
       "Practice fuzzing an endpoint with Burp Intruder-style payloads (or ZAP's fuzzer) in the PortSwigger labs",
-      'Once the homelab app exists, deliberately break it in unusual ways (malformed input, network drops mid-request) and check what gets exposed',
+      'Break the homelab app on purpose (malformed input, network drops mid-request) and check what it exposes - not started yet',
       'Review error handling patterns in .NET/C# for stack traces leaking into production responses',
     ],
     tools: ['OWASP ZAP fuzzer', 'Burp Suite'],
