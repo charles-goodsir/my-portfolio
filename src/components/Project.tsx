@@ -31,12 +31,12 @@ const projects: Project[] = [
     id: 'secure-azure-landing-zone',
     title: 'Secure Azure Landing Zone',
     description:
-      'An Azure DevOps pipeline built before the Terraform it gates - Validate and tfsec security-scan stages running clean end to end, ready to catch misconfigurations once the landing zone resources go in',
+      'A Terraform-managed Azure landing zone built pipeline-first: validate, Trivy scan, plan, and a manual approval gate before anything reaches Azure. The first resources are live',
     technologies: [
       'Terraform',
       'Azure DevOps',
       'Azure',
-      'tfsec',
+      'Trivy',
       'YAML',
     ],
   },
