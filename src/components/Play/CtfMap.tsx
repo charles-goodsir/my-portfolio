@@ -2,8 +2,8 @@ import { useEffect, useRef, useState, type RefObject } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Edges, Grid, Html, Trail } from '@react-three/drei'
-import { Bloom, EffectComposer } from '@react-three/postprocessing'
-import { AdditiveBlending, Color, Vector3, type Group, type Mesh } from 'three'
+import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing'
+import { AdditiveBlending, Color, DoubleSide, Vector3, type Group, type Mesh } from 'three'
 import { navItems } from '../ui/navItems'
 
 const MAP_SIZE = 40
@@ -18,6 +18,11 @@ const NEON_CYAN = new Color(0, 2.5, 3)
 const DIM_CYAN = new Color(0, 0.25, 0.3)
 const NEON_ORANGE = new Color(3, 0.8, 0) // Tron's "other team"
 const BEAM_ORANGE = new Color(1, 0.35, 0) // below 1, so the beam stays soft
+const WALL_CYAN = new Color(0, 0.6, 0.7)
+
+// Shared look for the HTML overlays: dark glass panel, glowing cyan text
+const HUD_PANEL = 'rounded border border-[#2dd4bf]/40 bg-black/70 font-mono'
+const HUD_GLOW = 'text-[#2dd4bf] [text-shadow:0_0_8px_#2dd4bf]'
 
 // Read once on load. If the visitor asked for less motion, the camera jumps instead of gliding
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -96,12 +101,45 @@ function Flag({
       </mesh>
 
       <Html position-y={3.5} center>
-        <div className="pointer-events-none whitespace-nowrap rounded bg-[#0b1120]/80 px-2 py-0.5 font-mono text-xs text-[#2dd4bf]">
+        <div className={`pointer-events-none whitespace-nowrap px-2 py-0.5 text-xs ${HUD_PANEL} ${HUD_GLOW}`}>
           {label}
         </div>
       </Html>
     </group>
   )
+}
+
+// The four arena walls sit on the edges of the floor: [x, z, rotation]
+const HALF = MAP_SIZE / 2
+const walls: [number, number, number][] = [
+  [0, -HALF, 0],
+  [0, HALF, 0],
+  [-HALF, 0, Math.PI / 2],
+  [HALF, 0, Math.PI / 2],
+]
+
+function Walls() {
+  return walls.map(([x, z, rotation]) => (
+    <group key={`${x},${z}`} position={[x, 0, z]} rotation-y={rotation}>
+      {/* Faint see-through panel, visible from both sides */}
+      <mesh position-y={0.75}>
+        <planeGeometry args={[MAP_SIZE, 1.5]} />
+        <meshBasicMaterial
+          color={WALL_CYAN}
+          transparent
+          opacity={0.12}
+          blending={AdditiveBlending}
+          depthWrite={false}
+          side={DoubleSide}
+        />
+      </mesh>
+      {/* Glowing rail along the top */}
+      <mesh position-y={1.5}>
+        <boxGeometry args={[MAP_SIZE, 0.05, 0.05]} />
+        <meshBasicMaterial color={NEON_CYAN} />
+      </mesh>
+    </group>
+  ))
 }
 
 function Player({
@@ -244,18 +282,22 @@ function CtfMap() {
           />
         ))}
 
+        <Walls />
+
         <Player target={target} onCapture={setCaptured} />
 
         {/* Bloom runs after the scene is drawn and blurs light out of
             every pixel brighter than the threshold */}
         <EffectComposer>
           <Bloom luminanceThreshold={1} intensity={1.5} mipmapBlur />
+          {/* Darkens the screen corners to pull the eye to the centre */}
+          <Vignette offset={0.3} darkness={0.8} />
         </EffectComposer>
       </Canvas>
 
       <Link
         to="/"
-        className="absolute left-4 top-4 rounded bg-[#0b1120]/80 px-3 py-1 font-mono text-sm text-[#2dd4bf] hover:underline"
+        className={`absolute left-4 top-4 px-3 py-1 text-sm hover:underline ${HUD_PANEL} ${HUD_GLOW}`}
       >
         Exit (Esc)
       </Link>
@@ -264,7 +306,7 @@ function CtfMap() {
           or anyone who would rather not play */}
       <nav
         aria-label="Pages"
-        className="absolute bottom-4 left-4 rounded bg-[#0b1120]/80 px-3 py-2 font-mono text-xs"
+        className={`absolute bottom-4 left-4 px-3 py-2 text-xs ${HUD_PANEL}`}
       >
         <ul className="space-y-1">
           {flags.map((flag) => (
@@ -280,7 +322,7 @@ function CtfMap() {
       {/* role="status" makes screen readers announce the capture */}
       <div
         role="status"
-        className="pointer-events-none absolute inset-x-0 top-1/3 text-center font-mono text-2xl text-[#2dd4bf]"
+        className={`pointer-events-none absolute inset-x-0 top-1/3 text-center font-mono text-2xl ${HUD_GLOW}`}
       >
         {captured && `Flag captured: ${captured.label}`}
       </div>
