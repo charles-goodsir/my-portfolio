@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, type RefObject } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Grid, Html } from '@react-three/drei'
-import { Vector3, type Group } from 'three'
+import { Bloom, EffectComposer } from '@react-three/postprocessing'
+import { Color, Vector3, type Group } from 'three'
 import { navItems } from '../ui/navItems'
 
 const MAP_SIZE = 40
@@ -10,6 +11,11 @@ const FLAG_RING_RADIUS = 12
 const PLAYER_SPEED = 8 // units per second
 const CAPTURE_RANGE = 1.5 // how close the player must get to a flag
 const CAMERA_OFFSET = new Vector3(0, 14, 14) // camera sits this far from the player
+
+// Colour channels above 1 are "brighter than white". Bloom only picks up
+// pixels above 1, so these glow and everything at or below 1 stays dark
+const NEON_CYAN = new Color(0, 2.5, 3)
+const DIM_CYAN = new Color(0, 0.25, 0.3)
 
 // Read once on load. If the visitor asked for less motion, the camera jumps instead of gliding
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -147,9 +153,11 @@ function CtfMap() {
   }, [navigate])
 
   return (
-    <div className="relative h-screen w-screen bg-[#0b1120]">
+    <div className="relative h-screen w-screen bg-black">
       <Canvas camera={{ position: CAMERA_OFFSET.toArray(), fov: 50 }}>
-        <color attach="background" args={['#0b1120']} />
+        <color attach="background" args={['#000000']} />
+        {/* Anything past 20 units from the camera fades to black by 50 */}
+        <fog attach="fog" args={['#000000', 20, 50]} />
         <ambientLight intensity={0.4} />
         <directionalLight position={[10, 20, 5]} intensity={1.2} />
 
@@ -160,15 +168,15 @@ function CtfMap() {
           onClick={(e) => target.current.set(e.point.x, 0, e.point.z)}
         >
           <planeGeometry args={[MAP_SIZE, MAP_SIZE]} />
-          <meshStandardMaterial color="#111827" />
+          <meshStandardMaterial color="#020409" />
         </mesh>
 
         {/* Grid lines sit just above the ground so they don't flicker */}
         <Grid
           position-y={0.01}
           args={[MAP_SIZE, MAP_SIZE]}
-          cellColor="#1e293b"
-          sectionColor="#2dd4bf"
+          cellColor={DIM_CYAN}
+          sectionColor={NEON_CYAN}
           sectionSize={5}
           fadeDistance={45}
         />
@@ -183,6 +191,12 @@ function CtfMap() {
         ))}
 
         <Player target={target} onCapture={setCaptured} />
+
+        {/* Bloom runs after the scene is drawn and blurs light out of
+            every pixel brighter than the threshold */}
+        <EffectComposer>
+          <Bloom luminanceThreshold={1} intensity={1.5} mipmapBlur />
+        </EffectComposer>
       </Canvas>
 
       <Link
