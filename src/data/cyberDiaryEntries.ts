@@ -44,6 +44,38 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-11-terraform-install-template',
+    date: '2026-09-25',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    title: 'Verifying the Terraform binary with a shared install template',
+    workedOn: [
+      'Found the pipeline downloaded the Terraform binary without a checksum, even though the binary is what checks the provider lock-file hashes',
+      'Found the install copied into three stages and already drifted: Validate used a version variable, Plan and Apply hardcoded the version in the URL',
+      'Moved it into one ADO step template, templates/install-terraform.yml, which downloads Terraform 1.9.8 with HashiCorp\'s SHA256SUMS file and verifies it under set -euo pipefail',
+      'Restructured Plan and Apply, since their install ran inside the AzureCLI@2 script: cd ../terraform became cd terraform',
+      'Caught a missing template line in the Plan stage on my first attempt',
+    ],
+    body: [
+      'The Terraform binary checks the provider\'s lock-file hashes, and the pipeline was downloading it without a checksum. The tool at the bottom of the verification chain was the one piece nobody checked. The install was also copied into three stages and had already drifted.',
+      'I moved it into one step template that verifies the download against HashiCorp\'s SHA256SUMS file. Each stage now pulls it in with a single - template: line. Plan and Apply needed a small restructure, because their install ran inside the AzureCLI@2 script.',
+      'My first attempt missed the template line in the Plan stage. If the hosted image ships its own Terraform, Plan would have run green on an unverified, different version, the exact drift the template exists to prevent.',
+      'When you deduplicate code, check every place that used the old copy. A missing include can fail silently, just like a wrong condition.',
+    ],
+    screenshots: [
+      'SecureAzureLandingZone/SALZ14.webp',
+      'SecureAzureLandingZone/SALZ15.webp',
+    ],
+    tools: ['Azure DevOps', 'Terraform', 'YAML'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Terraform',
+      'supply chain security',
+      'CI/CD pipeline',
+      'Azure DevOps',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-10-pr-gate-branch-protection',
     date: '2026-09-24',
     category: 'Secure Azure Landing Zone',
