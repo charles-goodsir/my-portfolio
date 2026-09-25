@@ -3,13 +3,22 @@ import { Link, useNavigate } from 'react-router'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Edges, Grid, Html, Trail } from '@react-three/drei'
 import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing'
-import { AdditiveBlending, Color, DoubleSide, Vector3, type Group, type Mesh } from 'three'
+import {
+  AdditiveBlending,
+  Color,
+  DoubleSide,
+  Vector3,
+  type Group,
+  type Mesh,
+  type MeshBasicMaterial,
+} from 'three'
 import { navItems } from '../ui/navItems'
 
 const MAP_SIZE = 40
 const FLAG_RING_RADIUS = 12
 const PLAYER_SPEED = 8 // units per second
 const CAPTURE_RANGE = 1.5 // how close the player must get to a flag
+const CAPTURE_SECONDS = 1 // how long the capture effect plays before the page changes
 const CAMERA_OFFSET = new Vector3(0, 14, 14) // camera sits this far from the player
 
 // Colour channels above 1 are "brighter than white". Bloom only picks up
@@ -19,6 +28,7 @@ const DIM_CYAN = new Color(0, 0.25, 0.3)
 const NEON_ORANGE = new Color(3, 0.8, 0) // Tron's "other team"
 const BEAM_ORANGE = new Color(1, 0.35, 0) // below 1, so the beam stays soft
 const WALL_CYAN = new Color(0, 0.6, 0.7)
+const WHITE_HOT = new Color(6, 6, 6) // the flash on capture
 
 // Shared look for the HTML overlays: dark glass panel, glowing cyan text
 const HUD_PANEL = 'rounded border border-[#2dd4bf]/40 bg-black/70 font-mono'
@@ -50,18 +60,44 @@ type MapFlag = (typeof flags)[number]
 function Flag({
   label,
   position,
+  captured,
   onClick,
 }: {
   label: string
   position: Vector3
+  captured: boolean
   onClick: () => void
 }) {
   const cloth = useRef<Mesh>(null)
+  const clothMaterial = useRef<MeshBasicMaterial>(null)
+  const beam = useRef<Mesh>(null)
+  const beamMaterial = useRef<MeshBasicMaterial>(null)
+  const captureStart = useRef<number | null>(null)
 
-  // Bob the cloth up and down. Offsetting by x means the flags bob out of step
   useFrame(({ clock }) => {
-    if (!cloth.current || reduceMotion) return
-    cloth.current.position.y = 2.6 + Math.sin(clock.elapsedTime * 2 + position.x) * 0.1
+    const now = clock.elapsedTime
+
+    // Bob the cloth up and down. Offsetting by x means the flags bob out of step
+    if (cloth.current && !reduceMotion) {
+      cloth.current.position.y = 2.6 + Math.sin(now * 2 + position.x) * 0.1
+    }
+
+    if (!captured) return
+
+    // progress runs 0 → 1 over the capture effect
+    captureStart.current ??= now
+    const progress = Math.min((now - captureStart.current) / CAPTURE_SECONDS, 1)
+
+    // One flash: cloth jumps to white-hot then fades back to orange.
+    // A single flash, never a strobe, which could trigger seizures
+    clothMaterial.current?.color.copy(WHITE_HOT).lerp(NEON_ORANGE, progress)
+
+    // Beam brightens and widens
+    if (beamMaterial.current) beamMaterial.current.opacity = 0.15 + progress * 0.5
+    if (beam.current && !reduceMotion) {
+      const width = 1 + progress * 3
+      beam.current.scale.set(width, 1, width)
+    }
   })
 
   return (
@@ -84,15 +120,17 @@ function Flag({
       {/* Cloth: a thin glowing box hanging off the top of the pole */}
       <mesh ref={cloth} position={[0.6, 2.6, 0]}>
         <boxGeometry args={[1.2, 0.8, 0.05]} />
-        <meshBasicMaterial color={NEON_ORANGE} />
+        <meshBasicMaterial ref={clothMaterial} color={NEON_ORANGE} />
       </mesh>
 
       {/* Beam: a tall, faint, open-ended tube into the sky. Additive blending
           means it brightens whatever is behind it, like real light */}
-      <mesh position-y={15}>
+      <mesh ref={beam} position-y={15}>
         <cylinderGeometry args={[0.3, 0.3, 30, 16, 1, true]} />
         <meshBasicMaterial
-          color={BEAM_ORANGE}
+          ref={beamMaterial}
+          // On capture the beam switches to neon so it blooms
+          color={captured ? NEON_ORANGE : BEAM_ORANGE}
           transparent
           opacity={0.15}
           blending={AdditiveBlending}
@@ -231,7 +269,7 @@ function CtfMap() {
   // After a capture, pause a moment so the message is readable, then go
   useEffect(() => {
     if (!captured) return
-    const timer = setTimeout(() => navigate(captured.to), 1000)
+    const timer = setTimeout(() => navigate(captured.to), CAPTURE_SECONDS * 1000)
     return () => clearTimeout(timer)
   }, [captured, navigate])
 
@@ -278,6 +316,7 @@ function CtfMap() {
             key={flag.to}
             label={flag.label}
             position={flag.position}
+            captured={captured?.to === flag.to}
             onClick={() => target.current.copy(flag.position)}
           />
         ))}
