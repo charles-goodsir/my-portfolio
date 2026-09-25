@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { HashRouter, Routes, Route } from 'react-router'
 import RootLayout from './components/ui/RootLayout'
 import Home from './components/Home'
@@ -20,10 +21,20 @@ import Airbnb from './components/Projects/Airbnb'
 import FinanceTracker from './components/Projects/FinanceTracker'
 import PortfolioSite from './components/Projects/PortfolioSite'
 
+const CtfMap = lazy(() => import('./components/Play/CtfMap'))
+
 function App() {
   return (
     <HashRouter>
       <Routes>
+        <Route
+          path="play"
+          element={
+            <Suspense fallback={null}>
+              <CtfMap />
+            </Suspense>
+          }
+        />
         <Route element={<RootLayout />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
