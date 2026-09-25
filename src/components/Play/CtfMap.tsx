@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Grid, Html } from '@react-three/drei'
+import { Grid, Html, Trail } from '@react-three/drei'
 import { Bloom, EffectComposer } from '@react-three/postprocessing'
 import { Color, Vector3, type Group } from 'three'
 import { navItems } from '../ui/navItems'
@@ -102,6 +102,8 @@ function Player({
       player.position.copy(target.current)
     } else {
       player.position.addScaledVector(toTarget, step / distance)
+      // Face the direction of travel. The bike is built pointing along +z
+      player.rotation.y = Math.atan2(toTarget.x, toTarget.z)
     }
 
     // Close enough to a flag? Capture it, once
@@ -123,10 +125,37 @@ function Player({
 
   return (
     <group ref={ref}>
-      <mesh position-y={0.6}>
-        <coneGeometry args={[0.5, 1.2, 16]} />
-        <meshStandardMaterial color="#f59e0b" />
+      {/* Body: a long, low dark box */}
+      <mesh position-y={0.35}>
+        <boxGeometry args={[0.35, 0.3, 1.3]} />
+        <meshStandardMaterial color="#05080f" />
       </mesh>
+
+      {/* Neon stripe along the top */}
+      <mesh position-y={0.51}>
+        <boxGeometry args={[0.08, 0.02, 1.1]} />
+        <meshBasicMaterial color={NEON_CYAN} />
+      </mesh>
+
+      {/* Wheels: glowing rings. A torus lies flat facing the camera by
+          default, so turn it side-on */}
+      {[0.55, -0.55].map((z) => (
+        <mesh key={z} position={[0, 0.3, z]} rotation-y={Math.PI / 2}>
+          <torusGeometry args={[0.28, 0.05, 8, 24]} />
+          <meshBasicMaterial color={NEON_CYAN} />
+        </mesh>
+      ))}
+
+      {/* Light trail. Trail follows the (invisible) point it wraps,
+          here the back of the bike */}
+      <Trail
+        width={1.2}
+        length={8}
+        color={NEON_CYAN}
+        attenuation={(t) => t * t}
+      >
+        <mesh position={[0, 0.3, -0.7]} />
+      </Trail>
     </group>
   )
 }
