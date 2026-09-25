@@ -1,7 +1,54 @@
 import { Canvas } from '@react-three/fiber'
-import { Grid } from '@react-three/drei'
+import { Grid, Html } from '@react-three/drei'
+import { navItems } from '../ui/navItems'
 
 const MAP_SIZE = 40
+const FLAG_RING_RADIUS = 12
+
+// Every nav page except Home becomes a flag, spaced evenly round a circle
+const flags = navItems
+  .filter((item) => item.to !== '/')
+  .map((item, i, all) => {
+    const angle = (i / all.length) * Math.PI * 2
+    return {
+      ...item,
+      position: [
+        Math.sin(angle) * FLAG_RING_RADIUS,
+        0,
+        -Math.cos(angle) * FLAG_RING_RADIUS,
+      ] as [number, number, number],
+    }
+  })
+
+function Flag({
+  label,
+  position,
+}: {
+  label: string
+  position: [number, number, number]
+}) {
+  return (
+    <group position={position}>
+      {/* Pole: cylinders are centred on their middle, so lift by half the height */}
+      <mesh position-y={1.5}>
+        <cylinderGeometry args={[0.08, 0.08, 3]} />
+        <meshStandardMaterial color="#94a3b8" />
+      </mesh>
+
+      {/* Cloth: a thin box hanging off the top of the pole */}
+      <mesh position={[0.6, 2.6, 0]}>
+        <boxGeometry args={[1.2, 0.8, 0.05]} />
+        <meshStandardMaterial color="#2dd4bf" />
+      </mesh>
+
+      <Html position-y={3.5} center>
+        <div className="pointer-events-none whitespace-nowrap rounded bg-[#0b1120]/80 px-2 py-0.5 font-mono text-xs text-[#2dd4bf]">
+          {label}
+        </div>
+      </Html>
+    </group>
+  )
+}
 
 function CtfMap() {
   return (
@@ -26,6 +73,10 @@ function CtfMap() {
           sectionSize={5}
           fadeDistance={45}
         />
+
+        {flags.map((flag) => (
+          <Flag key={flag.to} label={flag.label} position={flag.position} />
+        ))}
       </Canvas>
     </div>
   )
