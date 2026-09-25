@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Grid, Html, Trail } from '@react-three/drei'
+import { Edges, Grid, Html, Trail } from '@react-three/drei'
 import { Bloom, EffectComposer } from '@react-three/postprocessing'
-import { Color, Vector3, type Group } from 'three'
+import { AdditiveBlending, Color, Vector3, type Group, type Mesh } from 'three'
 import { navItems } from '../ui/navItems'
 
 const MAP_SIZE = 40
@@ -16,6 +16,8 @@ const CAMERA_OFFSET = new Vector3(0, 14, 14) // camera sits this far from the pl
 // pixels above 1, so these glow and everything at or below 1 stays dark
 const NEON_CYAN = new Color(0, 2.5, 3)
 const DIM_CYAN = new Color(0, 0.25, 0.3)
+const NEON_ORANGE = new Color(3, 0.8, 0) // Tron's "other team"
+const BEAM_ORANGE = new Color(1, 0.35, 0) // below 1, so the beam stays soft
 
 // Read once on load. If the visitor asked for less motion, the camera jumps instead of gliding
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -49,6 +51,14 @@ function Flag({
   position: Vector3
   onClick: () => void
 }) {
+  const cloth = useRef<Mesh>(null)
+
+  // Bob the cloth up and down. Offsetting by x means the flags bob out of step
+  useFrame(({ clock }) => {
+    if (!cloth.current || reduceMotion) return
+    cloth.current.position.y = 2.6 + Math.sin(clock.elapsedTime * 2 + position.x) * 0.1
+  })
+
   return (
     <group
       position={position}
@@ -58,16 +68,31 @@ function Flag({
         onClick()
       }}
     >
-      {/* Pole: cylinders are centred on their middle, so lift by half the height */}
+      {/* Pole: a dark six-sided pylon. Cylinders are centred on their middle,
+          so lift by half the height. <Edges> traces the hard edges in neon */}
       <mesh position-y={1.5}>
-        <cylinderGeometry args={[0.08, 0.08, 3]} />
-        <meshStandardMaterial color="#94a3b8" />
+        <cylinderGeometry args={[0.12, 0.12, 3, 6]} />
+        <meshStandardMaterial color="#05080f" />
+        <Edges color={NEON_CYAN} />
       </mesh>
 
-      {/* Cloth: a thin box hanging off the top of the pole */}
-      <mesh position={[0.6, 2.6, 0]}>
+      {/* Cloth: a thin glowing box hanging off the top of the pole */}
+      <mesh ref={cloth} position={[0.6, 2.6, 0]}>
         <boxGeometry args={[1.2, 0.8, 0.05]} />
-        <meshStandardMaterial color="#2dd4bf" />
+        <meshBasicMaterial color={NEON_ORANGE} />
+      </mesh>
+
+      {/* Beam: a tall, faint, open-ended tube into the sky. Additive blending
+          means it brightens whatever is behind it, like real light */}
+      <mesh position-y={15}>
+        <cylinderGeometry args={[0.3, 0.3, 30, 16, 1, true]} />
+        <meshBasicMaterial
+          color={BEAM_ORANGE}
+          transparent
+          opacity={0.15}
+          blending={AdditiveBlending}
+          depthWrite={false}
+        />
       </mesh>
 
       <Html position-y={3.5} center>
