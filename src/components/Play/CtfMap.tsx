@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Edges, Grid, Html, Trail } from '@react-three/drei'
+import { Edges, Grid, Html, MeshReflectorMaterial, Trail } from '@react-three/drei'
 import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing'
 import {
   AdditiveBlending,
@@ -19,6 +19,7 @@ const FLAG_RING_RADIUS = 12
 const PLAYER_SPEED = 8 // units per second
 const CAPTURE_RANGE = 1.5 // how close the player must get to a flag
 const CAPTURE_SECONDS = 1 // how long the capture effect plays before the page changes
+const HOVER_HEIGHT = 0.9 // how high the Bit floats
 const CAMERA_OFFSET = new Vector3(0, 14, 14) // camera sits this far from the player
 
 // Colour channels above 1 are "brighter than white". Bloom only picks up
@@ -188,10 +189,12 @@ function Player({
   onCapture: (flag: MapFlag) => void
 }) {
   const ref = useRef<Group>(null)
+  const tilt = useRef<Group>(null)
+  const spin = useRef<Group>(null)
   const captured = useRef(false)
 
   // Runs once per frame. delta = seconds since the last frame
-  useFrame(({ camera }, delta) => {
+  useFrame(({ camera, clock }, delta) => {
     const player = ref.current
     if (!player) return
 
@@ -199,13 +202,27 @@ function Player({
     const toTarget = scratch.copy(target.current).sub(player.position)
     const distance = toTarget.length()
     const step = PLAYER_SPEED * delta
-    if (distance <= step) {
-      player.position.copy(target.current)
-    } else {
+    const moving = distance > step
+    if (moving) {
       player.position.addScaledVector(toTarget, step / distance)
-      // Face the direction of travel. The bike is built pointing along +z
+      // Turn to face the direction of travel (+z counts as "forward")
       player.rotation.y = Math.atan2(toTarget.x, toTarget.z)
+    } else {
+      player.position.copy(target.current)
     }
+
+    // Lean into the direction of travel, and ease back upright on stopping
+    if (tilt.current) {
+      const lean = moving ? 0.4 : 0
+      tilt.current.rotation.x += (lean - tilt.current.rotation.x) * (1 - Math.exp(-8 * delta))
+      // Gentle hover
+      if (!reduceMotion) {
+        tilt.current.position.y = HOVER_HEIGHT + Math.sin(clock.elapsedTime * 2) * 0.08
+      }
+    }
+
+    // Slow spin
+    if (spin.current && !reduceMotion) spin.current.rotation.y += delta * 1.2
 
     // Close enough to a flag? Capture it, once
     if (!captured.current) {
@@ -225,37 +242,35 @@ function Player({
   })
 
   return (
-    <group ref={ref}>
-      {/* Body: a long, low dark box */}
-      <mesh position-y={0.35}>
-        <boxGeometry args={[0.35, 0.3, 1.3]} />
-        <meshStandardMaterial color="#05080f" />
-      </mesh>
-
-      {/* Neon stripe along the top */}
-      <mesh position-y={0.51}>
-        <boxGeometry args={[0.08, 0.02, 1.1]} />
-        <meshBasicMaterial color={NEON_CYAN} />
-      </mesh>
-
-      {/* Wheels: glowing rings. A torus lies flat facing the camera by
-          default, so turn it side-on */}
-      {[0.55, -0.55].map((z) => (
-        <mesh key={z} position={[0, 0.3, z]} rotation-y={Math.PI / 2}>
-          <torusGeometry args={[0.28, 0.05, 8, 24]} />
-          <meshBasicMaterial color={NEON_CYAN} />
-        </mesh>
-      ))}
+    <group ref={ref} scale={1.5}>
+      {/* The Bit, from the 1982 Tron. Three nested groups so each motion
+          stays separate: the outer one moves and turns, this one leans and
+          hovers, the inner one spins */}
+      <group ref={tilt} position-y={HOVER_HEIGHT}>
+        <group ref={spin}>
+          {/* Shell: a dark, see-through 20-sided crystal with neon edges */}
+          <mesh>
+            <icosahedronGeometry args={[0.45]} />
+            <meshStandardMaterial color="#05080f" transparent opacity={0.6} />
+            <Edges color={NEON_CYAN} />
+          </mesh>
+          {/* Core: a small glowing 8-sided crystal inside */}
+          <mesh>
+            <octahedronGeometry args={[0.18]} />
+            <meshBasicMaterial color={NEON_CYAN} />
+          </mesh>
+        </group>
+      </group>
 
       {/* Light trail. Trail follows the (invisible) point it wraps,
-          here the back of the bike */}
+          here the centre of the Bit */}
       <Trail
         width={1.2}
         length={8}
         color={NEON_CYAN}
         attenuation={(t) => t * t}
       >
-        <mesh position={[0, 0.3, -0.7]} />
+        <mesh position-y={HOVER_HEIGHT} />
       </Trail>
     </group>
   )
@@ -298,7 +313,22 @@ function CtfMap() {
           onClick={(e) => target.current.set(e.point.x, 0, e.point.z)}
         >
           <planeGeometry args={[MAP_SIZE, MAP_SIZE]} />
-          <meshStandardMaterial color="#020409" />
+          {/* Glossy black floor. Each frame the scene is drawn a second time
+              from below, into a 512px texture, and blurred onto the floor.
+              The shader does: floor colour × (1 - mirror + reflection × mixStrength),
+              so a near-black floor needs a big mixStrength or the
+              reflection multiplies down to nothing. Neutral grey so orange
+              reflects as well as cyan */}
+          <MeshReflectorMaterial
+            color="#101010"
+            resolution={512}
+            blur={[300, 100]} // blur across / along the floor
+            mixBlur={1} // how much the blur softens the reflection
+            mixStrength={50} // reflection brightness
+            mirror={0.5} // 0 = matte, 1 = perfect mirror
+            roughness={0.8}
+            metalness={0.5}
+          />
         </mesh>
 
         {/* Grid lines sit just above the ground so they don't flicker */}
