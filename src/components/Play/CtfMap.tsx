@@ -1,9 +1,16 @@
-import { Canvas } from '@react-three/fiber'
+import { useRef, type RefObject } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { Grid, Html } from '@react-three/drei'
+import { Vector3, type Group } from 'three'
 import { navItems } from '../ui/navItems'
 
 const MAP_SIZE = 40
 const FLAG_RING_RADIUS = 12
+const PLAYER_SPEED = 8 // units per second
+const CAMERA_OFFSET = new Vector3(0, 14, 14) // camera sits this far from the player
+
+// Reused every frame so we don't create a new vector 60 times a second
+const scratch = new Vector3()
 
 // Every nav page except Home becomes a flag, spaced evenly round a circle
 const flags = navItems
@@ -50,16 +57,55 @@ function Flag({
   )
 }
 
+function Player({ target }: { target: RefObject<Vector3> }) {
+  const ref = useRef<Group>(null)
+
+  // Runs once per frame. delta = seconds since the last frame
+  useFrame(({ camera }, delta) => {
+    const player = ref.current
+    if (!player) return
+
+    // Step toward the target, or land on it if this step would overshoot
+    const toTarget = scratch.copy(target.current).sub(player.position)
+    const distance = toTarget.length()
+    const step = PLAYER_SPEED * delta
+    if (distance <= step) {
+      player.position.copy(target.current)
+    } else {
+      player.position.addScaledVector(toTarget, step / distance)
+    }
+
+    // Ease the camera toward its spot behind the player
+    const cameraGoal = scratch.copy(player.position).add(CAMERA_OFFSET)
+    camera.position.lerp(cameraGoal, 1 - Math.exp(-4 * delta))
+  })
+
+  return (
+    <group ref={ref}>
+      <mesh position-y={0.6}>
+        <coneGeometry args={[0.5, 1.2, 16]} />
+        <meshStandardMaterial color="#f59e0b" />
+      </mesh>
+    </group>
+  )
+}
+
 function CtfMap() {
+  const target = useRef(new Vector3())
+
   return (
     <div className="h-screen w-screen bg-[#0b1120]">
-      <Canvas camera={{ position: [0, 14, 14], fov: 50 }}>
+      <Canvas camera={{ position: CAMERA_OFFSET.toArray(), fov: 50 }}>
         <color attach="background" args={['#0b1120']} />
         <ambientLight intensity={0.4} />
         <directionalLight position={[10, 20, 5]} intensity={1.2} />
 
-        {/* Ground: a plane lies upright by default, so tip it flat */}
-        <mesh rotation-x={-Math.PI / 2}>
+        {/* Ground: a plane lies upright by default, so tip it flat.
+            Clicking it sets where the player walks to. */}
+        <mesh
+          rotation-x={-Math.PI / 2}
+          onClick={(e) => target.current.set(e.point.x, 0, e.point.z)}
+        >
           <planeGeometry args={[MAP_SIZE, MAP_SIZE]} />
           <meshStandardMaterial color="#111827" />
         </mesh>
@@ -77,6 +123,8 @@ function CtfMap() {
         {flags.map((flag) => (
           <Flag key={flag.to} label={flag.label} position={flag.position} />
         ))}
+
+        <Player target={target} />
       </Canvas>
     </div>
   )
