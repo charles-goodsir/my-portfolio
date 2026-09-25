@@ -21,6 +21,9 @@ function Home() {
           <Button to="/diary" variant="secondary">
             Cyber Diary
           </Button>
+          <Button to="/play" variant="secondary">
+            Play CTF Map
+          </Button>
         </div>
       </div>
       <VisitorBadge />

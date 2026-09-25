@@ -11,6 +11,9 @@ const PLAYER_SPEED = 8 // units per second
 const CAPTURE_RANGE = 1.5 // how close the player must get to a flag
 const CAMERA_OFFSET = new Vector3(0, 14, 14) // camera sits this far from the player
 
+// Read once on load. If the visitor asked for less motion, the camera jumps instead of gliding
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
 // Reused every frame so we don't create a new vector 60 times a second
 const scratch = new Vector3()
 
@@ -108,7 +111,8 @@ function Player({
 
     // Ease the camera toward its spot behind the player
     const cameraGoal = scratch.copy(player.position).add(CAMERA_OFFSET)
-    camera.position.lerp(cameraGoal, 1 - Math.exp(-4 * delta))
+    if (reduceMotion) camera.position.copy(cameraGoal)
+    else camera.position.lerp(cameraGoal, 1 - Math.exp(-4 * delta))
   })
 
   return (
@@ -187,6 +191,23 @@ function CtfMap() {
       >
         Exit (Esc)
       </Link>
+
+      {/* Plain links to every page, for keyboard and screen reader users
+          or anyone who would rather not play */}
+      <nav
+        aria-label="Pages"
+        className="absolute bottom-4 left-4 rounded bg-[#0b1120]/80 px-3 py-2 font-mono text-xs"
+      >
+        <ul className="space-y-1">
+          {flags.map((flag) => (
+            <li key={flag.to}>
+              <Link to={flag.to} className="text-[#94a3b8] hover:text-[#2dd4bf] hover:underline">
+                {flag.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       {/* role="status" makes screen readers announce the capture */}
       <div
