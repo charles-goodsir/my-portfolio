@@ -1,4 +1,5 @@
-import { useRef, type RefObject } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
+import { Link, useNavigate } from 'react-router'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Grid, Html } from '@react-three/drei'
 import { Vector3, type Group } from 'three'
@@ -7,6 +8,7 @@ import { navItems } from '../ui/navItems'
 const MAP_SIZE = 40
 const FLAG_RING_RADIUS = 12
 const PLAYER_SPEED = 8 // units per second
+const CAPTURE_RANGE = 1.5 // how close the player must get to a flag
 const CAMERA_OFFSET = new Vector3(0, 14, 14) // camera sits this far from the player
 
 // Reused every frame so we don't create a new vector 60 times a second
@@ -19,23 +21,34 @@ const flags = navItems
     const angle = (i / all.length) * Math.PI * 2
     return {
       ...item,
-      position: [
+      position: new Vector3(
         Math.sin(angle) * FLAG_RING_RADIUS,
         0,
         -Math.cos(angle) * FLAG_RING_RADIUS,
-      ] as [number, number, number],
+      ),
     }
   })
+
+type MapFlag = (typeof flags)[number]
 
 function Flag({
   label,
   position,
+  onClick,
 }: {
   label: string
-  position: [number, number, number]
+  position: Vector3
+  onClick: () => void
 }) {
   return (
-    <group position={position}>
+    <group
+      position={position}
+      onClick={(e) => {
+        // Stop the click reaching the ground behind the flag
+        e.stopPropagation()
+        onClick()
+      }}
+    >
       {/* Pole: cylinders are centred on their middle, so lift by half the height */}
       <mesh position-y={1.5}>
         <cylinderGeometry args={[0.08, 0.08, 3]} />
@@ -57,8 +70,15 @@ function Flag({
   )
 }
 
-function Player({ target }: { target: RefObject<Vector3> }) {
+function Player({
+  target,
+  onCapture,
+}: {
+  target: RefObject<Vector3>
+  onCapture: (flag: MapFlag) => void
+}) {
   const ref = useRef<Group>(null)
+  const captured = useRef(false)
 
   // Runs once per frame. delta = seconds since the last frame
   useFrame(({ camera }, delta) => {
@@ -73,6 +93,17 @@ function Player({ target }: { target: RefObject<Vector3> }) {
       player.position.copy(target.current)
     } else {
       player.position.addScaledVector(toTarget, step / distance)
+    }
+
+    // Close enough to a flag? Capture it, once
+    if (!captured.current) {
+      const flag = flags.find(
+        (f) => f.position.distanceTo(player.position) < CAPTURE_RANGE,
+      )
+      if (flag) {
+        captured.current = true
+        onCapture(flag)
+      }
     }
 
     // Ease the camera toward its spot behind the player
@@ -92,9 +123,27 @@ function Player({ target }: { target: RefObject<Vector3> }) {
 
 function CtfMap() {
   const target = useRef(new Vector3())
+  const [captured, setCaptured] = useState<MapFlag | null>(null)
+  const navigate = useNavigate()
+
+  // After a capture, pause a moment so the message is readable, then go
+  useEffect(() => {
+    if (!captured) return
+    const timer = setTimeout(() => navigate(captured.to), 1000)
+    return () => clearTimeout(timer)
+  }, [captured, navigate])
+
+  // Escape leaves the game
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') navigate('/')
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [navigate])
 
   return (
-    <div className="h-screen w-screen bg-[#0b1120]">
+    <div className="relative h-screen w-screen bg-[#0b1120]">
       <Canvas camera={{ position: CAMERA_OFFSET.toArray(), fov: 50 }}>
         <color attach="background" args={['#0b1120']} />
         <ambientLight intensity={0.4} />
@@ -121,11 +170,31 @@ function CtfMap() {
         />
 
         {flags.map((flag) => (
-          <Flag key={flag.to} label={flag.label} position={flag.position} />
+          <Flag
+            key={flag.to}
+            label={flag.label}
+            position={flag.position}
+            onClick={() => target.current.copy(flag.position)}
+          />
         ))}
 
-        <Player target={target} />
+        <Player target={target} onCapture={setCaptured} />
       </Canvas>
+
+      <Link
+        to="/"
+        className="absolute left-4 top-4 rounded bg-[#0b1120]/80 px-3 py-1 font-mono text-sm text-[#2dd4bf] hover:underline"
+      >
+        Exit (Esc)
+      </Link>
+
+      {/* role="status" makes screen readers announce the capture */}
+      <div
+        role="status"
+        className="pointer-events-none absolute inset-x-0 top-1/3 text-center font-mono text-2xl text-[#2dd4bf]"
+      >
+        {captured && `Flag captured: ${captured.label}`}
+      </div>
     </div>
   )
 }
