@@ -44,6 +44,34 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-12-diagnostic-logging-azu-0057',
+    date: '2026-09-25',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    title: 'Adding diagnostic logging, and testing a suppression honestly',
+    workedOn: [
+      'Added a Log Analytics workspace and two diagnostic settings: the Key Vault AuditEvent log, and the blob service read, write, and delete logs',
+      'Learned the storage setting has to target /blobServices/default, not the account: a setting on the account only collects metrics, and nothing warns you',
+      'Removed the AZU-0057 suppression on a PR commit to test whether the logging fixed the finding. Trivy still failed, because the rule only looks for the legacy Storage Analytics setting inside the storage account block',
+      'Restored the suppression without the 31 Dec expiry, with a reason naming the resource that provides the logs',
+    ],
+    body: [
+      'The logging was meant to fix the AZU-0057 finding I had accepted with a 31 Dec expiry. To check, I removed the suppression on a PR commit. An ignored finding does not appear in Trivy\'s counts, so that was the only honest test.',
+      'Trivy still failed. The rule only looks for the legacy Storage Analytics setting inside the storage account block, and the new logging lives in a separate diagnostic setting.',
+      'I restored the suppression without the expiry, with a reason that names the resource providing the logs. The expiry had meant "fail me if I forget to fix this". With logging in place, the gap is in the rule, and an expiry would fail a working pipeline.',
+      'A passing or failing check tells you what the rule looks for, not whether you are secure. When they disagree, test it, then write down which one is right and why.',
+    ],
+    screenshots: ['SecureAzureLandingZone/SALZ16.webp'],
+    tools: ['Terraform', 'Azure', 'Trivy', 'Log Analytics'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Terraform',
+      'logging',
+      'Trivy',
+      'CI/CD pipeline',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-11-terraform-install-template',
     date: '2026-09-25',
     category: 'Secure Azure Landing Zone',
