@@ -41,6 +41,20 @@ const projects: Project[] = [
     ],
   },
   {
+    id: 'portfolio',
+    title: 'Portfolio Website (You are here now!)',
+    description:
+      'This site, built with React and TypeScript. It has an optional 3D capture-the-flag map, built with Three.js, where each page is a flag you drive to',
+    technologies: [
+      'React',
+      'TypeScript',
+      'Three.js',
+      'React Three Fiber',
+      'Tailwind CSS',
+      'Vite',
+    ],
+  },
+  {
     id: 'detour',
     title: 'Detour',
     description:
@@ -97,14 +111,6 @@ const projects: Project[] = [
     description:
       'A basic React homepage with interactive calendar and date selection functionality',
     technologies: ['React', 'JavaScript', 'CSS', 'Date Picker', 'Material UI'],
-  },
-
-  {
-    id: 'portfolio',
-    title: 'Portfolio Website (You are here now!)',
-    description:
-      'A responsive portfolio website built with React and TypeScript',
-    technologies: ['React', 'TypeScript', 'Tailwind CSS', 'Vite'],
   },
 ]
 

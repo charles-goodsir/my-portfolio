@@ -10,6 +10,7 @@ import {
   Float32BufferAttribute,
   type Group,
   type Mesh,
+  type MeshBasicMaterial,
 } from 'three'
 import { MAP_SIZE, NEON_CYAN, NEON_ORANGE, WALL_CYAN } from './constants'
 import { reduceMotion } from './motion'
@@ -76,10 +77,12 @@ const streaks = [
   { along: 'z', line: 5, speed: 10, offset: 25, color: NEON_CYAN },
 ] as const
 
-// Each loop runs from just outside one wall to just outside the other, so
-// streaks appear to come in and go out through the walls
-const STREAK_LOOP = MAP_SIZE + 2
+// Each loop runs wall to wall. Streaks fade in over the first STREAK_FADE
+// units and out over the last, so they appear out of and vanish into the
+// grid instead of driving off it
+const STREAK_LOOP = MAP_SIZE
 const STREAK_LENGTH = 3
+const STREAK_FADE = 4
 
 export function Traffic() {
   const refs = useRef<(Mesh | null)[]>([])
@@ -93,6 +96,11 @@ export function Traffic() {
       const along = (((travelled % STREAK_LOOP) + STREAK_LOOP) % STREAK_LOOP) - STREAK_LOOP / 2
       if (streak.along === 'x') mesh.position.set(along, 0.05, streak.line)
       else mesh.position.set(streak.line, 0.05, along)
+
+      // How far the streak's leading tip is from the nearest wall, as a 0 → 1 fade
+      const gap = HALF - (Math.abs(along) + STREAK_LENGTH / 2)
+      const material = mesh.material as MeshBasicMaterial
+      material.opacity = Math.min(Math.max(gap / STREAK_FADE, 0), 1)
     })
   })
 
@@ -109,7 +117,7 @@ export function Traffic() {
             : [0.06, 0.06, STREAK_LENGTH]
         }
       />
-      <meshBasicMaterial color={streak.color} />
+      <meshBasicMaterial color={streak.color} transparent depthWrite={false} />
     </mesh>
   ))
 }
