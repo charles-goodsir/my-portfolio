@@ -34,7 +34,11 @@ const STOP_SHORT = 2 // clicking a flag parks this far in front of it, inside PR
 const CAPTURE_SECONDS = 1 // how long the capture effect plays before the page changes
 const HOVER_HEIGHT = 0.9 // how high the Bit floats
 const RIPPLE_SECONDS = 0.6 // how long the click ring takes to expand and fade
-const CAMERA_OFFSET = new Vector3(0, 14, 14) // camera sits this far from the player
+// Low chase camera: 6 up and 15 back, aimed LOOK_HEIGHT above the player.
+// That tips the view to about 15° down, so the horizon and skyline sit along
+// the top of the screen and the Bit sits a little below centre
+const CAMERA_OFFSET = new Vector3(0, 6, 15)
+const LOOK_HEIGHT = 2
 // Opening shot: high up on the far side of the arena. After boot the camera
 // sweeps from here down to its normal spot, turning to keep the Bit in view
 const FLY_IN_START = new Vector3(-24, 30, -16)
@@ -514,9 +518,9 @@ function Player({
     // Hold the opening shot until the boot screen has cleared
     if (!booted) return
 
-    // Ease the camera toward its spot behind the player, always looking at
-    // the player. During the fly-in it eases slower, which makes the sweep
-    lookTarget.copy(player.position)
+    // Ease the camera toward its spot behind the player, always looking just
+    // above the player. During the fly-in it eases slower, which makes the sweep
+    lookTarget.set(player.position.x, LOOK_HEIGHT, player.position.z)
     const cameraGoal = scratch.copy(player.position).add(CAMERA_OFFSET)
     if (reduceMotion) {
       camera.position.copy(cameraGoal)
@@ -629,8 +633,9 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
         />
 
         <color attach="background" args={['#000000']} />
-        {/* Anything past 20 units from the camera fades to black by 50 */}
-        <fog attach="fog" args={['#000000', 20, 50]} />
+        {/* Anything past 30 units from the camera fades to black by 70.
+            Far enough that flags across the arena stay visible from low down */}
+        <fog attach="fog" args={['#000000', 30, 70]} />
         <ambientLight intensity={0.4} />
         <directionalLight position={[10, 20, 5]} intensity={1.2} />
 
@@ -670,7 +675,7 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
           cellColor={DIM_CYAN}
           sectionColor={NEON_CYAN}
           sectionSize={5}
-          fadeDistance={45}
+          fadeDistance={70}
         />
 
         {flags.map((flag) => (
