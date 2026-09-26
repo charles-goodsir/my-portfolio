@@ -33,7 +33,9 @@ import { DevStats } from './DevStats'
 import { flags, loadCaptured, saveCaptured, type MapFlag } from './flags'
 import Flag from './Flag'
 import { Player, Ripple, type RippleState } from './Player'
-import { Stadium, Traffic, Walls } from './Scenery'
+import { Radar } from './Radar'
+import { blip, chime, fanfare, loadSoundOn, setSoundOn, startMusic, stopMusic } from './sound'
+import { NameSign, Stadium, Traffic, Walls } from './Scenery'
 import { reduceMotion } from './device'
 
 // Rendering resolution range. dpr = device pixel ratio: 2 on a retina screen
@@ -62,6 +64,7 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
   const moveTo = (x: number, z: number) => {
     target.current.set(x, 0, z)
     rippleAt(x, z, 1, RIPPLE_SECONDS)
+    blip()
   }
   // Clicking a distant flag: park STOP_SHORT from it, on the side the Bit is
   // coming from, so it never has to pass through the pole
@@ -79,6 +82,22 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
   const [savedRoutes] = useState(loadCaptured) // read once, when the map opens
   const [dpr, setDpr] = useState((MIN_DPR + MAX_DPR) / 2)
   const [lowQuality, setLowQuality] = useState(false)
+  const [soundOn, setSoundOnState] = useState(loadSoundOn)
+  const toggleSound = () => {
+    setSoundOn(!soundOn)
+    setSoundOnState(!soundOn)
+  }
+
+  // The track starts when the arena appears (after the boot screen) and stops
+  // when you leave the map. It only plays if sound is switched on
+  useEffect(() => {
+    if (!booted) return
+    // The map can load while the boot screen's sound question is still up, so
+    // read the choice again now that it has definitely been made
+    setSoundOnState(loadSoundOn())
+    startMusic()
+    return stopMusic
+  }, [booted])
   const navigate = useNavigate()
 
   // Flags that are yours: saved ones plus the one being captured right now
@@ -95,6 +114,8 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
   // After a capture, pause so the effect plays out, then go
   useEffect(() => {
     if (!captured) return
+    if (finale) fanfare()
+    else chime()
     saveCaptured([...new Set([...savedRoutes, captured.to])])
     const timer = setTimeout(
       // fromGame tells the page to fade in out of the glow (see RootLayout)
@@ -102,7 +123,7 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
       leaveSeconds * 1000,
     )
     return () => clearTimeout(timer)
-  }, [captured, navigate, savedRoutes, leaveSeconds])
+  }, [captured, navigate, savedRoutes, leaveSeconds, finale])
 
   // Finale: big rings pulse out across the grid from the centre. One for
   // reduced motion, where the ring appears at full size and fades
@@ -222,6 +243,8 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
 
         <Stadium />
 
+        <NameSign booted={booted} />
+
         <Anomaly revealed={atAnomaly} />
 
         <Player
@@ -264,6 +287,16 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
         Exit (Esc)
       </Link>
 
+      {/* aria-pressed tells screen readers this is an on/off switch */}
+      <button
+        type="button"
+        onClick={toggleSound}
+        aria-pressed={soundOn}
+        className={`absolute left-4 top-14 px-3 py-1 text-sm hover:underline ${HUD_PANEL} ${HUD_GLOW}`}
+      >
+        Sound: {soundOn ? 'on' : 'off'}
+      </button>
+
       <p className={`absolute right-4 top-4 px-3 py-1 text-sm ${HUD_PANEL} ${HUD_GLOW}`}>
         {ownedCount}/{flags.length} captured
         {allOwned && ' · grid secured'}
@@ -275,6 +308,8 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
           className={`absolute right-4 top-14 px-3 py-1 text-xs text-[#94a3b8] ${HUD_PANEL}`}
         />
       )}
+
+      <Radar player={playerPosition} owned={owned} />
 
       <p className={`absolute bottom-4 right-4 px-3 py-2 text-xs text-[#94a3b8] ${HUD_PANEL}`}>
         WASD / arrows or click to move · Enter to go in · Esc to exit

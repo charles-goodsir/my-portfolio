@@ -48,7 +48,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-09-26',
     category: 'CTF Map',
     vulnTypes: ['CTF Map'],
-    title: 'A game mode for this site, with a real flag hidden in it',
+    title: 'A game mode for this site, with a real flag hidden in it (Just for fun)',
     workedOn: [
       'Added an optional 3D capture-the-flag map at /play: each page of the site is a flag, and you drive to one and press Enter to open it',
       'Kept the normal site as the default and put all the 3D code in its own chunk, so the main bundle only grew by about 1 KB',

@@ -1,8 +1,9 @@
 // The static world: arena walls, traffic on the grid, and the stadium
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import {
   AdditiveBlending,
+  BoxGeometry,
   Color,
   BufferGeometry,
   DoubleSide,
@@ -11,6 +12,7 @@ import {
   type Mesh,
   type MeshBasicMaterial,
 } from 'three'
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { MAP_SIZE, NEON_CYAN, NEON_ORANGE, WALL_CYAN } from './constants'
 import { reduceMotion } from './device'
 
@@ -176,7 +178,44 @@ function buildCrowd() {
   return { positions, colours }
 }
 
+// Every step block, and every edge strip, merged into one geometry each. 64
+// separate meshes become 2, which saves 128 draw calls a frame (each one is
+// drawn twice because of the reflective floor). The strips carry their colour
+// per vertex, so the dim step edges and the glowing rim can share one mesh
+function buildStands() {
+  const blocks: BoxGeometry[] = []
+  const edges: BoxGeometry[] = []
+  tiers.forEach(({ distance, height }, tier) => {
+    for (const side of sides) {
+      const depthCentre = distance + STEP_DEPTH / 2
+      const span = 2 * (distance + STEP_DEPTH) // long enough to meet the next side at the corners
+
+      // The step itself: a solid black block down to the ground
+      const block = side.alongZ
+        ? new BoxGeometry(STEP_DEPTH, height, span).translate(side.x * depthCentre, height / 2, 0)
+        : new BoxGeometry(span, height, STEP_DEPTH).translate(0, height / 2, side.z * depthCentre)
+      blocks.push(block)
+
+      // Lit strip along its front edge. The top step's edge is the rim: that one glows
+      const edge = side.alongZ
+        ? new BoxGeometry(0.08, 0.08, 2 * distance).translate(side.x * distance, height, 0)
+        : new BoxGeometry(2 * distance, 0.08, 0.08).translate(0, height, side.z * distance)
+      const colour = tier === TIERS - 1 ? NEON_CYAN : TIER_EDGE
+      const vertices = edge.attributes.position.count
+      edge.setAttribute(
+        'color',
+        new Float32BufferAttribute(Array.from({ length: vertices }, () => [colour.r, colour.g, colour.b]).flat(), 3),
+      )
+      edges.push(edge)
+    }
+  })
+  const merged = { blocks: mergeGeometries(blocks), edges: mergeGeometries(edges) }
+  for (const piece of [...blocks, ...edges]) piece.dispose() // the merged copies are all that's needed
+  return merged
+}
+
 export function Stadium() {
+  const stands = useMemo(buildStands, [])
   const crowd = useMemo(() => {
     const { positions, colours } = buildCrowd()
     const geometry = new BufferGeometry()
@@ -184,6 +223,17 @@ export function Stadium() {
     geometry.setAttribute('color', new Float32BufferAttribute(colours, 3))
     return { geometry, base: colours } // base: each person's full brightness
   }, [])
+
+  // Built by hand rather than as JSX, so free their GPU memory when the map
+  // closes. Otherwise every visit to /play would leave a copy behind
+  useEffect(
+    () => () => {
+      stands.blocks.dispose()
+      stands.edges.dispose()
+      crowd.geometry.dispose()
+    },
+    [stands, crowd],
+  )
 
   // Flicker: each frame a few dozen random people dim a little or come back
   // up. Background motion, so off for reduced motion
@@ -205,44 +255,91 @@ export function Stadium() {
 
   return (
     <>
-      {tiers.map(({ distance, height }, tier) =>
-        sides.map((side) => {
-          const depthCentre = distance + STEP_DEPTH / 2
-          const span = 2 * (distance + STEP_DEPTH) // long enough to meet the next side at the corners
-          // The top step's edge is the stadium rim: that one glows
-          const edge = tier === TIERS - 1 ? NEON_CYAN : TIER_EDGE
-          return (
-            <group key={`${tier},${side.x},${side.z}`}>
-              {/* The step itself: a solid black block down to the ground */}
-              <mesh
-                position={
-                  side.alongZ
-                    ? [side.x * depthCentre, height / 2, 0]
-                    : [0, height / 2, side.z * depthCentre]
-                }
-              >
-                <boxGeometry
-                  args={side.alongZ ? [STEP_DEPTH, height, span] : [span, height, STEP_DEPTH]}
-                />
-                <meshBasicMaterial color={BLACK} />
-              </mesh>
-              {/* Lit strip along its front edge. No fog, so the far side stays visible */}
-              <mesh
-                position={side.alongZ ? [side.x * distance, height, 0] : [0, height, side.z * distance]}
-              >
-                <boxGeometry
-                  args={side.alongZ ? [0.08, 0.08, 2 * distance] : [2 * distance, 0.08, 0.08]}
-                />
-                <meshBasicMaterial color={edge} fog={false} />
-              </mesh>
-            </group>
-          )
-        }),
-      )}
+      <mesh geometry={stands.blocks}>
+        <meshBasicMaterial color={BLACK} />
+      </mesh>
+      {/* No fog on the strips, so the far side stays visible */}
+      <mesh geometry={stands.edges}>
+        <meshBasicMaterial vertexColors fog={false} />
+      </mesh>
 
       <points geometry={crowd.geometry}>
         <pointsMaterial vertexColors size={0.35} sizeAttenuation fog={false} />
       </points>
     </>
+  )
+}
+
+// Your name in lights above the far (north) stand, built from dots like a
+// stadium bulb sign, one light per dot. It sits just above the rim, low enough
+// to stay in view along the top of the screen from the chase camera. After the
+// boot screen clears it switches on a letter at a time
+const SIGN_TEXT = 'CHARLES GOODSIR'
+const SIGN_DOT = 0.5 // gap between bulbs
+const SIGN_BASE = TIERS * STEP_RISE + 1 // just above the top step
+const SIGN_DISTANCE = STAND_START + TIERS * STEP_DEPTH // the back of the stand
+const SIGN_COLOUR = new Color(2.2, 3, 3.2) // cyan-white, above 1 so it blooms
+const SECONDS_PER_LETTER = 0.12
+
+// 5 × 7 dot patterns for the letters in the sign. # is a bulb. A letter that
+// isn't here (or a space) is left blank
+const LETTERS: Record<string, string[]> = {
+  A: ['.###.', '#...#', '#...#', '#####', '#...#', '#...#', '#...#'],
+  C: ['.###.', '#...#', '#....', '#....', '#....', '#...#', '.###.'],
+  D: ['####.', '#...#', '#...#', '#...#', '#...#', '#...#', '####.'],
+  E: ['#####', '#....', '#....', '####.', '#....', '#....', '#####'],
+  G: ['.###.', '#...#', '#....', '#.###', '#...#', '#...#', '.###.'],
+  H: ['#...#', '#...#', '#...#', '#####', '#...#', '#...#', '#...#'],
+  I: ['.###.', '..#..', '..#..', '..#..', '..#..', '..#..', '.###.'],
+  L: ['#....', '#....', '#....', '#....', '#....', '#....', '#####'],
+  O: ['.###.', '#...#', '#...#', '#...#', '#...#', '#...#', '.###.'],
+  R: ['####.', '#...#', '#...#', '####.', '#.#..', '#..#.', '#...#'],
+  S: ['.####', '#....', '#....', '.###.', '....#', '....#', '####.'],
+}
+
+// Bulb positions, letter by letter. letterEnds[i] is how many bulbs there are
+// up to and including letter i, which the switch-on uses
+function buildSign() {
+  const positions: number[] = []
+  const letterEnds: number[] = []
+  const columns = SIGN_TEXT.length * 6 - 1 // 5 per letter plus a 1-column gap
+  ;[...SIGN_TEXT].forEach((char, letter) => {
+    LETTERS[char]?.forEach((row, y) =>
+      [...row].forEach((cell, x) => {
+        if (cell !== '#') return
+        // Centred on x = 0, with row 0 at the top
+        positions.push((letter * 6 + x - columns / 2) * SIGN_DOT, (6 - y) * SIGN_DOT, 0)
+      }),
+    )
+    letterEnds.push(positions.length / 3)
+  })
+  return { positions, letterEnds }
+}
+
+export function NameSign({ booted }: { booted: boolean }) {
+  const sign = useMemo(() => {
+    const { positions, letterEnds } = buildSign()
+    const geometry = new BufferGeometry()
+    geometry.setAttribute('position', new Float32BufferAttribute(positions, 3))
+    geometry.setDrawRange(0, 0) // all bulbs off until boot
+    return { geometry, letterEnds }
+  }, [])
+  const switchedOnAt = useRef<number | null>(null)
+
+  // Only draw the bulbs of the letters that are on so far
+  useFrame(({ clock }) => {
+    if (!booted) return
+    switchedOnAt.current ??= clock.elapsedTime
+    const lettersOn = reduceMotion
+      ? SIGN_TEXT.length
+      : Math.floor((clock.elapsedTime - switchedOnAt.current) / SECONDS_PER_LETTER) + 1
+    const { letterEnds } = sign
+    sign.geometry.setDrawRange(0, letterEnds[Math.min(lettersOn, letterEnds.length) - 1])
+  })
+
+  return (
+    <points geometry={sign.geometry} position={[0, SIGN_BASE, -SIGN_DISTANCE]}>
+      <pointsMaterial color={SIGN_COLOUR} size={0.45} sizeAttenuation fog={false} />
+    </points>
   )
 }
