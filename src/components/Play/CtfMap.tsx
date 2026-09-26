@@ -37,6 +37,7 @@ const NEON_CYAN = new Color(0, 2.5, 3)
 const DIM_CYAN = new Color(0, 0.25, 0.3)
 const NEON_ORANGE = new Color(3, 0.8, 0) // Tron's "other team"
 const BEAM_ORANGE = new Color(1, 0.35, 0) // below 1, so the beam stays soft
+const BEAM_CYAN = new Color(0, 0.5, 0.6) // a captured flag's beam
 const WALL_CYAN = new Color(0, 0.6, 0.7)
 const WHITE_HOT = new Color(6, 6, 6) // the flash on capture
 
@@ -46,6 +47,28 @@ const HUD_GLOW = 'text-[#2dd4bf] [text-shadow:0_0_8px_#2dd4bf]'
 
 // Read once on load. If the visitor asked for less motion, the camera jumps instead of gliding
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+// Captured flags are remembered for this browser tab, so they stay cyan after
+// you visit a page and come back. Storage can be blocked (private mode,
+// strict settings), so every read and write is wrapped and fails quietly
+const STORAGE_KEY = 'ctf-captured'
+
+function loadCaptured(): string[] {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? '[]')
+    return Array.isArray(saved) ? saved : []
+  } catch {
+    return []
+  }
+}
+
+function saveCaptured(routes: string[]) {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(routes))
+  } catch {
+    // Storage blocked: the tracker just won't survive a page change
+  }
+}
 
 // Rendering resolution range. dpr = device pixel ratio: 2 on a retina screen
 // means 4 pixels per CSS pixel. No point going above what the screen has
@@ -94,6 +117,7 @@ function Flag({
   preview,
   position,
   nearby,
+  owned,
   captured,
   onClick,
   onEnter,
@@ -102,7 +126,8 @@ function Flag({
   preview: string
   position: Vector3
   nearby: boolean
-  captured: boolean
+  owned: boolean // captured at some point this session: shown in cyan
+  captured: boolean // being captured right now: plays the flash
   onClick: () => void
   onEnter: () => void
 }) {
@@ -126,9 +151,9 @@ function Flag({
     captureStart.current ??= now
     const progress = Math.min((now - captureStart.current) / CAPTURE_SECONDS, 1)
 
-    // One flash: cloth jumps to white-hot then fades back to orange.
+    // One flash: cloth jumps to white-hot then settles on cyan, the flag is yours.
     // A single flash, never a strobe, which could trigger seizures
-    clothMaterial.current?.color.copy(WHITE_HOT).lerp(NEON_ORANGE, progress)
+    clothMaterial.current?.color.copy(WHITE_HOT).lerp(NEON_CYAN, progress)
 
     // Beam brightens and widens
     if (beamMaterial.current) beamMaterial.current.opacity = 0.15 + progress * 0.5
@@ -158,7 +183,7 @@ function Flag({
       {/* Cloth: a thin glowing box hanging off the top of the pole */}
       <mesh ref={cloth} position={[0.6, 2.6, 0]}>
         <boxGeometry args={[1.2, 0.8, 0.05]} />
-        <meshBasicMaterial ref={clothMaterial} color={NEON_ORANGE} />
+        <meshBasicMaterial ref={clothMaterial} color={owned ? NEON_CYAN : NEON_ORANGE} />
       </mesh>
 
       {/* Beam: a tall, faint, open-ended tube into the sky. Additive blending
@@ -168,7 +193,7 @@ function Flag({
         <meshBasicMaterial
           ref={beamMaterial}
           // On capture the beam switches to neon so it blooms
-          color={captured ? NEON_ORANGE : BEAM_ORANGE}
+          color={captured ? NEON_CYAN : owned ? BEAM_CYAN : BEAM_ORANGE}
           transparent
           opacity={0.15}
           blending={AdditiveBlending}
@@ -196,6 +221,7 @@ function Flag({
         ) : (
           <div className={`pointer-events-none whitespace-nowrap px-2 py-0.5 text-xs ${HUD_PANEL} ${HUD_GLOW}`}>
             {label}
+            {owned && ' ✓'}
           </div>
         )}
       </Html>
@@ -333,6 +359,7 @@ function CtfMap({ onReady }: { onReady: () => void }) {
   const target = useRef(new Vector3())
   const [nearby, setNearby] = useState<MapFlag | null>(null)
   const [captured, setCaptured] = useState<MapFlag | null>(null)
+  const [savedRoutes] = useState(loadCaptured) // read once, when the map opens
   const [dpr, setDpr] = useState((MIN_DPR + MAX_DPR) / 2)
   const [lowQuality, setLowQuality] = useState(false)
   const navigate = useNavigate()
@@ -340,9 +367,15 @@ function CtfMap({ onReady }: { onReady: () => void }) {
   // After a capture, pause a moment so the message is readable, then go
   useEffect(() => {
     if (!captured) return
+    saveCaptured([...new Set([...savedRoutes, captured.to])])
     const timer = setTimeout(() => navigate(captured.to), CAPTURE_SECONDS * 1000)
     return () => clearTimeout(timer)
-  }, [captured, navigate])
+  }, [captured, navigate, savedRoutes])
+
+  // Flags that are yours: saved ones plus the one being captured right now
+  const owned = new Set(savedRoutes)
+  if (captured) owned.add(captured.to)
+  const ownedCount = flags.filter((f) => owned.has(f.to)).length
 
   // Escape leaves the game. Enter goes into the flag you're next to
   useEffect(() => {
@@ -427,6 +460,7 @@ function CtfMap({ onReady }: { onReady: () => void }) {
             preview={flag.preview}
             position={flag.position}
             nearby={nearby === flag}
+            owned={owned.has(flag.to)}
             captured={captured === flag}
             // Far away: walk there. Already there: go in
             onClick={() =>
@@ -455,6 +489,10 @@ function CtfMap({ onReady }: { onReady: () => void }) {
       >
         Exit (Esc)
       </Link>
+
+      <p className={`absolute right-4 top-4 px-3 py-1 text-sm ${HUD_PANEL} ${HUD_GLOW}`}>
+        {ownedCount}/{flags.length} captured
+      </p>
 
       {/* Plain links to every page, for keyboard and screen reader users
           or anyone who would rather not play */}
