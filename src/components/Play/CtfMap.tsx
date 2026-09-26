@@ -18,6 +18,7 @@ import {
   FLY_IN_START,
   FRINGE_OFFSET,
   GLOW_COLOUR,
+  HUD_FONT,
   HUD_GLOW,
   HUD_PANEL,
   MAP_SIZE,
@@ -227,7 +228,7 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
       {/* role="status" makes screen readers announce the capture */}
       <div
         role="status"
-        className={`pointer-events-none absolute inset-x-0 top-1/3 text-center font-mono text-2xl ${HUD_GLOW}`}
+        className={`pointer-events-none absolute inset-x-0 top-1/3 text-center text-2xl ${HUD_FONT} ${HUD_GLOW}`}
       >
         {captured && `Flag captured: ${captured.label}`}
         {!captured && nearby && (

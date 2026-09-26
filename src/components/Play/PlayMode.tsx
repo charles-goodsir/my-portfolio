@@ -1,6 +1,12 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { navItems } from '../ui/navItems'
 import { reduceMotion } from './motion'
+// Self-hosted fonts, bundled with the site instead of fetched from Google:
+// no third-party request, nothing sent about the visitor. Only the small
+// @font-face rules load up front. Browsers download a font file the first
+// time text actually uses it, which only happens on /play
+import '@fontsource/vt323/latin-400.css' // boot screen
+import '@fontsource/share-tech-mono/latin-400.css' // HUD
 
 // The 3D map (and Three.js) only downloads when someone opens /play.
 // This file stays small so the boot screen shows instantly while that happens
@@ -63,12 +69,12 @@ function BootScreen({ ready, onDone }: { ready: boolean; onDone: () => void }) {
       {/* Hidden from screen readers, which would read it a letter at a time */}
       <pre
         aria-hidden
-        className="min-w-[30ch] font-mono text-sm text-[#2dd4bf] [text-shadow:0_0_8px_#2dd4bf]"
+        className="min-w-[30ch] font-['VT323',monospace] text-xl leading-snug text-[#2dd4bf] [text-shadow:0_0_8px_#2dd4bf]"
       >
         {BOOT_TEXT.slice(0, typed)}
         <span className="animate-pulse">█</span>
       </pre>
-      <p className="absolute bottom-6 font-mono text-xs text-[#94a3b8]">
+      <p className="absolute bottom-6 font-['VT323',monospace] text-base text-[#94a3b8]">
         Click or press any key to skip
       </p>
       <p role="status" className="sr-only">
