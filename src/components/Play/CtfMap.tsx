@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Edges, Grid, Html, MeshReflectorMaterial, Trail } from '@react-three/drei'
+import {
+  Edges,
+  Grid,
+  Html,
+  MeshReflectorMaterial,
+  PerformanceMonitor,
+  Trail,
+} from '@react-three/drei'
 import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing'
 import {
   AdditiveBlending,
@@ -37,6 +44,11 @@ const HUD_GLOW = 'text-[#2dd4bf] [text-shadow:0_0_8px_#2dd4bf]'
 
 // Read once on load. If the visitor asked for less motion, the camera jumps instead of gliding
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+// Rendering resolution range. dpr = device pixel ratio: 2 on a retina screen
+// means 4 pixels per CSS pixel. No point going above what the screen has
+const MIN_DPR = 0.5
+const MAX_DPR = Math.min(2, window.devicePixelRatio)
 
 // Reused every frame so we don't create a new vector 60 times a second
 const scratch = new Vector3()
@@ -279,6 +291,8 @@ function Player({
 function CtfMap() {
   const target = useRef(new Vector3())
   const [captured, setCaptured] = useState<MapFlag | null>(null)
+  const [dpr, setDpr] = useState((MIN_DPR + MAX_DPR) / 2)
+  const [lowQuality, setLowQuality] = useState(false)
   const navigate = useNavigate()
 
   // After a capture, pause a moment so the message is readable, then go
@@ -299,7 +313,19 @@ function CtfMap() {
 
   return (
     <div className="relative h-screen w-screen bg-black">
-      <Canvas camera={{ position: CAMERA_OFFSET.toArray(), fov: 50 }}>
+      <Canvas dpr={dpr} camera={{ position: CAMERA_OFFSET.toArray(), fov: 50 }}>
+        {/* Watches the frame rate. factor drifts from 0 (struggling) to 1
+            (plenty of headroom) and we map it onto the resolution. If it
+            bottoms out, or keeps flip-flopping, turn reflections off for good */}
+        <PerformanceMonitor
+          onChange={({ factor }) => {
+            setDpr(Math.round((MIN_DPR + (MAX_DPR - MIN_DPR) * factor) * 10) / 10)
+            // < 0.05 not === 0: stepping down by 0.1 leaves float crumbs like 2.7e-17
+            if (factor < 0.05) setLowQuality(true)
+          }}
+          onFallback={() => setLowQuality(true)}
+        />
+
         <color attach="background" args={['#000000']} />
         {/* Anything past 20 units from the camera fades to black by 50 */}
         <fog attach="fog" args={['#000000', 20, 50]} />
@@ -319,16 +345,20 @@ function CtfMap() {
               so a near-black floor needs a big mixStrength or the
               reflection multiplies down to nothing. Neutral grey so orange
               reflects as well as cyan */}
-          <MeshReflectorMaterial
-            color="#101010"
-            resolution={512}
-            blur={[300, 100]} // blur across / along the floor
-            mixBlur={1} // how much the blur softens the reflection
-            mixStrength={50} // reflection brightness
-            mirror={0.5} // 0 = matte, 1 = perfect mirror
-            roughness={0.8}
-            metalness={0.5}
-          />
+          {lowQuality ? (
+            <meshStandardMaterial color="#020409" />
+          ) : (
+            <MeshReflectorMaterial
+              color="#101010"
+              resolution={512}
+              blur={[300, 100]} // blur across / along the floor
+              mixBlur={1} // how much the blur softens the reflection
+              mixStrength={50} // reflection brightness
+              mirror={0.5} // 0 = matte, 1 = perfect mirror
+              roughness={0.8}
+              metalness={0.5}
+            />
+          )}
         </mesh>
 
         {/* Grid lines sit just above the ground so they don't flicker */}
