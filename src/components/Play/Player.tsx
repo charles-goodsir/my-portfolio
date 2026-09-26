@@ -1,5 +1,5 @@
 // The Bit, the camera that follows it, and the ripple where you click
-import { useRef, type RefObject } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Edges, Trail } from '@react-three/drei'
 import {
@@ -16,6 +16,7 @@ import {
   FLY_IN_RATE,
   HOVER_HEIGHT,
   LOOK_HEIGHT,
+  MAP_SIZE,
   NEON_CYAN,
   PLAYER_SPEED,
   PREVIEW_RANGE,
@@ -63,6 +64,26 @@ export function Ripple({ ripple }: { ripple: RefObject<RippleState> }) {
   )
 }
 
+// Keyboard driving. Directions are fixed to the screen, which works because
+// the camera never turns. e.code is the physical key, so WASD stays in the
+// same place on AZERTY and other layouts. Values are [x, z]
+const KEY_DIRECTIONS: Record<string, [number, number]> = {
+  KeyW: [0, -1],
+  ArrowUp: [0, -1],
+  KeyS: [0, 1],
+  ArrowDown: [0, 1],
+  KeyA: [-1, 0],
+  ArrowLeft: [-1, 0],
+  KeyD: [1, 0],
+  ArrowRight: [1, 0],
+}
+
+// Keep the Bit (and anywhere it's heading) a unit inside the walls
+const EDGE = MAP_SIZE / 2 - 1
+const ARENA_MIN = new Vector3(-EDGE, 0, -EDGE)
+const ARENA_MAX = new Vector3(EDGE, 0, EDGE)
+const keyDirection = new Vector3()
+
 export function Player({
   target,
   booted,
@@ -79,11 +100,51 @@ export function Player({
   const tilt = useRef<Group>(null)
   const spin = useRef<Group>(null)
   const near = useRef<MapFlag | null>(null)
+  const heldKeys = useRef(new Set<string>())
+
+  // Track which driving keys are held down
+  useEffect(() => {
+    const held = heldKeys.current
+    const down = (e: KeyboardEvent) => {
+      if (!(e.code in KEY_DIRECTIONS)) return
+      e.preventDefault() // stop arrow keys scrolling the page
+      held.add(e.code)
+    }
+    const up = (e: KeyboardEvent) => held.delete(e.code)
+    // Switching tabs mid-press means the key-up never arrives. Without this
+    // the Bit would keep driving on its own when you come back
+    const clear = () => held.clear()
+    window.addEventListener('keydown', down)
+    window.addEventListener('keyup', up)
+    window.addEventListener('blur', clear)
+    return () => {
+      window.removeEventListener('keydown', down)
+      window.removeEventListener('keyup', up)
+      window.removeEventListener('blur', clear)
+    }
+  }, [])
 
   // Runs once per frame. delta = seconds since the last frame
   useFrame(({ camera, clock }, delta) => {
     const player = ref.current
     if (!player) return
+
+    // Keyboard: while keys are held, keep the target one unit ahead in that
+    // direction. That replaces any click target, and the normal movement below
+    // does the rest (speed, turning, leaning). Let go and the Bit coasts that
+    // last unit and stops. Diagonals are normalised so they aren't faster
+    keyDirection.set(0, 0, 0)
+    if (booted && !captured) {
+      for (const code of heldKeys.current) {
+        const [x, z] = KEY_DIRECTIONS[code]
+        keyDirection.x += x
+        keyDirection.z += z
+      }
+    }
+    if (keyDirection.lengthSq() > 0) {
+      target.current.copy(player.position).add(keyDirection.normalize())
+    }
+    target.current.clamp(ARENA_MIN, ARENA_MAX)
 
     // Step toward the target, or land on it if this step would overshoot
     const toTarget = scratch.copy(target.current).sub(player.position)

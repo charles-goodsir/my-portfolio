@@ -208,6 +208,10 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
         {ownedCount}/{flags.length} captured
       </p>
 
+      <p className={`absolute bottom-4 right-4 px-3 py-2 text-xs text-[#94a3b8] ${HUD_PANEL}`}>
+        WASD / arrows or click to move · Enter to go in · Esc to exit
+      </p>
+
       {/* Plain links to every page, for keyboard and screen reader users
           or anyone who would rather not play */}
       <nav
