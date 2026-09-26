@@ -233,8 +233,11 @@ function Flag({
       </group>
 
       {/* In range: the label opens into a hologram panel you can click.
-          Otherwise just the name. The panel floats above the symbol */}
-      <Html position-y={nearby ? 6 : 3.5} center>
+          Otherwise just the name. Both hang from the same point above the
+          cloth: the panel is lifted by its own height (-translate-y-1/2 on
+          top of Html's centring), so its bottom edge sits there and it stays
+          attached to this flag instead of floating over the ones behind */}
+      <Html position-y={3.5} center>
         {nearby ? (
           <button
             type="button"
@@ -243,7 +246,7 @@ function Flag({
               e.stopPropagation()
               onEnter()
             }}
-            className={`animate-fade-in block w-56 px-3 py-2 text-left ${HUD_PANEL}`}
+            className={`animate-fade-in block w-56 -translate-y-1/2 px-3 py-2 text-left ${HUD_PANEL}`}
           >
             <span className={`block text-sm ${HUD_GLOW}`}>{label}</span>
             <span className="mt-1 block text-xs text-[#94a3b8]">{preview}</span>

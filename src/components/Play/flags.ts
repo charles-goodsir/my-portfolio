@@ -3,7 +3,7 @@
 import { Vector3 } from 'three'
 import { navItems } from '../ui/navItems'
 import { cyberDiaryEntries } from '../../data/cyberDiaryEntries'
-import { FLAG_RING_RADIUS, STOP_SHORT } from './constants'
+import { FLAG_RING_RADIUS } from './constants'
 
 // Captured flags are remembered for this browser tab, so they stay cyan after
 // you visit a page and come back. Storage can be blocked (private mode,
@@ -51,11 +51,6 @@ export const flags = navItems
       ...item,
       preview: previews[item.to] ?? '',
       position,
-      // Where the player parks when you click this flag: STOP_SHORT units
-      // from the pole, on the side facing the centre of the arena.
-      // ponytail: always the inner side, so coming from behind the ring the
-      // Bit passes through the pole. Use the player's position if that matters
-      approach: position.clone().multiplyScalar((FLAG_RING_RADIUS - STOP_SHORT) / FLAG_RING_RADIUS),
     }
   })
 

@@ -92,12 +92,14 @@ export function Player({
   captured,
   onNear,
   onAnomaly,
+  position,
 }: {
   target: RefObject<Vector3>
   booted: boolean
   captured: MapFlag | null
   onNear: (flag: MapFlag | null) => void
   onAnomaly: (inRange: boolean) => void
+  position: RefObject<Vector3> // kept up to date with where the Bit is, for CtfMap
 }) {
   const ref = useRef<Group>(null)
   const flyingIn = useRef(!reduceMotion)
@@ -176,6 +178,8 @@ export function Player({
 
     // Slow spin
     if (spin.current && !reduceMotion) spin.current.rotation.y += delta * 1.2
+
+    position.current.copy(player.position)
 
     // Which flag (if any) is in range? Only tell React when that changes,
     // not 60 times a second

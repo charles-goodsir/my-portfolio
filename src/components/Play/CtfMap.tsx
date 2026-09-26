@@ -23,6 +23,7 @@ import {
   HUD_PANEL,
   MAP_SIZE,
   NEON_CYAN,
+  STOP_SHORT,
 } from './constants'
 import { Anomaly } from './Anomaly'
 import { flags, loadCaptured, saveCaptured, type MapFlag } from './flags'
@@ -38,6 +39,7 @@ const MAX_DPR = Math.min(2, window.devicePixelRatio)
 
 function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
   const target = useRef(new Vector3())
+  const playerPosition = useRef(new Vector3())
   const ripple = useRef<RippleState>({ position: new Vector3(), start: -Infinity })
 
   // Send the player somewhere and ripple the floor there
@@ -46,6 +48,16 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
     ripple.current.position.set(x, 0.02, z)
     ripple.current.start = performance.now() / 1000
   }
+  // Clicking a distant flag: park STOP_SHORT from it, on the side the Bit is
+  // coming from, so it never has to pass through the pole
+  const approach = (flag: MapFlag) => {
+    const stop = new Vector3().subVectors(playerPosition.current, flag.position).setY(0)
+    // Standing right on it: use the side facing the centre instead
+    if (stop.lengthSq() < 0.01) stop.copy(flag.position).negate()
+    stop.setLength(STOP_SHORT).add(flag.position)
+    moveTo(stop.x, stop.z)
+  }
+
   const [nearby, setNearby] = useState<MapFlag | null>(null)
   const [atAnomaly, setAtAnomaly] = useState(false)
   const [captured, setCaptured] = useState<MapFlag | null>(null)
@@ -160,7 +172,7 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
             captured={captured === flag}
             // Far away: walk there. Already there: go in
             onClick={() =>
-              nearby === flag ? setCaptured(flag) : moveTo(flag.approach.x, flag.approach.z)
+              nearby === flag ? setCaptured(flag) : approach(flag)
             }
             onEnter={() => setCaptured(flag)}
           />
@@ -182,6 +194,7 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
           captured={captured}
           onNear={setNearby}
           onAnomaly={setAtAnomaly}
+          position={playerPosition}
         />
 
         {/* Bloom runs after the scene is drawn and blurs light out of

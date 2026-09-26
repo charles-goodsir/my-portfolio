@@ -8,6 +8,7 @@ import {
   CylinderGeometry,
   DoubleSide,
   Float32BufferAttribute,
+  type Group,
   type Mesh,
 } from 'three'
 import { MAP_SIZE, NEON_CYAN, NEON_ORANGE, WALL_CYAN } from './constants'
@@ -23,8 +24,26 @@ const walls: [number, number, number][] = [
 ]
 
 export function Walls() {
-  return walls.map(([x, z, rotation]) => (
-    <group key={`${x},${z}`} position={[x, 0, z]} rotation-y={rotation}>
+  const refs = useRef<(Group | null)[]>([])
+
+  // The camera sits behind the Bit, so near the edge it can end up outside the
+  // arena, looking through a wall. Hide whichever wall it's behind
+  useFrame(({ camera }) => {
+    walls.forEach(([x, z], i) => {
+      const wall = refs.current[i]
+      if (!wall) return
+      const outside = x === 0 ? Math.sign(z) * camera.position.z > HALF : Math.sign(x) * camera.position.x > HALF
+      wall.visible = !outside
+    })
+  })
+
+  return walls.map(([x, z, rotation], i) => (
+    <group
+      key={`${x},${z}`}
+      ref={(wall) => void (refs.current[i] = wall)}
+      position={[x, 0, z]}
+      rotation-y={rotation}
+    >
       {/* Faint see-through panel, visible from both sides */}
       <mesh position-y={0.75}>
         <planeGeometry args={[MAP_SIZE, 1.5]} />
@@ -100,7 +119,10 @@ export function Traffic() {
 // which would otherwise turn it the same black as the sky
 const HORIZON_RADIUS = 80
 const SKYLINE_DISTANCE = 70
-const HORIZON_GLOW = new Color(0, 0.35, 0.45)
+const HORIZON_GLOW = new Color(0, 0.3, 0.38)
+// The glow fades to black this far up. Kept low so the sky above stays black
+// and the glow reads as a thin band at the horizon
+const GLOW_HEIGHT = 10
 const BLACK = new Color(0, 0, 0)
 
 // Worked out from the index, not Math.random, so the skyline is the same on
@@ -119,8 +141,8 @@ export function Horizon() {
   // A tall open cylinder round the whole world. Its bottom edge is coloured
   // glow and its top edge black, and the GPU blends between them: a gradient
   const glow = useMemo(() => {
-    const geometry = new CylinderGeometry(HORIZON_RADIUS, HORIZON_RADIUS, 30, 64, 1, true)
-    geometry.translate(0, 15, 0) // sit it on the ground instead of centred on it
+    const geometry = new CylinderGeometry(HORIZON_RADIUS, HORIZON_RADIUS, GLOW_HEIGHT, 64, 1, true)
+    geometry.translate(0, GLOW_HEIGHT / 2, 0) // sit it on the ground instead of centred on it
     const { position } = geometry.attributes
     const colours: number[] = []
     for (let i = 0; i < position.count; i++) {

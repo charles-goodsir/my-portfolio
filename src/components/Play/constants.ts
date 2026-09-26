@@ -43,5 +43,5 @@ export const WHITE_HOT = new Color(6, 6, 6) // the flash on capture
 export const HUD_FONT = "font-['Share_Tech_Mono',monospace]"
 
 // Shared look for the HTML overlays: dark glass panel, glowing cyan text
-export const HUD_PANEL = `rounded border border-[#2dd4bf]/40 bg-black/70 ${HUD_FONT}`
+export const HUD_PANEL = `rounded border border-[#2dd4bf]/40 bg-black/85 ${HUD_FONT}`
 export const HUD_GLOW = 'text-[#2dd4bf] [text-shadow:0_0_8px_#2dd4bf]'
