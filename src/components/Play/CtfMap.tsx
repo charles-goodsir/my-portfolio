@@ -29,7 +29,7 @@ import { Anomaly } from './Anomaly'
 import { flags, loadCaptured, saveCaptured, type MapFlag } from './flags'
 import Flag from './Flag'
 import { Player, Ripple, type RippleState } from './Player'
-import { Horizon, Traffic, Walls } from './Scenery'
+import { Stadium, Traffic, Walls } from './Scenery'
 import { reduceMotion } from './motion'
 
 // Rendering resolution range. dpr = device pixel ratio: 2 on a retina screen
@@ -184,7 +184,7 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
 
         <Traffic />
 
-        <Horizon />
+        <Stadium />
 
         <Anomaly revealed={atAnomaly} />
 

@@ -1,11 +1,10 @@
-// The static world: arena walls, traffic on the grid, and the horizon
+// The static world: arena walls, traffic on the grid, and the stadium
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import {
   AdditiveBlending,
-  BackSide,
   Color,
-  CylinderGeometry,
+  BufferGeometry,
   DoubleSide,
   Float32BufferAttribute,
   type Group,
@@ -122,87 +121,128 @@ export function Traffic() {
   ))
 }
 
-// The world past the walls: a glowing band low on the horizon, and a ring of
-// black mountains and towers cut out against it. All of it ignores the fog,
-// which would otherwise turn it the same black as the sky
-const HORIZON_RADIUS = 80
-const SKYLINE_DISTANCE = 70
-const HORIZON_GLOW = new Color(0, 0.3, 0.38)
-// The glow fades to black this far up. Kept low so the sky above stays black
-// and the glow reads as a thin band at the horizon
-const GLOW_HEIGHT = 10
+// The stadium, after the disc-game arena in Tron: Legacy. Stepped black tiers
+// rise on all four sides, each step with a lit front edge and a crowd of small
+// lights on top. It starts far enough out that the chase camera (15 units
+// behind the Bit) never ends up inside the stands
+const STAND_START = HALF + 16
+const TIERS = 8
+const STEP_DEPTH = 2 // how deep each step is
+const STEP_RISE = 1.5 // how much higher each step is than the one in front
 const BLACK = new Color(0, 0, 0)
+const TIER_EDGE = new Color(0, 0.5, 0.6) // below 1, so the step edges don't bloom
+const CROWD_COLOURS = [
+  new Color(0, 0.7, 0.9), // most of the crowd
+  new Color(1, 0.45, 0.1), // some orange
+  new Color(0.8, 0.8, 0.8), // a few white
+]
+const CROWD_PER_UNIT = 1 // seats per unit of step length
+const FLICKERS_PER_FRAME = 40
 
-// Worked out from the index, not Math.random, so the skyline is the same on
-// every visit. Every third shape is a tower, the rest are four-sided mountains
-const skyline = Array.from({ length: 18 }, (_, i) => {
-  const tower = i % 3 === 0
-  return {
-    angle: (i / 18) * Math.PI * 2 + Math.sin(i * 12.9) * 0.15,
-    tower,
-    height: tower ? 18 + (i % 4) * 4 : 6 + ((i * 7) % 5) * 3,
-    width: tower ? 1.5 : 6 + ((i * 3) % 4) * 3,
-  }
-})
+const tiers = Array.from({ length: TIERS }, (_, i) => ({
+  distance: STAND_START + i * STEP_DEPTH, // from the centre to the front of this step
+  height: (i + 1) * STEP_RISE,
+}))
 
-export function Horizon() {
-  // A tall open cylinder round the whole world. Its bottom edge is coloured
-  // glow and its top edge black, and the GPU blends between them: a gradient
-  const glow = useMemo(() => {
-    const geometry = new CylinderGeometry(HORIZON_RADIUS, HORIZON_RADIUS, GLOW_HEIGHT, 64, 1, true)
-    geometry.translate(0, GLOW_HEIGHT / 2, 0) // sit it on the ground instead of centred on it
-    const { position } = geometry.attributes
-    const colours: number[] = []
-    for (let i = 0; i < position.count; i++) {
-      const colour = position.getY(i) < 1 ? HORIZON_GLOW : BLACK
-      colours.push(colour.r, colour.g, colour.b)
+// The four sides of a square ring: which way it faces, and whether it runs
+// along z (east and west) rather than x (north and south)
+const sides = [
+  { x: 0, z: -1, alongZ: false },
+  { x: 0, z: 1, alongZ: false },
+  { x: -1, z: 0, alongZ: true },
+  { x: 1, z: 0, alongZ: true },
+]
+
+// One light per person, scattered over the top of every step, with some
+// empty seats. Built once, as plain number arrays for the GPU
+function buildCrowd() {
+  const positions: number[] = []
+  const colours: number[] = []
+  for (const { distance, height } of tiers) {
+    for (const side of sides) {
+      const length = 2 * distance
+      for (let seat = 0; seat < length * CROWD_PER_UNIT; seat++) {
+        if (Math.random() < 0.25) continue // empty seat
+        const along = (Math.random() - 0.5) * length
+        const depth = distance + Math.random() * STEP_DEPTH
+        if (side.alongZ) positions.push(side.x * depth, height + 0.3, along)
+        else positions.push(along, height + 0.3, side.z * depth)
+        const pick = Math.random()
+        const colour = CROWD_COLOURS[pick < 0.7 ? 0 : pick < 0.9 ? 1 : 2]
+        colours.push(colour.r, colour.g, colour.b)
+      }
     }
+  }
+  return { positions, colours }
+}
+
+export function Stadium() {
+  const crowd = useMemo(() => {
+    const { positions, colours } = buildCrowd()
+    const geometry = new BufferGeometry()
+    geometry.setAttribute('position', new Float32BufferAttribute(positions, 3))
     geometry.setAttribute('color', new Float32BufferAttribute(colours, 3))
-    return geometry
+    return { geometry, base: colours } // base: each person's full brightness
   }, [])
+
+  // Flicker: each frame a few dozen random people dim a little or come back
+  // up. Background motion, so off for reduced motion
+  useFrame(() => {
+    if (reduceMotion) return
+    const colour = crowd.geometry.attributes.color
+    for (let n = 0; n < FLICKERS_PER_FRAME; n++) {
+      const i = Math.floor(Math.random() * colour.count)
+      const brightness = 0.3 + Math.random() * 0.7
+      colour.setXYZ(
+        i,
+        crowd.base[i * 3] * brightness,
+        crowd.base[i * 3 + 1] * brightness,
+        crowd.base[i * 3 + 2] * brightness,
+      )
+    }
+    colour.needsUpdate = true // tell three.js to send the changed colours to the GPU
+  })
 
   return (
     <>
-      {/* BackSide: we're inside the cylinder, looking at its inner faces */}
-      <mesh geometry={glow}>
-        <meshBasicMaterial
-          vertexColors
-          side={BackSide}
-          fog={false}
-          transparent
-          blending={AdditiveBlending}
-          depthWrite={false}
-        />
-      </mesh>
+      {tiers.map(({ distance, height }, tier) =>
+        sides.map((side) => {
+          const depthCentre = distance + STEP_DEPTH / 2
+          const span = 2 * (distance + STEP_DEPTH) // long enough to meet the next side at the corners
+          // The top step's edge is the stadium rim: that one glows
+          const edge = tier === TIERS - 1 ? NEON_CYAN : TIER_EDGE
+          return (
+            <group key={`${tier},${side.x},${side.z}`}>
+              {/* The step itself: a solid black block down to the ground */}
+              <mesh
+                position={
+                  side.alongZ
+                    ? [side.x * depthCentre, height / 2, 0]
+                    : [0, height / 2, side.z * depthCentre]
+                }
+              >
+                <boxGeometry
+                  args={side.alongZ ? [STEP_DEPTH, height, span] : [span, height, STEP_DEPTH]}
+                />
+                <meshBasicMaterial color={BLACK} />
+              </mesh>
+              {/* Lit strip along its front edge. No fog, so the far side stays visible */}
+              <mesh
+                position={side.alongZ ? [side.x * distance, height, 0] : [0, height, side.z * distance]}
+              >
+                <boxGeometry
+                  args={side.alongZ ? [0.08, 0.08, 2 * distance] : [2 * distance, 0.08, 0.08]}
+                />
+                <meshBasicMaterial color={edge} fog={false} />
+              </mesh>
+            </group>
+          )
+        }),
+      )}
 
-      {/* A thin bright line right on the horizon, which blooms */}
-      <mesh position-y={0.1}>
-        <cylinderGeometry args={[HORIZON_RADIUS - 0.5, HORIZON_RADIUS - 0.5, 0.15, 64, 1, true]} />
-        <meshBasicMaterial color={NEON_CYAN} side={BackSide} fog={false} />
-      </mesh>
-
-      {skyline.map(({ angle, tower, height, width }, i) => (
-        <group
-          key={i}
-          position={[Math.sin(angle) * SKYLINE_DISTANCE, 0, Math.cos(angle) * SKYLINE_DISTANCE]}
-        >
-          <mesh position-y={height / 2}>
-            {tower ? (
-              <boxGeometry args={[width, height, width]} />
-            ) : (
-              <coneGeometry args={[width, height, 4]} />
-            )}
-            <meshBasicMaterial color={BLACK} fog={false} />
-          </mesh>
-          {/* A small warning light on top of each tower */}
-          {tower && (
-            <mesh position-y={height + 0.3}>
-              <boxGeometry args={[0.4, 0.4, 0.4]} />
-              <meshBasicMaterial color={NEON_ORANGE} fog={false} />
-            </mesh>
-          )}
-        </group>
-      ))}
+      <points geometry={crowd.geometry}>
+        <pointsMaterial vertexColors size={0.35} sizeAttenuation fog={false} />
+      </points>
     </>
   )
 }
