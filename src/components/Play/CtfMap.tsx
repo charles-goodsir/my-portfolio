@@ -273,6 +273,58 @@ function Walls() {
   ))
 }
 
+// Other programs racing along the grid lines, on fixed loops. along = which
+// way it travels, line = which grid line it rides, speed in units/second
+// (negative = the other way), offset = where on the loop it starts
+const streaks = [
+  { along: 'x', line: -15, speed: 10, offset: 0, color: NEON_CYAN },
+  { along: 'x', line: 15, speed: -8, offset: 20, color: NEON_CYAN },
+  { along: 'x', line: -5, speed: 12, offset: 30, color: NEON_ORANGE },
+  { along: 'x', line: 10, speed: -11, offset: 8, color: NEON_CYAN },
+  { along: 'z', line: -15, speed: 9, offset: 12, color: NEON_CYAN },
+  { along: 'z', line: 15, speed: -12, offset: 35, color: NEON_ORANGE },
+  { along: 'z', line: 5, speed: 10, offset: 25, color: NEON_CYAN },
+  { along: 'z', line: -10, speed: -9, offset: 4, color: NEON_CYAN },
+] as const
+
+// Each loop runs from just outside one wall to just outside the other, so
+// streaks appear to come in and go out through the walls
+const STREAK_LOOP = MAP_SIZE + 2
+const STREAK_LENGTH = 3
+
+function Traffic() {
+  const refs = useRef<(Mesh | null)[]>([])
+
+  useFrame(({ clock }) => {
+    streaks.forEach((streak, i) => {
+      const mesh = refs.current[i]
+      if (!mesh) return
+      // % in JS keeps the sign, so add the loop back on to wrap negatives too
+      const travelled = clock.elapsedTime * streak.speed + streak.offset
+      const along = (((travelled % STREAK_LOOP) + STREAK_LOOP) % STREAK_LOOP) - STREAK_LOOP / 2
+      if (streak.along === 'x') mesh.position.set(along, 0.05, streak.line)
+      else mesh.position.set(streak.line, 0.05, along)
+    })
+  })
+
+  // Ambient motion the visitor didn't cause, so hidden for reduced motion
+  if (reduceMotion) return null
+
+  return streaks.map((streak, i) => (
+    <mesh key={i} ref={(mesh) => void (refs.current[i] = mesh)}>
+      {/* A long thin bar pointing along its direction of travel */}
+      <boxGeometry
+        args={
+          streak.along === 'x'
+            ? [STREAK_LENGTH, 0.06, 0.06]
+            : [0.06, 0.06, STREAK_LENGTH]
+        }
+      />
+      <meshBasicMaterial color={streak.color} />
+    </mesh>
+  ))
+}
+
 type RippleState = { position: Vector3; start: number }
 
 // One glowing ring on the floor, reused for every click: each click moves it
@@ -559,6 +611,8 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
         <Walls />
 
         <Ripple ripple={ripple} />
+
+        <Traffic />
 
         <Player target={target} booted={booted} captured={captured} onNear={setNearby} />
 
