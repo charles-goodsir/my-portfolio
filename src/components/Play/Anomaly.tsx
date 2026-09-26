@@ -5,7 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import { Edges, Html } from '@react-three/drei'
 import type { Mesh } from 'three'
 import { ANOMALY_POSITION, ANOMALY_RED, HUD_PANEL } from './constants'
-import { reduceMotion } from './motion'
+import { reduceMotion } from './device'
 
 // Base64, so searching the page's code for "flag{" finds nothing.
 // Spotting and decoding this is a fair way to solve it too

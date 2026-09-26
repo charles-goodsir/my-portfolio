@@ -12,7 +12,7 @@ import {
   type MeshBasicMaterial,
 } from 'three'
 import { MAP_SIZE, NEON_CYAN, NEON_ORANGE, WALL_CYAN } from './constants'
-import { reduceMotion } from './motion'
+import { reduceMotion } from './device'
 
 // The four arena walls sit on the edges of the floor: [x, z, rotation]
 const HALF = MAP_SIZE / 2

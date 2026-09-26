@@ -20,7 +20,7 @@ import {
   NEON_ORANGE,
   WHITE_HOT,
 } from './constants'
-import { reduceMotion } from './motion'
+import { reduceMotion } from './device'
 
 // One piece of a hologram symbol: a barely-there fill with glowing edges.
 // children is the shape, e.g. <boxGeometry />

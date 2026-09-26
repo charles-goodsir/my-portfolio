@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
+import { Link } from 'react-router'
 import { navItems } from '../ui/navItems'
-import { reduceMotion } from './motion'
+import { hasFinePointer, reduceMotion } from './device'
 // Self-hosted fonts, bundled with the site instead of fetched from Google:
 // no third-party request, nothing sent about the visitor. Only the small
 // @font-face rules load up front. Browsers download a font file the first
@@ -88,6 +89,22 @@ function BootScreen({ ready, onDone }: { ready: boolean; onDone: () => void }) {
 function PlayMode() {
   const [ready, setReady] = useState(false)
   const [booted, setBooted] = useState(false)
+
+  // Phones and touch-only tablets: explain instead of loading the game. The
+  // Play buttons are hidden there, but a shared link can still land here
+  if (!hasFinePointer) {
+    return (
+      <div className="flex h-screen w-screen flex-col items-center justify-center gap-6 bg-black px-6 text-center font-['VT323',monospace] text-xl text-[#2dd4bf] [text-shadow:0_0_8px_#2dd4bf]">
+        <p>&gt; NO KEYBOARD OR MOUSE DETECTED</p>
+        <p className="text-[#94a3b8] [text-shadow:none]">
+          The CTF map needs a keyboard or a mouse. Try it on a computer.
+        </p>
+        <Link to="/" className="underline underline-offset-4">
+          Back to the site
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <div className="relative h-screen w-screen bg-black">

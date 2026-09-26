@@ -14,6 +14,8 @@ import { Vector3 } from 'three'
 import {
   CAMERA_OFFSET,
   CAPTURE_SECONDS,
+  FINALE_PULSES,
+  FINALE_SECONDS,
   DIM_CYAN,
   FLY_IN_START,
   FRINGE_OFFSET,
@@ -23,14 +25,16 @@ import {
   HUD_PANEL,
   MAP_SIZE,
   NEON_CYAN,
+  RIPPLE_SECONDS,
   STOP_SHORT,
 } from './constants'
 import { Anomaly } from './Anomaly'
+import { DevStats } from './DevStats'
 import { flags, loadCaptured, saveCaptured, type MapFlag } from './flags'
 import Flag from './Flag'
 import { Player, Ripple, type RippleState } from './Player'
 import { Stadium, Traffic, Walls } from './Scenery'
-import { reduceMotion } from './motion'
+import { reduceMotion } from './device'
 
 // Rendering resolution range. dpr = device pixel ratio: 2 on a retina screen
 // means 4 pixels per CSS pixel. No point going above what the screen has
@@ -40,13 +44,24 @@ const MAX_DPR = Math.min(2, window.devicePixelRatio)
 function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
   const target = useRef(new Vector3())
   const playerPosition = useRef(new Vector3())
-  const ripple = useRef<RippleState>({ position: new Vector3(), start: -Infinity })
+  const devStats = useRef<HTMLParagraphElement>(null)
+  const ripple = useRef<RippleState>({
+    position: new Vector3(),
+    start: -Infinity,
+    size: 1,
+    seconds: RIPPLE_SECONDS,
+  })
+
+  // Start a ripple on the floor
+  const rippleAt = (x: number, z: number, size: number, seconds: number) => {
+    Object.assign(ripple.current, { size, seconds, start: performance.now() / 1000 })
+    ripple.current.position.set(x, 0.02, z)
+  }
 
   // Send the player somewhere and ripple the floor there
   const moveTo = (x: number, z: number) => {
     target.current.set(x, 0, z)
-    ripple.current.position.set(x, 0.02, z)
-    ripple.current.start = performance.now() / 1000
+    rippleAt(x, z, 1, RIPPLE_SECONDS)
   }
   // Clicking a distant flag: park STOP_SHORT from it, on the side the Bit is
   // coming from, so it never has to pass through the pole
@@ -66,22 +81,39 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
   const [lowQuality, setLowQuality] = useState(false)
   const navigate = useNavigate()
 
-  // After a capture, pause a moment so the message is readable, then go
+  // Flags that are yours: saved ones plus the one being captured right now
+  const owned = new Set(savedRoutes)
+  if (captured) owned.add(captured.to)
+  const ownedCount = flags.filter((f) => owned.has(f.to)).length
+  const allOwned = ownedCount === flags.length
+
+  // This capture is the one that completes the set (not a repeat visit to a
+  // flag you already had): play the finale before leaving
+  const finale = captured !== null && allOwned && !savedRoutes.includes(captured.to)
+  const leaveSeconds = finale ? FINALE_SECONDS : CAPTURE_SECONDS
+
+  // After a capture, pause so the effect plays out, then go
   useEffect(() => {
     if (!captured) return
     saveCaptured([...new Set([...savedRoutes, captured.to])])
     const timer = setTimeout(
       // fromGame tells the page to fade in out of the glow (see RootLayout)
       () => navigate(captured.to, { state: { fromGame: true } }),
-      CAPTURE_SECONDS * 1000,
+      leaveSeconds * 1000,
     )
     return () => clearTimeout(timer)
-  }, [captured, navigate, savedRoutes])
+  }, [captured, navigate, savedRoutes, leaveSeconds])
 
-  // Flags that are yours: saved ones plus the one being captured right now
-  const owned = new Set(savedRoutes)
-  if (captured) owned.add(captured.to)
-  const ownedCount = flags.filter((f) => owned.has(f.to)).length
+  // Finale: big rings pulse out across the grid from the centre. One for
+  // reduced motion, where the ring appears at full size and fades
+  useEffect(() => {
+    if (!finale) return
+    const pulses = reduceMotion ? 1 : FINALE_PULSES
+    const timers = Array.from({ length: pulses }, (_, i) =>
+      setTimeout(() => rippleAt(0, 0, 15, 1.2), i * 900),
+    )
+    return () => timers.forEach(clearTimeout)
+  }, [finale])
 
   // Escape leaves the game. Enter goes into the flag you're next to
   useEffect(() => {
@@ -102,6 +134,9 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
         camera={{ position: (reduceMotion ? CAMERA_OFFSET : FLY_IN_START).toArray(), fov: 50 }}
         onCreated={onReady} // WebGL is up: the boot screen can fade out
       >
+        {/* First in the Canvas so its per-frame reset runs before any drawing */}
+        {import.meta.env.DEV && <DevStats output={devStats} />}
+
         {/* Watches the frame rate. factor drifts from 0 (struggling) to 1
             (plenty of headroom) and we map it onto the resolution. If it
             bottoms out, or keeps flip-flopping, turn reflections off for good */}
@@ -169,7 +204,8 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
             position={flag.position}
             nearby={nearby === flag}
             owned={owned.has(flag.to)}
-            captured={captured === flag}
+            // In the finale every flag flashes and flares together
+            captured={captured === flag || finale}
             // Far away: walk there. Already there: go in
             onClick={() =>
               nearby === flag ? setCaptured(flag) : approach(flag)
@@ -192,6 +228,7 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
           target={target}
           booted={booted}
           captured={captured}
+          finale={finale}
           onNear={setNearby}
           onAnomaly={setAtAnomaly}
           position={playerPosition}
@@ -229,7 +266,15 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
 
       <p className={`absolute right-4 top-4 px-3 py-1 text-sm ${HUD_PANEL} ${HUD_GLOW}`}>
         {ownedCount}/{flags.length} captured
+        {allOwned && ' · grid secured'}
       </p>
+
+      {import.meta.env.DEV && (
+        <p
+          ref={devStats}
+          className={`absolute right-4 top-14 px-3 py-1 text-xs text-[#94a3b8] ${HUD_PANEL}`}
+        />
+      )}
 
       <p className={`absolute bottom-4 right-4 px-3 py-2 text-xs text-[#94a3b8] ${HUD_PANEL}`}>
         WASD / arrows or click to move · Enter to go in · Esc to exit
@@ -257,14 +302,23 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
         role="status"
         className={`pointer-events-none absolute inset-x-0 top-1/3 text-center text-2xl ${HUD_FONT} ${HUD_GLOW}`}
       >
-        {captured && `Flag captured: ${captured.label}`}
+        {finale ? (
+          <>
+            <span className="block text-4xl">GRID SECURED</span>
+            <span className="mt-3 block text-base">
+              {flags.length}/{flags.length} flags. One process is still unaccounted for.
+            </span>
+          </>
+        ) : (
+          captured && `Flag captured: ${captured.label}`
+        )}
         {!captured && nearby && (
           <span className="sr-only">{nearby.label} in range. Press Enter to go in.</span>
         )}
       </div>
 
-      {/* Exit glow: on capture the screen fades to cyan-white over the second
-          half of the effect, so the page change happens under it */}
+      {/* Exit glow: the screen fades to cyan-white over the last half second
+          before leaving, so the page change happens under it */}
       {!reduceMotion && (
         <div
           aria-hidden
@@ -274,7 +328,7 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
           style={{
             backgroundColor: GLOW_COLOUR,
             transitionDuration: `${CAPTURE_SECONDS * 500}ms`,
-            transitionDelay: captured ? `${CAPTURE_SECONDS * 500}ms` : '0ms',
+            transitionDelay: captured ? `${(leaveSeconds - CAPTURE_SECONDS / 2) * 1000}ms` : '0ms',
           }}
         />
       )}

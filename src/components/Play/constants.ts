@@ -7,6 +7,11 @@ export const PLAYER_SPEED = 8 // units per second
 export const PREVIEW_RANGE = 3 // how close the player must get for a flag's hologram to open
 export const STOP_SHORT = 2 // clicking a flag parks this far in front of it, inside PREVIEW_RANGE
 export const CAPTURE_SECONDS = 1 // how long the capture effect plays before the page changes
+// Capturing the last flag plays a longer finale first: the camera pulls up
+// over the arena, every flag flares and the grid pulses
+export const FINALE_SECONDS = 4
+export const FINALE_CAMERA = new Vector3(0, 32, 30)
+export const FINALE_PULSES = 3
 export const HOVER_HEIGHT = 0.9 // how high the Bit floats
 export const RIPPLE_SECONDS = 0.6 // how long the click ring takes to expand and fade
 // Low chase camera: 6 up and 15 back, aimed LOOK_HEIGHT above the player.

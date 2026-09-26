@@ -15,6 +15,7 @@ import {
   CAMERA_OFFSET,
   DIVE_FOV,
   DIVE_OFFSET,
+  FINALE_CAMERA,
   FLY_IN_RATE,
   HOVER_HEIGHT,
   LOOK_HEIGHT,
@@ -22,33 +23,34 @@ import {
   NEON_CYAN,
   PLAYER_SPEED,
   PREVIEW_RANGE,
-  RIPPLE_SECONDS,
 } from './constants'
 import { flags, type MapFlag } from './flags'
-import { reduceMotion } from './motion'
+import { reduceMotion } from './device'
 
 // Reused every frame so we don't create a new vector 60 times a second
 const scratch = new Vector3()
 const lookTarget = new Vector3() // where the camera is pointing
 const lookGoal = new Vector3()
 
-export type RippleState = { position: Vector3; start: number }
+// size: 1 for a click, bigger for the finale's grid pulse. seconds: how long it lasts
+export type RippleState = { position: Vector3; start: number; size: number; seconds: number }
 
-// One glowing ring on the floor, reused for every click: each click moves it
-// and restarts it. Only one ripple at a time, which is all you ever see anyway
+// One glowing ring on the floor, reused for every ripple: each one moves it
+// and restarts it. Only one at a time, which is all you ever see anyway
 export function Ripple({ ripple }: { ripple: RefObject<RippleState> }) {
   const mesh = useRef<Mesh>(null)
   const material = useRef<MeshBasicMaterial>(null)
 
   useFrame(() => {
     if (!mesh.current || !material.current) return
-    const progress = (performance.now() / 1000 - ripple.current.start) / RIPPLE_SECONDS
+    const { start, size, seconds } = ripple.current
+    const progress = (performance.now() / 1000 - start) / seconds
     mesh.current.visible = progress < 1
     if (progress >= 1) return
 
     mesh.current.position.copy(ripple.current.position)
-    // Grows from small to 2 units wide. Reduced motion: stays put and just fades
-    mesh.current.scale.setScalar(reduceMotion ? 1 : 0.2 + progress * 1.8)
+    // Grows from small to 2 × size wide. Reduced motion: full size, just fades
+    mesh.current.scale.setScalar(size * (reduceMotion ? 2 : 0.2 + progress * 1.8))
     material.current.opacity = 1 - progress
   })
 
@@ -90,6 +92,7 @@ export function Player({
   target,
   booted,
   captured,
+  finale,
   onNear,
   onAnomaly,
   position,
@@ -97,6 +100,7 @@ export function Player({
   target: RefObject<Vector3>
   booted: boolean
   captured: MapFlag | null
+  finale: boolean // this capture completes the set: pull up over the arena instead of diving
   onNear: (flag: MapFlag | null) => void
   onAnomaly: (inRange: boolean) => void
   position: RefObject<Vector3> // kept up to date with where the Bit is, for CtfMap
@@ -195,6 +199,16 @@ export function Player({
     if (inRange !== atAnomaly.current) {
       atAnomaly.current = inRange
       onAnomaly(inRange)
+    }
+
+    if (captured && finale) {
+      // Finale: rise up and back over the arena, looking at its centre, so the
+      // whole grid is in view while every flag flares
+      const ease = reduceMotion ? 1 : 1 - Math.exp(-1.5 * delta)
+      camera.position.lerp(FINALE_CAMERA, ease)
+      lookTarget.lerp(lookGoal.set(0, 0, 0), ease)
+      camera.lookAt(lookTarget)
+      return
     }
 
     if (captured && !reduceMotion) {
