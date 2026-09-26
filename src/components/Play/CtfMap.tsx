@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Canvas, useFrame } from '@react-three/fiber'
 import {
@@ -12,7 +12,10 @@ import {
 import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing'
 import {
   AdditiveBlending,
+  BackSide,
   Color,
+  CylinderGeometry,
+  Float32BufferAttribute,
   DoubleSide,
   Vector3,
   type Group,
@@ -277,14 +280,11 @@ function Walls() {
 // way it travels, line = which grid line it rides, speed in units/second
 // (negative = the other way), offset = where on the loop it starts
 const streaks = [
-  { along: 'x', line: -15, speed: 10, offset: 0, color: NEON_CYAN },
   { along: 'x', line: 15, speed: -8, offset: 20, color: NEON_CYAN },
   { along: 'x', line: -5, speed: 12, offset: 30, color: NEON_ORANGE },
   { along: 'x', line: 10, speed: -11, offset: 8, color: NEON_CYAN },
-  { along: 'z', line: -15, speed: 9, offset: 12, color: NEON_CYAN },
   { along: 'z', line: 15, speed: -12, offset: 35, color: NEON_ORANGE },
   { along: 'z', line: 5, speed: 10, offset: 25, color: NEON_CYAN },
-  { along: 'z', line: -10, speed: -9, offset: 4, color: NEON_CYAN },
 ] as const
 
 // Each loop runs from just outside one wall to just outside the other, so
@@ -323,6 +323,88 @@ function Traffic() {
       <meshBasicMaterial color={streak.color} />
     </mesh>
   ))
+}
+
+// The world past the walls: a glowing band low on the horizon, and a ring of
+// black mountains and towers cut out against it. All of it ignores the fog,
+// which would otherwise turn it the same black as the sky
+const HORIZON_RADIUS = 80
+const SKYLINE_DISTANCE = 70
+const HORIZON_GLOW = new Color(0, 0.35, 0.45)
+const BLACK = new Color(0, 0, 0)
+
+// Worked out from the index, not Math.random, so the skyline is the same on
+// every visit. Every third shape is a tower, the rest are four-sided mountains
+const skyline = Array.from({ length: 18 }, (_, i) => {
+  const tower = i % 3 === 0
+  return {
+    angle: (i / 18) * Math.PI * 2 + Math.sin(i * 12.9) * 0.15,
+    tower,
+    height: tower ? 18 + (i % 4) * 4 : 6 + ((i * 7) % 5) * 3,
+    width: tower ? 1.5 : 6 + ((i * 3) % 4) * 3,
+  }
+})
+
+function Horizon() {
+  // A tall open cylinder round the whole world. Its bottom edge is coloured
+  // glow and its top edge black, and the GPU blends between them: a gradient
+  const glow = useMemo(() => {
+    const geometry = new CylinderGeometry(HORIZON_RADIUS, HORIZON_RADIUS, 30, 64, 1, true)
+    geometry.translate(0, 15, 0) // sit it on the ground instead of centred on it
+    const { position } = geometry.attributes
+    const colours: number[] = []
+    for (let i = 0; i < position.count; i++) {
+      const colour = position.getY(i) < 1 ? HORIZON_GLOW : BLACK
+      colours.push(colour.r, colour.g, colour.b)
+    }
+    geometry.setAttribute('color', new Float32BufferAttribute(colours, 3))
+    return geometry
+  }, [])
+
+  return (
+    <>
+      {/* BackSide: we're inside the cylinder, looking at its inner faces */}
+      <mesh geometry={glow}>
+        <meshBasicMaterial
+          vertexColors
+          side={BackSide}
+          fog={false}
+          transparent
+          blending={AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* A thin bright line right on the horizon, which blooms */}
+      <mesh position-y={0.1}>
+        <cylinderGeometry args={[HORIZON_RADIUS - 0.5, HORIZON_RADIUS - 0.5, 0.15, 64, 1, true]} />
+        <meshBasicMaterial color={NEON_CYAN} side={BackSide} fog={false} />
+      </mesh>
+
+      {skyline.map(({ angle, tower, height, width }, i) => (
+        <group
+          key={i}
+          position={[Math.sin(angle) * SKYLINE_DISTANCE, 0, Math.cos(angle) * SKYLINE_DISTANCE]}
+        >
+          <mesh position-y={height / 2}>
+            {tower ? (
+              <boxGeometry args={[width, height, width]} />
+            ) : (
+              <coneGeometry args={[width, height, 4]} />
+            )}
+            <meshBasicMaterial color={BLACK} fog={false} />
+          </mesh>
+          {/* A small warning light on top of each tower */}
+          {tower && (
+            <mesh position-y={height + 0.3}>
+              <boxGeometry args={[0.4, 0.4, 0.4]} />
+              <meshBasicMaterial color={NEON_ORANGE} fog={false} />
+            </mesh>
+          )}
+        </group>
+      ))}
+    </>
+  )
 }
 
 type RippleState = { position: Vector3; start: number }
@@ -613,6 +695,8 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
         <Ripple ripple={ripple} />
 
         <Traffic />
+
+        <Horizon />
 
         <Player target={target} booted={booted} captured={captured} onNear={setNearby} />
 
