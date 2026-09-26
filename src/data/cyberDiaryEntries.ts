@@ -55,10 +55,11 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Found the reflective floor showed nothing because the shader multiplies the reflection by the floor colour, and mine was almost black',
       'Self-hosted the fonts instead of loading them from Google Fonts, and added a Content Security Policy to the build',
       'Hid a real flag on the map',
+      'Web browser only not available on phone'
     ],
     body: [
       'I added a game mode to this site. The Play CTF Map button on the home page opens a 3D arena styled on the grid from Tron. You drive a small program called the Bit around it, and each page of the site is a flag. Get close to one, press Enter, and you land on that page. The normal site stays the default, since nobody should have to play a game to read my CV.',
-      'I built it with Claude Code over one Saturday, one phase at a time, committing each phase before starting the next.',
+      'I built it with help from Claude Code over one Saturday, one phase at a time, committing each phase before starting the next.',
       'It uses Three.js through React Three Fiber, which comes to about 300 KB gzipped. All of it sits in its own chunk that only downloads when someone opens the map. The main bundle grew by about 1 KB.',
       'The reflective floor showed nothing at first. Reading the shader explained it: the reflection is multiplied by the floor colour, and my floor was almost black, so the result was almost black too. Raising the reflection strength from 3 to 50 fixed it.',
       'Two decisions came from this being a security portfolio. The fonts are bundled with the site instead of loaded from Google Fonts, so opening the map does not send a visitor\'s IP address to Google. The build also adds a Content Security Policy now. GitHub Pages cannot send response headers, so the policy goes in a meta tag, with the one inline script allowed by its hash. Browsers ignore frame-ancestors in a meta tag, so there is still no clickjacking protection on this host.',
