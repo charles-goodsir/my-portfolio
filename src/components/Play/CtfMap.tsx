@@ -31,6 +31,10 @@ const STOP_SHORT = 2 // clicking a flag parks this far in front of it, inside PR
 const CAPTURE_SECONDS = 1 // how long the capture effect plays before the page changes
 const HOVER_HEIGHT = 0.9 // how high the Bit floats
 const CAMERA_OFFSET = new Vector3(0, 14, 14) // camera sits this far from the player
+// Opening shot: high up on the far side of the arena. After boot the camera
+// sweeps from here down to its normal spot, turning to keep the Bit in view
+const FLY_IN_START = new Vector3(-24, 30, -16)
+const FLY_IN_RATE = 1.5 // lower = slower sweep. The normal follow uses 4
 const DIVE_OFFSET = new Vector3(0, 3, 5) // on capture the camera dives to here, relative to the flag
 const DIVE_FOV = 85 // lens widens from 50 to this during the dive, for a warp feel
 const GLOW_COLOUR = '#e0fbff' // the cyan-white the screen fades to on exit
@@ -270,14 +274,17 @@ function Walls() {
 
 function Player({
   target,
+  booted,
   captured,
   onNear,
 }: {
   target: RefObject<Vector3>
+  booted: boolean
   captured: MapFlag | null
   onNear: (flag: MapFlag | null) => void
 }) {
   const ref = useRef<Group>(null)
+  const flyingIn = useRef(!reduceMotion)
   const tilt = useRef<Group>(null)
   const spin = useRef<Group>(null)
   const near = useRef<MapFlag | null>(null)
@@ -335,12 +342,21 @@ function Player({
       return
     }
 
-    // Ease the camera toward its spot behind the player. The camera's angle
-    // never changes, so it's always looking at the player
+    // Hold the opening shot until the boot screen has cleared
+    if (!booted) return
+
+    // Ease the camera toward its spot behind the player, always looking at
+    // the player. During the fly-in it eases slower, which makes the sweep
     lookTarget.copy(player.position)
     const cameraGoal = scratch.copy(player.position).add(CAMERA_OFFSET)
-    if (reduceMotion) camera.position.copy(cameraGoal)
-    else camera.position.lerp(cameraGoal, 1 - Math.exp(-4 * delta))
+    if (reduceMotion) {
+      camera.position.copy(cameraGoal)
+    } else {
+      const rate = flyingIn.current ? FLY_IN_RATE : 4
+      camera.position.lerp(cameraGoal, 1 - Math.exp(-rate * delta))
+      if (camera.position.distanceTo(cameraGoal) < 0.5) flyingIn.current = false
+    }
+    camera.lookAt(lookTarget)
   })
 
   return (
@@ -378,7 +394,7 @@ function Player({
   )
 }
 
-function CtfMap({ onReady }: { onReady: () => void }) {
+function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
   const target = useRef(new Vector3())
   const [nearby, setNearby] = useState<MapFlag | null>(null)
   const [captured, setCaptured] = useState<MapFlag | null>(null)
@@ -420,7 +436,7 @@ function CtfMap({ onReady }: { onReady: () => void }) {
     <div className="relative isolate h-screen w-screen bg-black">
       <Canvas
         dpr={dpr}
-        camera={{ position: CAMERA_OFFSET.toArray(), fov: 50 }}
+        camera={{ position: (reduceMotion ? CAMERA_OFFSET : FLY_IN_START).toArray(), fov: 50 }}
         onCreated={onReady} // WebGL is up: the boot screen can fade out
       >
         {/* Watches the frame rate. factor drifts from 0 (struggling) to 1
@@ -499,7 +515,7 @@ function CtfMap({ onReady }: { onReady: () => void }) {
 
         <Walls />
 
-        <Player target={target} captured={captured} onNear={setNearby} />
+        <Player target={target} booted={booted} captured={captured} onNear={setNearby} />
 
         {/* Bloom runs after the scene is drawn and blurs light out of
             every pixel brighter than the threshold */}

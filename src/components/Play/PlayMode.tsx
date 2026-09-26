@@ -30,9 +30,14 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 
 // Kept separate from PlayMode so typing (a re-render per character) doesn't
 // re-render the 3D map as well
-function BootScreen({ ready }: { ready: boolean }) {
+function BootScreen({ ready, onDone }: { ready: boolean; onDone: () => void }) {
   const [typed, setTyped] = useState(reduceMotion ? BOOT_TEXT.length : 0)
   const done = ready && typed >= BOOT_TEXT.length
+
+  // Tell the map the screen is clearing, so the camera fly-in can start
+  useEffect(() => {
+    if (done) onDone()
+  }, [done, onDone])
 
   // Type one more character, waiting as long as that character asks for
   useEffect(() => {
@@ -76,13 +81,14 @@ function BootScreen({ ready }: { ready: boolean }) {
 
 function PlayMode() {
   const [ready, setReady] = useState(false)
+  const [booted, setBooted] = useState(false)
 
   return (
     <div className="relative h-screen w-screen bg-black">
       <Suspense fallback={null}>
-        <CtfMap onReady={() => setReady(true)} />
+        <CtfMap booted={booted} onReady={() => setReady(true)} />
       </Suspense>
-      <BootScreen ready={ready} />
+      <BootScreen ready={ready} onDone={() => setBooted(true)} />
     </div>
   )
 }
