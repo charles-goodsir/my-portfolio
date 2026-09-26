@@ -20,11 +20,13 @@ import {
   type MeshBasicMaterial,
 } from 'three'
 import { navItems } from '../ui/navItems'
+import { cyberDiaryEntries } from '../../data/cyberDiaryEntries'
 
 const MAP_SIZE = 40
 const FLAG_RING_RADIUS = 12
 const PLAYER_SPEED = 8 // units per second
-const CAPTURE_RANGE = 1.5 // how close the player must get to a flag
+const PREVIEW_RANGE = 3 // how close the player must get for a flag's hologram to open
+const STOP_SHORT = 2 // clicking a flag parks this far in front of it, inside PREVIEW_RANGE
 const CAPTURE_SECONDS = 1 // how long the capture effect plays before the page changes
 const HOVER_HEIGHT = 0.9 // how high the Bit floats
 const CAMERA_OFFSET = new Vector3(0, 14, 14) // camera sits this far from the player
@@ -53,18 +55,35 @@ const MAX_DPR = Math.min(2, window.devicePixelRatio)
 // Reused every frame so we don't create a new vector 60 times a second
 const scratch = new Vector3()
 
+const latestEntry = [...cyberDiaryEntries].sort((a, b) => b.date.localeCompare(a.date))[0]
+
+// What each flag's hologram says. Diary numbers come from the real data
+const previews: Record<string, string> = {
+  '/about': "My story and the roles I'm targeting. CV download.",
+  '/experience': 'Software Application Engineer at Datacom since 2021. Education and certifications.',
+  '/projects': 'AppSec homelab, a secure Azure landing zone, and earlier web builds.',
+  '/diary': `${cyberDiaryEntries.length} entries. Latest: ${latestEntry.title}`,
+  '/owasp': 'My notes on each of the 10 risks.',
+  '/contact': 'Email, LinkedIn and GitHub.',
+}
+
 // Every nav page except Home becomes a flag, spaced evenly round a circle
 const flags = navItems
   .filter((item) => item.to !== '/')
   .map((item, i, all) => {
     const angle = (i / all.length) * Math.PI * 2
+    const position = new Vector3(Math.sin(angle), 0, -Math.cos(angle)).multiplyScalar(
+      FLAG_RING_RADIUS,
+    )
     return {
       ...item,
-      position: new Vector3(
-        Math.sin(angle) * FLAG_RING_RADIUS,
-        0,
-        -Math.cos(angle) * FLAG_RING_RADIUS,
-      ),
+      preview: previews[item.to] ?? '',
+      position,
+      // Where the player parks when you click this flag: STOP_SHORT units
+      // from the pole, on the side facing the centre of the arena.
+      // ponytail: always the inner side, so coming from behind the ring the
+      // Bit passes through the pole. Use the player's position if that matters
+      approach: position.clone().multiplyScalar((FLAG_RING_RADIUS - STOP_SHORT) / FLAG_RING_RADIUS),
     }
   })
 
@@ -72,14 +91,20 @@ type MapFlag = (typeof flags)[number]
 
 function Flag({
   label,
+  preview,
   position,
+  nearby,
   captured,
   onClick,
+  onEnter,
 }: {
   label: string
+  preview: string
   position: Vector3
+  nearby: boolean
   captured: boolean
   onClick: () => void
+  onEnter: () => void
 }) {
   const cloth = useRef<Mesh>(null)
   const clothMaterial = useRef<MeshBasicMaterial>(null)
@@ -151,10 +176,28 @@ function Flag({
         />
       </mesh>
 
-      <Html position-y={3.5} center>
-        <div className={`pointer-events-none whitespace-nowrap px-2 py-0.5 text-xs ${HUD_PANEL} ${HUD_GLOW}`}>
-          {label}
-        </div>
+      {/* In range: the label opens into a hologram panel you can click.
+          Otherwise just the name */}
+      <Html position-y={nearby ? 5 : 3.5} center>
+        {nearby ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              // Keep the click from also reaching the 3D scene underneath
+              e.stopPropagation()
+              onEnter()
+            }}
+            className={`animate-fade-in block w-56 px-3 py-2 text-left ${HUD_PANEL}`}
+          >
+            <span className={`block text-sm ${HUD_GLOW}`}>{label}</span>
+            <span className="mt-1 block text-xs text-[#94a3b8]">{preview}</span>
+            <span className="mt-2 block text-xs text-[#f59e0b]">Enter ↵ or click to go in</span>
+          </button>
+        ) : (
+          <div className={`pointer-events-none whitespace-nowrap px-2 py-0.5 text-xs ${HUD_PANEL} ${HUD_GLOW}`}>
+            {label}
+          </div>
+        )}
       </Html>
     </group>
   )
@@ -195,15 +238,15 @@ function Walls() {
 
 function Player({
   target,
-  onCapture,
+  onNear,
 }: {
   target: RefObject<Vector3>
-  onCapture: (flag: MapFlag) => void
+  onNear: (flag: MapFlag | null) => void
 }) {
   const ref = useRef<Group>(null)
   const tilt = useRef<Group>(null)
   const spin = useRef<Group>(null)
-  const captured = useRef(false)
+  const near = useRef<MapFlag | null>(null)
 
   // Runs once per frame. delta = seconds since the last frame
   useFrame(({ camera, clock }, delta) => {
@@ -236,15 +279,13 @@ function Player({
     // Slow spin
     if (spin.current && !reduceMotion) spin.current.rotation.y += delta * 1.2
 
-    // Close enough to a flag? Capture it, once
-    if (!captured.current) {
-      const flag = flags.find(
-        (f) => f.position.distanceTo(player.position) < CAPTURE_RANGE,
-      )
-      if (flag) {
-        captured.current = true
-        onCapture(flag)
-      }
+    // Which flag (if any) is in range? Only tell React when that changes,
+    // not 60 times a second
+    const flag =
+      flags.find((f) => f.position.distanceTo(player.position) < PREVIEW_RANGE) ?? null
+    if (flag !== near.current) {
+      near.current = flag
+      onNear(flag)
     }
 
     // Ease the camera toward its spot behind the player
@@ -290,6 +331,7 @@ function Player({
 
 function CtfMap({ onReady }: { onReady: () => void }) {
   const target = useRef(new Vector3())
+  const [nearby, setNearby] = useState<MapFlag | null>(null)
   const [captured, setCaptured] = useState<MapFlag | null>(null)
   const [dpr, setDpr] = useState((MIN_DPR + MAX_DPR) / 2)
   const [lowQuality, setLowQuality] = useState(false)
@@ -302,14 +344,15 @@ function CtfMap({ onReady }: { onReady: () => void }) {
     return () => clearTimeout(timer)
   }, [captured, navigate])
 
-  // Escape leaves the game
+  // Escape leaves the game. Enter goes into the flag you're next to
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') navigate('/')
+      if (e.key === 'Enter' && nearby) setCaptured(nearby)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [navigate])
+  }, [navigate, nearby])
 
   return (
     // isolate: drei's <Html> labels use huge z-index values. This keeps them
@@ -381,15 +424,21 @@ function CtfMap({ onReady }: { onReady: () => void }) {
           <Flag
             key={flag.to}
             label={flag.label}
+            preview={flag.preview}
             position={flag.position}
-            captured={captured?.to === flag.to}
-            onClick={() => target.current.copy(flag.position)}
+            nearby={nearby === flag}
+            captured={captured === flag}
+            // Far away: walk there. Already there: go in
+            onClick={() =>
+              nearby === flag ? setCaptured(flag) : target.current.copy(flag.approach)
+            }
+            onEnter={() => setCaptured(flag)}
           />
         ))}
 
         <Walls />
 
-        <Player target={target} onCapture={setCaptured} />
+        <Player target={target} onNear={setNearby} />
 
         {/* Bloom runs after the scene is drawn and blurs light out of
             every pixel brighter than the threshold */}
@@ -430,6 +479,9 @@ function CtfMap({ onReady }: { onReady: () => void }) {
         className={`pointer-events-none absolute inset-x-0 top-1/3 text-center font-mono text-2xl ${HUD_GLOW}`}
       >
         {captured && `Flag captured: ${captured.label}`}
+        {!captured && nearby && (
+          <span className="sr-only">{nearby.label} in range. Press Enter to go in.</span>
+        )}
       </div>
     </div>
   )
