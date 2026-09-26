@@ -16,7 +16,14 @@ import {
   PerformanceMonitor,
   Trail,
 } from '@react-three/drei'
-import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing'
+import {
+  Bloom,
+  ChromaticAberration,
+  EffectComposer,
+  Noise,
+  Scanline,
+  Vignette,
+} from '@react-three/postprocessing'
 import {
   AdditiveBlending,
   BackSide,
@@ -25,6 +32,7 @@ import {
   Float32BufferAttribute,
   DoubleSide,
   Shape,
+  Vector2,
   Vector3,
   type Group,
   type Mesh,
@@ -53,6 +61,8 @@ const FLY_IN_START = new Vector3(-24, 30, -16)
 const FLY_IN_RATE = 1.5 // lower = slower sweep. The normal follow uses 4
 const DIVE_OFFSET = new Vector3(0, 3, 5) // on capture the camera dives to here, relative to the flag
 const DIVE_FOV = 85 // lens widens from 50 to this during the dive, for a warp feel
+// CRT feel. Kept faint on purpose: noticeable, it looks cheap
+const FRINGE_OFFSET = new Vector2(0.0008, 0.0008) // how far red and blue split apart
 const GLOW_COLOUR = '#e0fbff' // the cyan-white the screen fades to on exit
 
 // Colour channels above 1 are "brighter than white". Bloom only picks up
@@ -839,6 +849,20 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
             every pixel brighter than the threshold */}
         <EffectComposer>
           <Bloom luminanceThreshold={1} intensity={1.5} mipmapBlur />
+          {/* Colour fringing: red and blue split slightly apart, like an old
+              lens. radialModulation keeps the centre clean, fringing only
+              towards the edges */}
+          <ChromaticAberration
+            offset={FRINGE_OFFSET}
+            radialModulation
+            modulationOffset={0.4}
+          />
+          {/* Horizontal lines like a CRT monitor */}
+          <Scanline density={1.5} opacity={0.08} />
+          {/* Film grain. premultiply scales it by the pixel's brightness, so
+              black stays black and only lit areas get grain. The grain
+              changes every frame, so it's off for reduced motion */}
+          <Noise premultiply opacity={reduceMotion ? 0 : 0.3} />
           {/* Darkens the screen corners to pull the eye to the centre */}
           <Vignette offset={0.3} darkness={0.8} />
         </EffectComposer>
