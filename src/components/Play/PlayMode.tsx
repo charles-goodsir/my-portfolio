@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { navItems } from '../ui/navItems'
+import { reduceMotion } from './motion'
 
 // The 3D map (and Three.js) only downloads when someone opens /play.
 // This file stays small so the boot screen shows instantly while that happens
@@ -25,8 +26,6 @@ function delayFor(char: string) {
   if (char === '#') return 70
   return 30 + Math.random() * 20 // slight stutter, like an old terminal
 }
-
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 // Kept separate from PlayMode so typing (a re-render per character) doesn't
 // re-render the 3D map as well
