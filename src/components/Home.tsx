@@ -1,5 +1,6 @@
 import Button from './ui/Button'
 import VisitorBadge from './ui/VisitorBadge'
+import { hasFinePointer } from './Play/device'
 
 function Home() {
   return (
@@ -21,6 +22,12 @@ function Home() {
           <Button to="/diary" variant="secondary">
             Cyber Diary
           </Button>
+          {/* The map needs a keyboard or mouse, so no button on phones */}
+          {hasFinePointer && (
+            <Button to="/play" variant="secondary">
+              Play CTF Map
+            </Button>
+          )}
         </div>
       </div>
       <VisitorBadge />

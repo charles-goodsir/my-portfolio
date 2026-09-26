@@ -13,6 +13,7 @@ const screenshotModules = import.meta.glob(
     '../assets/Burp/*.webp',
     '../assets/Homelab/*.webp',
     '../assets/SecureAzureLandingZone/*.webp',
+    '../assets/CTFMap/*.webp',
   ],
   { eager: true, import: 'default' },
 ) as Record<string, string>

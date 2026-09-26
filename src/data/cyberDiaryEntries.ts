@@ -44,6 +44,33 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'ctf-map-entry-1-game-mode-and-hidden-flag',
+    date: '2026-09-26',
+    category: 'CTF Map',
+    vulnTypes: ['CTF Map'],
+    title: 'A game mode for this site, with a real flag hidden in it (Just for fun)',
+    workedOn: [
+      'Added an optional 3D capture-the-flag map at /play: each page of the site is a flag, and you drive to one and press Enter to open it',
+      'Kept the normal site as the default and put all the 3D code in its own chunk, so the main bundle only grew by about 1 KB',
+      'Found the reflective floor showed nothing because the shader multiplies the reflection by the floor colour, and mine was almost black',
+      'Self-hosted the fonts instead of loading them from Google Fonts, and added a Content Security Policy to the build',
+      'Hid a real flag on the map',
+    ],
+    body: [
+      'I added a game mode to this site. The Play CTF Map button on the home page opens a 3D arena styled on the grid from Tron. You drive a small program called the Bit around it, and each page of the site is a flag. Get close to one, press Enter, and you land on that page. The normal site stays the default, since nobody should have to play a game to read my CV.',
+      'I built it with Claude Code over one Saturday, one phase at a time, committing each phase before starting the next.',
+      'It uses Three.js through React Three Fiber, which comes to about 300 KB gzipped. All of it sits in its own chunk that only downloads when someone opens the map. The main bundle grew by about 1 KB.',
+      'The reflective floor showed nothing at first. Reading the shader explained it: the reflection is multiplied by the floor colour, and my floor was almost black, so the result was almost black too. Raising the reflection strength from 3 to 50 fixed it.',
+      'Two decisions came from this being a security portfolio. The fonts are bundled with the site instead of loaded from Google Fonts, so opening the map does not send a visitor\'s IP address to Google. The build also adds a Content Security Policy now. GitHub Pages cannot send response headers, so the policy goes in a meta tag, with the one inline script allowed by its hash. Browsers ignore frame-ancestors in a meta tag, so there is still no clickjacking protection on this host.',
+      'While I was in there, moving the Tailwind build plugin into devDependencies and running npm audit fix took the audit to 0 findings.',
+      'There is also a real flag hidden on the map, in the usual flag{...} format. The boot screen tells you where to start looking. The string is base64 encoded in the bundle, so searching the source for flag{ finds nothing, but decoding it counts as a solve too.',
+      'A static site cannot keep a secret. Anyone can read the bundle, so the flag is a game string and nothing real goes near it.',
+    ],
+    screenshots: ['CTFMap/CTFMap1.webp'],
+    tools: ['React Three Fiber', 'Three.js', 'Vite', 'Claude Code'],
+    tags: ['CTF Map', 'Three.js', 'Content Security Policy', 'self-hosted fonts'],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-15-private-endpoint-plan-drift',
     date: '2026-09-26',
     category: 'Secure Azure Landing Zone',

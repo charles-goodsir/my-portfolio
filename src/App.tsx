@@ -19,11 +19,13 @@ import NewsDashboard from './components/Projects/NewsDashboard'
 import Airbnb from './components/Projects/Airbnb'
 import FinanceTracker from './components/Projects/FinanceTracker'
 import PortfolioSite from './components/Projects/PortfolioSite'
+import PlayMode from './components/Play/PlayMode'
 
 function App() {
   return (
     <HashRouter>
       <Routes>
+        <Route path="play" element={<PlayMode />} />
         <Route element={<RootLayout />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />

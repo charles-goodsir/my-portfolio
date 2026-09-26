@@ -88,6 +88,20 @@ body {
   animation: fade-in 1s ease-out;
 }
 
+/* The CTF map's exit glow clearing as the page appears. */
+@keyframes glow-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.animate-glow-out {
+  animation: glow-out 0.6s ease-out forwards;
+}
+
 /* Respect reduced-motion everywhere. */
 @media (prefers-reduced-motion: reduce) {
   *,

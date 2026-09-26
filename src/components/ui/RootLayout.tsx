@@ -1,10 +1,20 @@
-import { Outlet } from 'react-router'
+import { Outlet, useLocation } from 'react-router'
 import Nav from './Nav'
 import ScrollToTop from './ScrollToTop'
 
 function RootLayout() {
+  const { state } = useLocation()
+  const fromGame = (state as { fromGame?: boolean } | null)?.fromGame
+
   return (
     <>
+      {/* Arriving from the CTF map: fade in out of its cyan-white exit glow */}
+      {fromGame && (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-50 bg-[#e0fbff] animate-glow-out"
+        />
+      )}
       <ScrollToTop />
       <a
         href="#main"
