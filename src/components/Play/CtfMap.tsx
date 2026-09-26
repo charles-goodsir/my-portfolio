@@ -18,6 +18,7 @@ import {
   type Group,
   type Mesh,
   type MeshBasicMaterial,
+  type PerspectiveCamera,
 } from 'three'
 import { navItems } from '../ui/navItems'
 import { cyberDiaryEntries } from '../../data/cyberDiaryEntries'
@@ -30,6 +31,9 @@ const STOP_SHORT = 2 // clicking a flag parks this far in front of it, inside PR
 const CAPTURE_SECONDS = 1 // how long the capture effect plays before the page changes
 const HOVER_HEIGHT = 0.9 // how high the Bit floats
 const CAMERA_OFFSET = new Vector3(0, 14, 14) // camera sits this far from the player
+const DIVE_OFFSET = new Vector3(0, 3, 5) // on capture the camera dives to here, relative to the flag
+const DIVE_FOV = 85 // lens widens from 50 to this during the dive, for a warp feel
+const GLOW_COLOUR = '#e0fbff' // the cyan-white the screen fades to on exit
 
 // Colour channels above 1 are "brighter than white". Bloom only picks up
 // pixels above 1, so these glow and everything at or below 1 stays dark
@@ -77,6 +81,8 @@ const MAX_DPR = Math.min(2, window.devicePixelRatio)
 
 // Reused every frame so we don't create a new vector 60 times a second
 const scratch = new Vector3()
+const lookTarget = new Vector3() // where the camera is pointing
+const lookGoal = new Vector3()
 
 const latestEntry = [...cyberDiaryEntries].sort((a, b) => b.date.localeCompare(a.date))[0]
 
@@ -264,9 +270,11 @@ function Walls() {
 
 function Player({
   target,
+  captured,
   onNear,
 }: {
   target: RefObject<Vector3>
+  captured: MapFlag | null
   onNear: (flag: MapFlag | null) => void
 }) {
   const ref = useRef<Group>(null)
@@ -314,7 +322,22 @@ function Player({
       onNear(flag)
     }
 
-    // Ease the camera toward its spot behind the player
+    if (captured && !reduceMotion) {
+      // Exit dive: swoop at the flag, turn to look at its cloth, widen the lens
+      const ease = 1 - Math.exp(-3 * delta)
+      camera.position.lerp(scratch.copy(captured.position).add(DIVE_OFFSET), ease)
+      lookGoal.copy(captured.position).setY(2.6)
+      lookTarget.lerp(lookGoal, ease * 2)
+      camera.lookAt(lookTarget)
+      const lens = camera as PerspectiveCamera
+      lens.fov += (DIVE_FOV - lens.fov) * ease
+      lens.updateProjectionMatrix() // fov changes only apply after this
+      return
+    }
+
+    // Ease the camera toward its spot behind the player. The camera's angle
+    // never changes, so it's always looking at the player
+    lookTarget.copy(player.position)
     const cameraGoal = scratch.copy(player.position).add(CAMERA_OFFSET)
     if (reduceMotion) camera.position.copy(cameraGoal)
     else camera.position.lerp(cameraGoal, 1 - Math.exp(-4 * delta))
@@ -368,7 +391,11 @@ function CtfMap({ onReady }: { onReady: () => void }) {
   useEffect(() => {
     if (!captured) return
     saveCaptured([...new Set([...savedRoutes, captured.to])])
-    const timer = setTimeout(() => navigate(captured.to), CAPTURE_SECONDS * 1000)
+    const timer = setTimeout(
+      // fromGame tells the page to fade in out of the glow (see RootLayout)
+      () => navigate(captured.to, { state: { fromGame: true } }),
+      CAPTURE_SECONDS * 1000,
+    )
     return () => clearTimeout(timer)
   }, [captured, navigate, savedRoutes])
 
@@ -472,7 +499,7 @@ function CtfMap({ onReady }: { onReady: () => void }) {
 
         <Walls />
 
-        <Player target={target} onNear={setNearby} />
+        <Player target={target} captured={captured} onNear={setNearby} />
 
         {/* Bloom runs after the scene is drawn and blurs light out of
             every pixel brighter than the threshold */}
@@ -521,6 +548,22 @@ function CtfMap({ onReady }: { onReady: () => void }) {
           <span className="sr-only">{nearby.label} in range. Press Enter to go in.</span>
         )}
       </div>
+
+      {/* Exit glow: on capture the screen fades to cyan-white over the second
+          half of the effect, so the page change happens under it */}
+      {!reduceMotion && (
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute inset-0 transition-opacity ${
+            captured ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{
+            backgroundColor: GLOW_COLOUR,
+            transitionDuration: `${CAPTURE_SECONDS * 500}ms`,
+            transitionDelay: captured ? `${CAPTURE_SECONDS * 500}ms` : '0ms',
+          }}
+        />
+      )}
     </div>
   )
 }
