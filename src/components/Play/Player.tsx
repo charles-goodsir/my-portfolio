@@ -10,6 +10,8 @@ import {
   type PerspectiveCamera,
 } from 'three'
 import {
+  ANOMALY_POSITION,
+  ANOMALY_RANGE,
   CAMERA_OFFSET,
   DIVE_FOV,
   DIVE_OFFSET,
@@ -89,17 +91,20 @@ export function Player({
   booted,
   captured,
   onNear,
+  onAnomaly,
 }: {
   target: RefObject<Vector3>
   booted: boolean
   captured: MapFlag | null
   onNear: (flag: MapFlag | null) => void
+  onAnomaly: (inRange: boolean) => void
 }) {
   const ref = useRef<Group>(null)
   const flyingIn = useRef(!reduceMotion)
   const tilt = useRef<Group>(null)
   const spin = useRef<Group>(null)
   const near = useRef<MapFlag | null>(null)
+  const atAnomaly = useRef(false)
   const heldKeys = useRef(new Set<string>())
 
   // Track which driving keys are held down
@@ -179,6 +184,13 @@ export function Player({
     if (flag !== near.current) {
       near.current = flag
       onNear(flag)
+    }
+
+    // Same for the hidden anomaly
+    const inRange = player.position.distanceTo(ANOMALY_POSITION) < ANOMALY_RANGE
+    if (inRange !== atAnomaly.current) {
+      atAnomaly.current = inRange
+      onAnomaly(inRange)
     }
 
     if (captured && !reduceMotion) {

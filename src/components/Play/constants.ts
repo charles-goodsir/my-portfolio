@@ -22,6 +22,10 @@ export const DIVE_OFFSET = new Vector3(0, 3, 5) // on capture the camera dives t
 export const DIVE_FOV = 85 // lens widens from 50 to this during the dive, for a warp feel
 // CRT feel. Kept faint on purpose: noticeable, it looks cheap
 export const FRINGE_OFFSET = new Vector2(0.0008, 0.0008) // how far red and blue split apart
+// Phase 7's hidden flag: where it sits (south-east corner, near the camera's
+// side of the arena where nobody looks) and how close you must get
+export const ANOMALY_POSITION = new Vector3(16, 0, 16)
+export const ANOMALY_RANGE = 2.5
 export const GLOW_COLOUR = '#e0fbff' // the cyan-white the screen fades to on exit
 
 // Colour channels above 1 are "brighter than white". Bloom only picks up
@@ -32,6 +36,7 @@ export const NEON_ORANGE = new Color(3, 0.8, 0) // Tron's "other team"
 export const BEAM_ORANGE = new Color(1, 0.35, 0) // below 1, so the beam stays soft
 export const BEAM_CYAN = new Color(0, 0.5, 0.6) // a captured flag's beam
 export const WALL_CYAN = new Color(0, 0.6, 0.7)
+export const ANOMALY_RED = new Color(0.6, 0, 0.1) // below 1: faint, easy to miss
 export const WHITE_HOT = new Color(6, 6, 6) // the flash on capture
 
 // HUD font (loaded in PlayMode). Tailwind turns the _ into spaces

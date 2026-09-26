@@ -19,6 +19,7 @@ const BOOT_TEXT = [
   '[####################] 100%',
   'USER: GUEST',
   `${navItems.length - 1} FLAGS DETECTED`,
+  'ANOMALY IN SE QUADRANT', // hint for the hidden flag (Anomaly.tsx)
   'CAPTURE A FLAG TO ENTER',
 ]
   .map((line) => `> ${line}`)

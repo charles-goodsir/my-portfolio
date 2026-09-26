@@ -24,6 +24,7 @@ import {
   MAP_SIZE,
   NEON_CYAN,
 } from './constants'
+import { Anomaly } from './Anomaly'
 import { flags, loadCaptured, saveCaptured, type MapFlag } from './flags'
 import Flag from './Flag'
 import { Player, Ripple, type RippleState } from './Player'
@@ -46,6 +47,7 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
     ripple.current.start = performance.now() / 1000
   }
   const [nearby, setNearby] = useState<MapFlag | null>(null)
+  const [atAnomaly, setAtAnomaly] = useState(false)
   const [captured, setCaptured] = useState<MapFlag | null>(null)
   const [savedRoutes] = useState(loadCaptured) // read once, when the map opens
   const [dpr, setDpr] = useState((MIN_DPR + MAX_DPR) / 2)
@@ -172,7 +174,15 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
 
         <Horizon />
 
-        <Player target={target} booted={booted} captured={captured} onNear={setNearby} />
+        <Anomaly revealed={atAnomaly} />
+
+        <Player
+          target={target}
+          booted={booted}
+          captured={captured}
+          onNear={setNearby}
+          onAnomaly={setAtAnomaly}
+        />
 
         {/* Bloom runs after the scene is drawn and blurs light out of
             every pixel brighter than the threshold */}
