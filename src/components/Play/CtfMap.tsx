@@ -30,6 +30,7 @@ const PREVIEW_RANGE = 3 // how close the player must get for a flag's hologram t
 const STOP_SHORT = 2 // clicking a flag parks this far in front of it, inside PREVIEW_RANGE
 const CAPTURE_SECONDS = 1 // how long the capture effect plays before the page changes
 const HOVER_HEIGHT = 0.9 // how high the Bit floats
+const RIPPLE_SECONDS = 0.6 // how long the click ring takes to expand and fade
 const CAMERA_OFFSET = new Vector3(0, 14, 14) // camera sits this far from the player
 // Opening shot: high up on the far side of the arena. After boot the camera
 // sweeps from here down to its normal spot, turning to keep the Bit in view
@@ -272,6 +273,40 @@ function Walls() {
   ))
 }
 
+type RippleState = { position: Vector3; start: number }
+
+// One glowing ring on the floor, reused for every click: each click moves it
+// and restarts it. Only one ripple at a time, which is all you ever see anyway
+function Ripple({ ripple }: { ripple: RefObject<RippleState> }) {
+  const mesh = useRef<Mesh>(null)
+  const material = useRef<MeshBasicMaterial>(null)
+
+  useFrame(() => {
+    if (!mesh.current || !material.current) return
+    const progress = (performance.now() / 1000 - ripple.current.start) / RIPPLE_SECONDS
+    mesh.current.visible = progress < 1
+    if (progress >= 1) return
+
+    mesh.current.position.copy(ripple.current.position)
+    // Grows from small to 2 units wide. Reduced motion: stays put and just fades
+    mesh.current.scale.setScalar(reduceMotion ? 1 : 0.2 + progress * 1.8)
+    material.current.opacity = 1 - progress
+  })
+
+  return (
+    // A flat ring, tipped flat like the floor, just above the grid
+    <mesh ref={mesh} rotation-x={-Math.PI / 2} visible={false}>
+      <ringGeometry args={[0.9, 1, 48]} />
+      <meshBasicMaterial
+        ref={material}
+        color={NEON_CYAN}
+        transparent
+        depthWrite={false}
+      />
+    </mesh>
+  )
+}
+
 function Player({
   target,
   booted,
@@ -396,6 +431,14 @@ function Player({
 
 function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
   const target = useRef(new Vector3())
+  const ripple = useRef<RippleState>({ position: new Vector3(), start: -Infinity })
+
+  // Send the player somewhere and ripple the floor there
+  const moveTo = (x: number, z: number) => {
+    target.current.set(x, 0, z)
+    ripple.current.position.set(x, 0.02, z)
+    ripple.current.start = performance.now() / 1000
+  }
   const [nearby, setNearby] = useState<MapFlag | null>(null)
   const [captured, setCaptured] = useState<MapFlag | null>(null)
   const [savedRoutes] = useState(loadCaptured) // read once, when the map opens
@@ -461,7 +504,7 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
             Clicking it sets where the player walks to. */}
         <mesh
           rotation-x={-Math.PI / 2}
-          onClick={(e) => target.current.set(e.point.x, 0, e.point.z)}
+          onClick={(e) => moveTo(e.point.x, e.point.z)}
         >
           <planeGeometry args={[MAP_SIZE, MAP_SIZE]} />
           {/* Glossy black floor. Each frame the scene is drawn a second time
@@ -507,13 +550,15 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
             captured={captured === flag}
             // Far away: walk there. Already there: go in
             onClick={() =>
-              nearby === flag ? setCaptured(flag) : target.current.copy(flag.approach)
+              nearby === flag ? setCaptured(flag) : moveTo(flag.approach.x, flag.approach.z)
             }
             onEnter={() => setCaptured(flag)}
           />
         ))}
 
         <Walls />
+
+        <Ripple ripple={ripple} />
 
         <Player target={target} booted={booted} captured={captured} onNear={setNearby} />
 
