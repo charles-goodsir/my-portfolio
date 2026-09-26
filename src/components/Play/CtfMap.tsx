@@ -288,7 +288,7 @@ function Player({
   )
 }
 
-function CtfMap() {
+function CtfMap({ onReady }: { onReady: () => void }) {
   const target = useRef(new Vector3())
   const [captured, setCaptured] = useState<MapFlag | null>(null)
   const [dpr, setDpr] = useState((MIN_DPR + MAX_DPR) / 2)
@@ -312,8 +312,14 @@ function CtfMap() {
   }, [navigate])
 
   return (
-    <div className="relative h-screen w-screen bg-black">
-      <Canvas dpr={dpr} camera={{ position: CAMERA_OFFSET.toArray(), fov: 50 }}>
+    // isolate: drei's <Html> labels use huge z-index values. This keeps them
+    // stacked inside the map so the boot screen can still cover them
+    <div className="relative isolate h-screen w-screen bg-black">
+      <Canvas
+        dpr={dpr}
+        camera={{ position: CAMERA_OFFSET.toArray(), fov: 50 }}
+        onCreated={onReady} // WebGL is up: the boot screen can fade out
+      >
         {/* Watches the frame rate. factor drifts from 0 (struggling) to 1
             (plenty of headroom) and we map it onto the resolution. If it
             bottoms out, or keeps flip-flopping, turn reflections off for good */}
