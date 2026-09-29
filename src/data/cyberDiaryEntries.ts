@@ -44,6 +44,32 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-16-approve-known-diff-verify-endpoint',
+    date: '2026-09-29',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    title: 'Approving a plan I knew was not clean, and checking the endpoint worked',
+    workedOn: [
+      'Merged the blob private endpoint with the diagnostic settings diff still in it, approving 7 to add, 2 to change, 0 to destroy on purpose, since the fix for the 2 was already planned for its own PR',
+      'Checked the result after apply instead of trusting the green pipeline: the endpoint connection shows Approved, with an A record for the storage account at 10.0.2.4, the first usable address in the subnet',
+      'Confirmed from my laptop that nslookup resolves through the privatelink name to the storage account\'s public IP, which the firewall still blocks, since my laptop is not in the VNet',
+    ],
+    body: [
+      'I merged the blob private endpoint with the diagnostic settings diff still in it. At the approval gate, the plan matched the PR: 7 to add, 2 to change, 0 to destroy. The only ~ lines removed metric entries that were already switched off, and nothing touched the storage account or the Key Vault. I approved on purpose, knowing what the 2 changes were and that the fix would follow in its own PR.',
+      'After the apply, I checked the result instead of trusting the green pipeline. The endpoint connection is Approved. The private DNS zone has an A record for the storage account at 10.0.2.4, the first usable address in the subnet, since Azure reserves the first four. Azure wrote that record itself, through the zone group.',
+      'From my laptop, nslookup goes through the privatelink name and ends at the storage account\'s public IP, which the firewall still blocks. That is expected, because my laptop is not in the VNet. From inside it, the same lookup would stop at 10.0.2.4.',
+      'Approving a plan that is not clean is fine if you can explain every line of it. Approving without reading it is not.',
+    ],
+    screenshots: ['SecureAzureLandingZone/SALZ20.webp'],
+    tools: ['Terraform', 'Azure', 'Azure DevOps'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Terraform',
+      'private endpoints',
+      'private DNS',
+    ],
+  },
+  {
     id: 'ctf-map-entry-1-game-mode-and-hidden-flag',
     date: '2026-09-26',
     category: 'CTF Map',
