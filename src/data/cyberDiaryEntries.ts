@@ -44,6 +44,35 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-17-diagnostic-diff-blocked-push',
+    date: '2026-09-29',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    milestone: true,
+    title: 'Fixing a diff that kept coming back, and a push that did not get through',
+    workedOn: [
+      'Fixed the recurring diagnostic settings diff by declaring the disabled metric categories in code: AllMetrics on the vault, Capacity and Transaction on blob storage, all with enabled = false',
+      'Expected the next plan to show 2 changes putting back what the last apply had removed. It said No changes instead, since Azure had never actually removed them, it just kept reporting categories whatever code sent',
+      'Branched from origin/main and had Git set main as its upstream by default, so a VS Code push went straight to main',
+      'Watched the branch ruleset reject the push twice with "Changes must be made through a pull request", the first time it blocked a real mistake rather than a test',
+      'Pushed the branch under its own name and merged through a PR instead',
+    ],
+    body: [
+      'The diagnostic settings from the audit logging work had been showing up as changes on every plan. When you create a diagnostic setting, Azure records every metric category the resource supports, each one switched off. My code did not mention them, so every plan tried to remove them, and Azure kept reporting them anyway. The fix was to declare them in code: AllMetrics on the vault, and Capacity and Transaction on blob storage, all with enabled = false.',
+      'I expected the next plan to show 2 changes, putting back entries the last apply had removed. It said No changes, and the apply after merging did nothing. The earlier apply had never removed them in the first place, because Azure keeps them whatever you send. That is why the diff kept coming back. My prediction was wrong, and the result proved the fix better than the prediction would have.',
+      'Getting it merged went wrong first. I made the branch from origin/main, and Git quietly set main as its upstream. When VS Code pushed my commit, it pushed to main. The ruleset I set up earlier rejected it twice with "Changes must be made through a pull request". That was the first time it blocked a real mistake rather than a test. I pushed the branch under its own name and went through a PR.',
+      'A control you have only tested on purpose has not been proven yet. The first time it catches a real mistake is when you find out it works.',
+    ],
+    screenshots: ['SecureAzureLandingZone/SALZ21.webp'],
+    tools: ['Terraform', 'Azure', 'Git', 'GitHub'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Terraform',
+      'branch protection',
+      'Log Analytics',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-16-approve-known-diff-verify-endpoint',
     date: '2026-09-29',
     category: 'Secure Azure Landing Zone',
