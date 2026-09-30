@@ -139,7 +139,7 @@ function AppSecHomelab() {
               View on GitHub
             </a>
             <Link
-              to="/diary?vuln=AppSec%20Homelab"
+              to="/diary?project=AppSec%20Homelab"
               className="border border-line text-ink px-6 py-3 rounded-lg hover:bg-sunken transition-colors duration-300 font-semibold"
             >
               Full write-up in the CyberDiary

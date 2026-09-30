@@ -86,7 +86,7 @@ function PortfolioSite() {
             </p>
             <p className="text-ink-muted mb-4">
               The CyberDiary and OWASP Top 10 sections are data-driven from typed
-              content files, with a vulnerability-type filter that is reflected
+              content files, with a project filter that is reflected
               in the URL.
             </p>
             <p className="text-ink-muted">

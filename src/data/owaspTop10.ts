@@ -5,9 +5,8 @@ export interface OwaspRisk {
   whyItMatters: string
   howToLearnIt: string[]
   tools: string[]
-  relatedDiaryVulnType?: string
   progress?: 'Not started' | 'Planned' | 'In progress' | 'Completed'
-  relatedDiaryLinks?: { label: string; entryId: string; vulnType: string }[]
+  relatedDiaryLinks?: { label: string; entryId: string }[]
 }
 
 export const owaspTop10: OwaspRisk[] = [
@@ -49,32 +48,26 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'First ZAP baseline scan',
         entryId: 'appsec-homelab-entry-9-first-zap-scan',
-        vulnType: 'AppSec Homelab',
       },
       {
         label: 'ZAP remediation, final round',
         entryId: 'appsec-homelab-entry-10-zap-remediation-final',
-        vulnType: 'AppSec Homelab',
       },
       {
         label: 'Landing zone Terraform: secure defaults, tfsec findings',
         entryId: 'secure-azure-landing-zone-entry-7-main-tf-resource-by-resource',
-        vulnType: 'Secure Azure Landing Zone',
       },
       {
         label: 'Fixing the tfsec findings, first deployment',
         entryId: 'secure-azure-landing-zone-entry-8-tfsec-fixes-first-apply',
-        vulnType: 'Secure Azure Landing Zone',
       },
       {
         label: 'Semgrep: Dockerfile running as root',
         entryId: 'appsec-homelab-entry-21-azure-pipelines-lan-self-hosted-agent',
-        vulnType: 'AppSec Homelab',
       },
       {
         label: 'Trivy: storage account findings tfsec missed',
         entryId: 'secure-azure-landing-zone-entry-9-tfsec-to-trivy',
-        vulnType: 'Secure Azure Landing Zone',
       },
     ],
   },
@@ -102,22 +95,18 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'AppSec Homelab',
         entryId: 'appsec-homelab-entry-4-first-pipeline-run',
-        vulnType: 'AppSec Homelab',
       },
       {
         label: 'Full CI/CD security pipeline',
         entryId: 'appsec-homelab-entry-14-cicd-pipeline',
-        vulnType: 'AppSec Homelab',
       },
       {
         label: 'Dependabot gap and a transitive vulnerability',
         entryId: 'appsec-homelab-entry-20-azure-pipelines-migration-dependabot-gap',
-        vulnType: 'AppSec Homelab',
       },
       {
         label: 'Swapping tfsec for a checksum-verified Trivy',
         entryId: 'secure-azure-landing-zone-entry-9-tfsec-to-trivy',
-        vulnType: 'Secure Azure Landing Zone',
       },
     ],
   },
@@ -141,12 +130,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Fixing plaintext password storage',
         entryId: 'appsec-homelab-entry-16-plaintext-password-fix',
-        vulnType: 'Cryptographic Failures',
       },
       {
         label: 'Landing zone: TLS and Key Vault settings',
         entryId: 'secure-azure-landing-zone-entry-7-main-tf-resource-by-resource',
-        vulnType: 'Secure Azure Landing Zone',
       },
     ],
   },
@@ -174,22 +161,18 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'SQL Injection labs',
         entryId: 'portswigger-sqli-path-complete',
-        vulnType: 'SQL Injection',
       },
       {
         label: 'XSS path complete',
         entryId: 'portswigger-xss-labs-25-30',
-        vulnType: 'XSS',
       },
       {
         label: 'Homelab: login bypass exploit and fix',
         entryId: 'appsec-homelab-entry-11-login-bypass-fix',
-        vulnType: 'SQL Injection',
       },
       {
         label: 'Homelab: XSS exploit and fix',
         entryId: 'appsec-homelab-entry-13-product-search-xss-fix',
-        vulnType: 'XSS',
       },
     ],
   },
@@ -211,12 +194,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Homelab risk assessment (NIST CSF)',
         entryId: 'appsec-homelab-entry-17-risk-assessment',
-        vulnType: 'AppSec Homelab',
       },
       {
         label: 'Visitor map: privacy boundary and risk assessment',
         entryId: 'visitor-map-entry-1-build-and-rate-limit',
-        vulnType: 'Visitor Map',
       },
     ],
   },
@@ -241,12 +222,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Authentication labs 1-5',
         entryId: 'portswigger-auth-labs-1-5',
-        vulnType: 'Authentication',
       },
       {
         label: 'Landing zone: OIDC pipeline auth',
         entryId: 'secure-azure-landing-zone-entry-5-plan-stage-oidc-auth',
-        vulnType: 'Secure Azure Landing Zone',
       },
     ],
   },
@@ -268,7 +247,6 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Landing zone: Apply stage and approval gate',
         entryId: 'secure-azure-landing-zone-entry-6-apply-stage-deployment-jobs',
-        vulnType: 'Secure Azure Landing Zone',
       },
     ],
   },

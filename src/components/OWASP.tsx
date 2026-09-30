@@ -101,9 +101,7 @@ function OwaspTop10() {
                   {risk.relatedDiaryLinks.map((link) => (
                     <Link
                       key={link.entryId}
-                      to={`/diary/${link.entryId}?vuln=${encodeURIComponent(
-                        link.vulnType,
-                      )}`}
+                      to={`/diary/${link.entryId}`}
                       className="text-warn hover:text-warn text-sm font-medium underline underline-offset-2"
                     >
                       See {link.label} →

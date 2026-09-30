@@ -105,7 +105,7 @@ function SecureAzureLandingZone() {
           {/* Project Links */}
           <div className="flex flex-wrap gap-4">
             <Link
-              to="/diary?vuln=Secure%20Azure%20Landing%20Zone"
+              to="/diary?project=Secure%20Azure%20Landing%20Zone"
               className="bg-ink text-card px-6 py-3 rounded-lg hover:opacity-90 transition-colors duration-300 font-semibold"
             >
               Full write-up in the CyberDiary
