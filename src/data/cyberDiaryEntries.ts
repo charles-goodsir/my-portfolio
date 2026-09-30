@@ -44,6 +44,68 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-azure-landing-zone-entry-20-drift-detection-pipeline',
+    date: '2026-09-30',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    milestone: true,
+    title: 'A weekly drift check, and a config that would have passed review',
+    workedOn: [
+      'Added a second pipeline that only plans: terraform plan -detailed-exitcode, which exits 0 when Azure matches the code, 1 on an error, and 2 on drift, so any non-zero exit fails the run',
+      'Set trigger: none and pr: none so it never runs Apply or waits at the approval gate, and always: true so ADO still runs it when there are no new commits, since drift happens in Azure, not in git',
+      'Caught two typos in the schedule: a cron with four fields instead of five, and includes instead of include, neither of which would have failed the PR, since the PR runs the main pipeline, not this file',
+      'Confirmed cron runs in UTC, so "Monday 3am" in Brisbane is Sunday, day 0',
+      'Proved it works by tagging the resource group drifttest in the Portal: the pipeline went red with "Drift detected" and a plan to remove the tag, then green again once the tag was deleted',
+      'Checked the service connection\'s permissions after registering the new pipeline and confirmed only the two pipelines are listed',
+    ],
+    body: [
+      'I added a second pipeline that only plans. It runs terraform plan -detailed-exitcode, which exits 0 when Azure matches the code, 1 on an error and 2 when something has drifted. Any non-zero exit fails the run, so drift shows up as red. It lives in its own file with trigger: none and pr: none, so it never runs Apply and never waits at the approval gate. always: true matters because ADO skips a scheduled run when there are no new commits, and drift happens in Azure, not in git.',
+      'My first version had two typos in the schedule: a cron with four fields instead of five, and includes instead of include. Neither would have failed the PR, because the PR runs the main pipeline, not this file. ADO does not read it until you register it. The schedule was also easy to get wrong: cron runs in UTC, so "Monday 3am" in Brisbane is Sunday, day 0.',
+      'To prove it works, I added a drifttest tag to the resource group in the Portal and ran the pipeline. It went red with "Drift detected", and the plan wanted to remove the tag. I deleted the tag, ran it again, and it went green. Registering the pipeline did not ask me to permit the service connection, because ADO authorises a pipeline\'s resources when the owner creates it. I checked the connection\'s permissions and they list only the two pipelines.',
+      'A config file is not tested until something reads it. If the PR checks do not run it, they have not reviewed it.',
+    ],
+    screenshots: [
+      'SecureAzureLandingZone/SALZ26.webp',
+      'SecureAzureLandingZone/SALZ27.webp',
+    ],
+    tools: ['Azure DevOps', 'Terraform', 'YAML'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Terraform',
+      'drift detection',
+      'CI/CD pipeline',
+      'Azure DevOps',
+    ],
+  },
+  {
+    id: 'secure-azure-landing-zone-entry-18-keyvault-endpoint-plan-matched',
+    date: '2026-09-30',
+    category: 'Secure Azure Landing Zone',
+    vulnTypes: ['Secure Azure Landing Zone'],
+    title: 'The Key Vault endpoint, and a plan that finally matched',
+    workedOn: [
+      'Added the second private endpoint, for the Key Vault: the same pattern as blob with three different values, the vault\'s ID, the sub-resource vault, and the vault\'s DNS zone',
+      'Read the plan line by line rather than trusting the green check, since a wrong sub-resource name or the blob zone pasted into the zone group would both pass validate without complaint',
+      'Got exactly 1 to add, 0 to change, 0 to destroy, and the diagnostic settings refreshed with no diff, confirming the metric fix held on a new PR',
+      'Checked right after merging and saw only the blob endpoint, since main was still waiting on approval and nothing reaches Azure until Apply runs',
+      'After approving, confirmed both endpoints as Approved, with the vault\'s A record at 10.0.2.5, the next free address after blob\'s 10.0.2.4',
+    ],
+    body: [
+      'I added the second private endpoint, for the Key Vault. It is the same pattern as blob with three different values: the vault\'s ID, the sub-resource vault, and the vault\'s DNS zone. Two slips would have passed validate without complaint: a wrong sub-resource name, or the blob zone pasted into the zone group. So I read the plan line by line instead of trusting the green check. It said exactly 1 to add, 0 to change, 0 to destroy. The diagnostic settings refreshed with no diff, so the metric fix held on a new PR.',
+      'My first check after merging showed only the blob endpoint. The merge had worked, but the main run was still waiting for my approval, and nothing reaches Azure until the Apply runs. After approving, both endpoints showed Approved. The vault\'s A record came up at 10.0.2.5, the next free address after blob\'s 10.0.2.4, since Azure reserves the first four in every subnet.',
+      'From my laptop, nslookup for the vault goes through privatelink.vaultcore.azure.net and ends at a public address, the same as blob. That is what should happen outside the VNet. Inside it, both names now resolve to private IPs.',
+      'A merged PR only changes code. Check that the change has reached Azure before checking whether it works.',
+    ],
+    screenshots: ['SecureAzureLandingZone/SALZ22.webp'],
+    tools: ['Terraform', 'Azure', 'Azure DevOps'],
+    tags: [
+      'Secure Azure Landing Zone',
+      'Terraform',
+      'private endpoints',
+      'private DNS',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-17-diagnostic-diff-blocked-push',
     date: '2026-09-29',
     category: 'Secure Azure Landing Zone',
@@ -296,7 +358,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
   },
   {
-    id: 'secure-azure-landing-zone-entry-9-provider-lock-file',
+    id: 'secure-azure-landing-zone-entry-19-provider-lock-file',
     date: '2026-09-24',
     category: 'Secure Azure Landing Zone',
     vulnTypes: ['Secure Azure Landing Zone'],
@@ -341,9 +403,9 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       "Lesson: a replace is a delete followed by a create, and it can fail between the two. On an account holding real data, I'd plan that change as a migration.",
     ],
     screenshots: [
-      'SecureAzureLandingZone/SALZ14.webp',
-      'SecureAzureLandingZone/SALZ15.webp',
-      'SecureAzureLandingZone/SALZ16.webp',
+      'SecureAzureLandingZone/SALZ23.webp',
+      'SecureAzureLandingZone/SALZ24.webp',
+      'SecureAzureLandingZone/SALZ25.webp',
     ],
     tools: ['Trivy', 'Terraform', 'Azure DevOps', 'Azure'],
     tags: [
