@@ -4,9 +4,7 @@ export interface DiaryLab {
   solution: string
   /** Whether the lab was fully solved. Some blind/OAST labs are blocked behind Burp Pro. */
   status?: 'completed' | 'in-progress' | 'blocked'
-  /** Path to a reference screenshot, relative to src/assets, e.g. 'Burp/Lab10.webp' */
-  screenshot?: string
-  /** Additional reference screenshots, relative to src/assets. Rendered after `screenshot`. */
+  /** Reference screenshots, relative to src/assets, e.g. 'Burp/Lab10.webp' */
   screenshots?: string[]
   /** Path to an accompanying automation script, relative to src/assets, e.g. 'LabScripts/sqli_solver.py' */
   script?: string
@@ -29,11 +27,10 @@ export interface DiaryEntry {
   codeSnippets?: { label: string; code: string }[]
   tools?: string[]
   tags?: string[]
-  link?: { label: string; url: string }
-  /** Multiple external references, rendered as a list after `link`. */
+  /** External references, rendered as a list at the end. */
   links?: { label: string; url: string }[]
   milestone?: boolean
-  screenshot?: string
+  /** Paths relative to src/assets, e.g. 'Homelab/HomeLab3.webp'. */
   screenshots?: string[]
 }
 
@@ -158,7 +155,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
   {
     id: 'ctf-map-entry-1-game-mode-and-hidden-flag',
     date: '2026-09-26',
-    category: 'CTF Map',
+    category: 'Portfolio Site',
     title: 'A game mode for this site, with a real flag hidden in it (Just for fun)',
     workedOn: [
       'Added an optional 3D capture-the-flag map at /play: each page of the site is a flag, and you drive to one and press Enter to open it',
@@ -597,7 +594,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
   {
     id: 'visitor-map-entry-1-build-and-rate-limit',
     date: '2026-09-23',
-    category: 'Visitor Map',
+    category: 'Portfolio Site',
     milestone: true,
     title: 'Small feature, first backend: a visitor map with a rate limit',
     workedOn: [
@@ -887,10 +884,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'DevOps',
       'infrastructure as code',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-18-azure-terraform-setup',
@@ -922,10 +921,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'infrastructure as code',
       'toolchain debugging',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-17-risk-assessment',
@@ -945,10 +946,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'This is the part of the job I have not had much reason to practice day to day: taking real technical controls and describing them the way a risk register would, rather than the way an engineer would. Worth doing on purpose rather than meeting it for the first time in an actual GRC role.',
     ],
     tags: ['AppSec homelab', 'risk assessment', 'NIST CSF', 'GRC'],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab/blob/main/homelab-risk-assessment.md',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab/blob/main/homelab-risk-assessment.md',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-16-plaintext-password-fix',
@@ -1001,10 +1004,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'PBKDF2',
       'OWASP Top 10',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-15-readme-audit-xss-reverify',
@@ -1045,10 +1050,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'output encoding',
       'documentation',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-14-cicd-pipeline',
@@ -1078,7 +1085,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       "DAST had an interesting constraint: the mini PC is LAN-only by design, never exposed to the internet, so a GitHub-hosted runner physically can't reach it. Rather than standing up a self-hosted runner, ran ZAP through the same SSH connection used for the deploy, so the scan executes on the LAN side where the target is actually reachable, then SCP the HTML report back and attach it to the workflow run as a downloadable artifact. Good enough for now - a self-hosted runner on the mini PC is the more correct long-term answer if DAST needs to become its own independent job.",
       "Phase 4 was making results visible without digging through logs. A nightly cron run, because dependency advisories update daily and a package clean yesterday can have a new CVE today with zero code changes on my end. A summary job with if: always() that reads every other job's result via needs.* and writes a pass/fail table to the run's $GITHUB_STEP_SUMMARY, so the pipeline's outcome is one glance instead of eight job logs. A Mermaid pipeline diagram in the README, which GitHub renders natively with no image asset needed, showing the parallel gates feeding staging, DAST folded into that stage, and the required-reviewer pause before production.",
     ],
-    screenshot: 'Homelab/HomeLabCICD1.webp',
+    screenshots: ['Homelab/HomeLabCICD1.webp'],
     tools: [
       'GitHub Actions',
       'Semgrep',
@@ -1099,10 +1106,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'least privilege',
       'SHA pinning',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'portswigger-auth-labs-1-5',
@@ -1132,7 +1141,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: 'Username: albuquerque\nPassword: mustang',
         status: 'completed',
-        screenshot: 'Burp/Lab1Authentication.webp',
+        screenshots: ['Burp/Lab1Authentication.webp'],
       },
       {
         title: 'Lab 2: 2FA simple bypass',
@@ -1144,7 +1153,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           'After reaching the 2FA prompt, navigate directly to /my-account.',
         status: 'completed',
-        screenshot: 'Burp/Lab2Authentication.webp',
+        screenshots: ['Burp/Lab2Authentication.webp'],
       },
       {
         title: 'Lab 3: Password reset broken logic',
@@ -1156,7 +1165,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           'POST to the reset endpoint with temp-forgot-password-token=<any valid token>&username=carlos&new-password-1=test&new-password-2=test',
         status: 'completed',
-        screenshot: 'Burp/Lab3Authentication.webp',
+        screenshots: ['Burp/Lab3Authentication.webp'],
       },
       {
         title: 'Lab 4: Username enumeration via subtly different responses',
@@ -1167,7 +1176,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: 'Username: Agenda\nPassword: Access',
         status: 'completed',
-        screenshot: 'Burp/Lab4Authentication.webp',
+        screenshots: ['Burp/Lab4Authentication.webp'],
       },
       {
         title: 'Lab 5: Username enumeration via response timing',
@@ -1179,7 +1188,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           'Username: vagrant\nPassword: moon\n\nAccount lockout bypassed with an X-Forwarded-For header on the login request.',
         status: 'completed',
-        screenshot: 'Burp/Lab5Authentication.webp',
+        screenshots: ['Burp/Lab5Authentication.webp'],
       },
     ],
     tools: ['Burp Suite', 'Burp Intruder', 'Burp Repeater', 'Web Browser'],
@@ -1192,10 +1201,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'response timing',
       'X-Forwarded-For',
     ],
-    link: {
-      label: 'Authentication vulnerabilities',
-      url: 'https://portswigger.net/web-security/authentication',
-    },
+    links: [
+      {
+        label: 'Authentication vulnerabilities',
+        url: 'https://portswigger.net/web-security/authentication',
+      },
+    ],
   },
   {
     id: 'portswigger-xss-labs-25-30',
@@ -1252,7 +1263,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           'LAB-ID.web-security-academy.net/?search=<svg><a><animate attributeName=href values=javascript:alert(1) /><text x=20 y=20>Click me</text></a>\n\n(URL-encoded in the search param.)',
         status: 'completed',
-        screenshot: 'Burp/Lab27XSS.webp',
+        screenshots: ['Burp/Lab27XSS.webp'],
       },
       {
         title:
@@ -1301,10 +1312,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'SVG',
       'exploit server',
     ],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'portswigger-xss-labs-21-24',
@@ -1385,10 +1398,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'exploit server',
       'Burp Collaborator',
     ],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'portswigger-xss-labs-15-20',
@@ -1422,7 +1437,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           '<script>\nlocation = "https://LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+onfocus%3Dalert%28document.cookie%29%20tabindex=1%3E#x";\n</script>\n\nDelivered from the exploit server.',
         status: 'completed',
-        screenshot: 'Burp/Lab15XSS.webp',
+        screenshots: ['Burp/Lab15XSS.webp'],
       },
       {
         title: 'Lab 16: Reflected XSS with some SVG markup allowed',
@@ -1446,7 +1461,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           "https://LAB-ID.web-security-academy.net/?'accesskey='x'onclick='alert(1)\n\nVictim presses the access key to fire it.",
         status: 'completed',
-        screenshot: 'Burp/Lab17XSS.webp',
+        screenshots: ['Burp/Lab17XSS.webp'],
       },
       {
         title:
@@ -1496,10 +1511,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'HTML entities',
       'exploit server',
     ],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'portswigger-xss-labs-12-14',
@@ -1533,7 +1550,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           'p3p\\"-alert()}//\n\nFull URL: https://LAB-ID.web-security-academy.net/?search=p3p\\%22-alert()}//',
         status: 'completed',
-        screenshot: 'Burp/Lab12XSS.webp',
+        screenshots: ['Burp/Lab12XSS.webp'],
       },
       {
         title: 'Lab 13: Stored DOM XSS',
@@ -1574,10 +1591,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'WAF bypass',
       'exploit server',
     ],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-13-product-search-xss-fix',
@@ -1618,10 +1637,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
     tools: ['React', 'JSX', 'Chrome DevTools'],
     tags: ['AppSec homelab', 'XSS', 'reflected XSS', 'output encoding'],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-12-product-search-sqli-fix',
@@ -1662,10 +1683,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'parameterized queries',
       'OWASP Top 10',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-11-login-bypass-fix',
@@ -1712,10 +1735,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'authentication bypass',
       'parameterized queries',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-10-zap-remediation-final',
@@ -1826,7 +1851,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Where things stand: the mini PC boots headless into a text console and runs Docker, and the homelab app is containerized and reachable on port 8080 from devices on my home network. Next is to confirm the app loads from my Mac, then start pointing OWASP ZAP at it for the DAST layer of the pipeline.',
       'The scoped ufw rule is a small thing, but it is the kind of default worth keeping visible in the eventual writeup. Running a deliberately vulnerable app on the network means being deliberate about what can reach it.',
     ],
-    screenshot: 'Homelab/HomeLab2.webp',
+    screenshots: ['Homelab/HomeLab2.webp'],
     tools: ['systemd', 'OpenSSH', 'Docker Compose', 'ufw', 'Git'],
     tags: [
       'AppSec homelab',
@@ -1859,7 +1884,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Still to do: a DHCP reservation on the router for 192.168.88.13 so the IP stops shifting, then deploy the homelab vulnerable app on this box and point OWASP ZAP at it to complete the DAST layer of the CI/CD pipeline.',
       'Most of today went on ruling out bootloader, driver, network, and firewall causes before landing on the simple ones: a bad cable, a stale IP, a wrong username. That is what the work usually looks like. Writing up the diagnosis path in the repo is worth more than a list of the commands that ran.',
     ],
-    screenshot: 'Homelab/HomeLab1.webp',
+    screenshots: ['Homelab/HomeLab1.webp'],
     tools: ['Linux Mint', 'GRUB', 'OpenSSH', 'ufw', 'fail2ban'],
     tags: [
       'AppSec homelab',
@@ -1901,7 +1926,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           '/feedback?returnPath=javascript:alert(document.cookie)\n\nSet as the returnPath param; the alert fires on clicking the Back link.',
         status: 'completed',
-        screenshot: 'Burp/Lab6XSS.webp',
+        screenshots: ['Burp/Lab6XSS.webp'],
       },
       {
         title:
@@ -1920,8 +1945,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           '<iframe src="https://LAB-ID.web-security-academy.net/#" onload="this.src+=\'<img src=x onerror=print()>\'"></iframe>\n\nDelivered from the exploit server.',
         status: 'completed',
-        screenshot: 'Burp/Lab7XSS.webp',
-        screenshots: ['Burp/Lab7XSS2.webp'],
+        screenshots: ['Burp/Lab7XSS.webp', 'Burp/Lab7XSS2.webp'],
       },
       {
         title:
@@ -1933,8 +1957,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: "p3p\" onmouseover='alert()'",
         status: 'completed',
-        screenshot: 'Burp/Lab8XSS.webp',
-        screenshots: ['Burp/Lab8XSS2.webp'],
+        screenshots: ['Burp/Lab8XSS.webp', 'Burp/Lab8XSS2.webp'],
       },
       {
         title:
@@ -1947,8 +1970,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: 'javascript:alert()',
         status: 'completed',
-        screenshot: 'Burp/Lab9XSS.webp',
-        screenshots: ['Burp/Lab9XSS2.webp'],
+        screenshots: ['Burp/Lab9XSS.webp', 'Burp/Lab9XSS2.webp'],
       },
       {
         title:
@@ -1963,7 +1985,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           "p3p'; alert(); let cake = 'test\n\nAlso works as a self-contained break-in: '-alert()-'",
         status: 'completed',
-        screenshot: 'Burp/Lab10XSS.webp',
+        screenshots: ['Burp/Lab10XSS.webp'],
       },
       {
         title:
@@ -1977,7 +1999,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: "{{ $eval.constructor('alert()')() }}",
         status: 'completed',
-        screenshot: 'Burp/Lab11XSS.webp',
+        screenshots: ['Burp/Lab11XSS.webp'],
       },
     ],
     tools: ['Burp Suite', 'Web Browser', 'Chrome DevTools'],
@@ -1991,10 +2013,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'hashchange',
       'javascript: URI',
     ],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'portswigger-xss-labs-2-5',
@@ -2047,8 +2071,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           "?productId=1&storeId=p3p</select><img src='1' onerror='alert()'>\n\nURL-encoded:\n?productId=1&storeId=p3p%3C/select%3E%3Cimg%20src=%271%27%20onerror=%27alert()%27%3E",
         status: 'completed',
-        screenshot: 'Burp/Lab4XSS.webp',
-        screenshots: ['Burp/Lab4XSS2.webp'],
+        screenshots: ['Burp/Lab4XSS.webp', 'Burp/Lab4XSS2.webp'],
       },
       {
         title: 'Lab 5: DOM XSS in innerHTML sink using source location.search',
@@ -2059,7 +2082,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: "<img src='0' onerror='alert()'>",
         status: 'completed',
-        screenshot: 'Burp/Lab5XSS.webp',
+        screenshots: ['Burp/Lab5XSS.webp'],
       },
     ],
     tools: ['Burp Suite', 'Web Browser', 'Chrome DevTools'],
@@ -2071,10 +2094,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'innerHTML',
       'JavaScript',
     ],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-6-documented-false-negative',
@@ -2093,10 +2118,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
     tools: ['Semgrep', '.NET / C#', 'GitHub Actions'],
     tags: ['AppSec homelab', 'SQL injection', 'Semgrep', 'SAST limitations'],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-5-semgrep-frombody-gap',
@@ -2129,10 +2156,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'SAST limitations',
       'taint analysis',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-4-first-pipeline-run',
@@ -2169,10 +2198,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Semgrep',
       'software supply chain',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
     screenshots: [
       'Homelab/SQLiHomeLabDay1.webp',
       'Homelab/XSSHomeLabDay1.webp',
@@ -2193,7 +2224,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'First attempt at XSS after finishing the SQL injection path. Different mental model to SQLi - instead of manipulating a database query, the goal is getting the browser itself to execute a script that gets reflected back into the page unencoded.',
       'Went in with a rough idea from JavaScript that a <script> tag triggers execution, but the specifics of what actually fires in a browser context took a bit of trial and error.',
     ],
-    screenshot: 'Burp/Lab1XSS.webp',
+    screenshots: ['Burp/Lab1XSS.webp'],
     labs: [
       {
         title: 'Lab 1: Reflected XSS into HTML context with nothing encoded',
@@ -2208,10 +2239,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
     tools: ['Web Browser', 'Burp Suite'],
     tags: ['XSS', 'reflected XSS', 'JavaScript'],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'portswigger-sqli-path-complete',
@@ -2227,7 +2260,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Closing out the SQL injection learning path for now. Went from basic WHERE-clause tautologies through UNION attacks on Oracle, MySQL, and PostgreSQL, blind SQLi via conditional responses, conditional errors, and time delays, and a WAF bypass using XML encoding via Hackvertor.',
       'Labs 15 and 16 need Burp Collaborator, which sits behind a Professional licence. Flagging them as blocked rather than skipping past quietly - revisiting once I upgrade or find a trial window.',
     ],
-    screenshot: 'Burp/CompletedSQLiLabs.webp',
+    screenshots: ['Burp/CompletedSQLiLabs.webp'],
     tools: [
       'Burp Suite',
       'Burp Proxy',
@@ -2236,10 +2269,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Python',
     ],
     tags: ['SQL injection', 'milestone', 'PortSwigger Web Security Academy'],
-    link: {
-      label: 'SQL injection labs',
-      url: 'https://portswigger.net/web-security/sql-injection',
-    },
+    links: [
+      {
+        label: 'SQL injection labs',
+        url: 'https://portswigger.net/web-security/sql-injection',
+      },
+    ],
   },
 
   {
@@ -2332,10 +2367,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'WAF bypass',
       'PostgreSQL',
     ],
-    link: {
-      label: 'SQL injection labs',
-      url: 'https://portswigger.net/web-security/sql-injection',
-    },
+    links: [
+      {
+        label: 'SQL injection labs',
+        url: 'https://portswigger.net/web-security/sql-injection',
+      },
+    ],
   },
   {
     id: 'portswigger-sqli-labs-11-12',
@@ -2392,10 +2429,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'conditional errors',
       'Oracle',
     ],
-    link: {
-      label: 'SQL injection labs',
-      url: 'https://portswigger.net/web-security/sql-injection',
-    },
+    links: [
+      {
+        label: 'SQL injection labs',
+        url: 'https://portswigger.net/web-security/sql-injection',
+      },
+    ],
   },
   {
     id: 'portswigger-sqli-labs-1-10',
@@ -2544,7 +2583,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: "' UNION SELECT NULL, username || password FROM users--",
         status: 'completed',
-        screenshot: 'Burp/Lab10.webp',
+        screenshots: ['Burp/Lab10.webp'],
       },
     ],
     tools: ['Burp Suite', 'Burp Proxy', 'Burp Repeater'],
@@ -2556,9 +2595,11 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'PostgreSQL',
       'login bypass',
     ],
-    link: {
-      label: 'SQL injection labs',
-      url: 'https://portswigger.net/web-security/sql-injection',
-    },
+    links: [
+      {
+        label: 'SQL injection labs',
+        url: 'https://portswigger.net/web-security/sql-injection',
+      },
+    ],
   },
 ]
