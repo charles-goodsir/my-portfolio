@@ -69,17 +69,6 @@ function symbolFor(route: string, color: Color) {
           </HoloPart>
         </>
       )
-    case '/experience': // a briefcase with a handle
-      return (
-        <>
-          <HoloPart color={color}>
-            <boxGeometry args={[0.7, 0.45, 0.2]} />
-          </HoloPart>
-          <HoloPart color={color} position-y={0.28}>
-            <boxGeometry args={[0.25, 0.08, 0.08]} />
-          </HoloPart>
-        </>
-      )
     case '/projects': // a stack of blocks
       return (
         <>

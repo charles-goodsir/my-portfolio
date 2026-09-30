@@ -33,7 +33,7 @@ const risk = (r) => {
       if (!e) return ''
       return `<a class="logged__item" href="${SITE}/#/diary/${esc(e.id)}">
                 <b>${esc(e.title)}</b>
-                <span>CyberDiary &middot; ${fmtDate(e.date)}${e.milestone ? ' &middot; milestone' : ''}</span>
+                <span>Lab Notes &middot; ${fmtDate(e.date)}${e.milestone ? ' &middot; milestone' : ''}</span>
               </a>`
     })
     .join('')
@@ -56,15 +56,19 @@ const risk = (r) => {
           <p class="field__label">Why it matters</p>
           <p>${esc(r.whyItMatters)}</p>
         </div>
-        <div class="field">
-          <p class="field__label">How I'm learning it</p>
-          <ul>${r.howToLearnIt.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>
-        </div>
-        <div class="field">
+        ${r.done.length ? `<div class="field">
+          <p class="field__label">What I've done</p>
+          <ul>${r.done.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>
+        </div>` : ''}
+        ${r.next?.length ? `<div class="field">
+          <p class="field__label">Next</p>
+          <ul>${r.next.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>
+        </div>` : ''}
+        ${r.tools.length ? `<div class="field">
           <p class="field__label">Tools</p>
           <div class="chips">${r.tools.map((t) => `<span class="chip">${esc(t)}</span>`).join('')}</div>
-        </div>
-        ${logged ? `<div class="field"><p class="field__label">Logged in the CyberDiary</p><div class="logged">${logged}</div></div>` : ''}
+        </div>` : ''}
+        ${logged ? `<div class="field"><p class="field__label">Logged in my Lab Notes</p><div class="logged">${logged}</div></div>` : ''}
       </div>
     </li>`
 }
@@ -203,7 +207,7 @@ const html = `<title>Learning the OWASP Top 10</title>
     <h1>Learning the OWASP Top 10</h1>
     <p class="standfirst">
       The ten most critical web application security risks in the 2025 list, and
-      where I am on each one: what I've done, what's logged in the CyberDiary,
+      where I am on each one: what I've done, what's logged in my Lab Notes,
       and what's next.
     </p>
     <p class="meta">
@@ -237,7 +241,7 @@ const html = `<title>Learning the OWASP Top 10</title>
   <footer class="foot">
     Rankings and category names follow the OWASP Top 10 (2025).
     Progress notes are my own and change as the work does.<br>
-    Full write-ups live in the <a href="${SITE}/#/diary">CyberDiary</a>.
+    Full write-ups live in the <a href="${SITE}/#/diary">Lab Notes</a>.
   </footer>
 </div>
 `

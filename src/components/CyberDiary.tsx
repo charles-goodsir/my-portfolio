@@ -92,7 +92,7 @@ function CyberDiary() {
   return (
     <section id="cyberdiary" className="max-w-[45rem] mx-auto py-16 px-4">
       <SectionHeader
-        title="CyberDiary"
+        title="Lab Notes"
         intro="A running log of security labs and practice, one notebook per project."
       />
 

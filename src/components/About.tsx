@@ -1,4 +1,5 @@
 import Me from '../assets/MyPic/me.webp'
+import Experience from './Experience'
 
 const CV = `${import.meta.env.BASE_URL}Charles_Goodsir_CV.pdf`
 
@@ -44,9 +45,9 @@ function About() {
         <div className="grid lg:grid-cols-2 gap-8 items-start">
           {/* Personal Story */}
           <div>
-            <h3 className="text-2xl font-semibold text-ink mb-4">
+            <h2 className="text-2xl font-semibold text-ink mb-4">
               My Story
-            </h3>
+            </h2>
             <div className="prose prose-lg max-w-none">
               <p className="text-ink-muted mb-4">
                 I'm Charles Goodsir, an Application Engineer working toward
@@ -61,7 +62,7 @@ function About() {
                   CompTIA Security+ certified
                 </strong>{' '}
                 and I work through PortSwigger's labs in Burp Suite, logging
-                each one in my CyberDiary. On the dev side I use React,
+                each one in my Lab Notes. On the dev side I use React,
                 Node.js, TypeScript, and Python.
               </p>
               <p className="text-ink-muted mb-4">
@@ -83,15 +84,15 @@ function About() {
 
           {/* Roles & Interests */}
           <div>
-            <h3 className="text-2xl font-semibold text-ink mb-4">
+            <h2 className="text-2xl font-semibold text-ink mb-4">
               Roles I'm Targeting
-            </h3>
+            </h2>
 
             <div className="space-y-4">
               <div className="bg-sunken p-4 rounded-lg">
-                <h4 className="font-semibold text-ink mb-2">
+                <h3 className="font-semibold text-ink mb-2">
                   DevOps / DevSecOps
-                </h4>
+                </h3>
                 <p className="text-ink-muted text-sm">
                   My main focus: automated security scanning and deployment
                   gates in CI/CD, working with engineers to catch issues
@@ -103,9 +104,9 @@ function About() {
               </div>
 
               <div className="bg-sunken p-4 rounded-lg">
-                <h4 className="font-semibold text-ink mb-2">
+                <h3 className="font-semibold text-ink mb-2">
                   Application Security
-                </h4>
+                </h3>
                 <p className="text-ink-muted text-sm">
                   My specialty inside the pipeline: web app testing, secure
                   code review, and fixing the vulnerabilities I find. I back
@@ -114,9 +115,9 @@ function About() {
               </div>
 
               <div className="bg-sunken p-4 rounded-lg">
-                <h4 className="font-semibold text-ink mb-2">
+                <h3 className="font-semibold text-ink mb-2">
                   Full-Stack Foundation
-                </h4>
+                </h3>
                 <p className="text-ink-muted text-sm">
                   My background: React, Node.js, TypeScript, APIs, and
                   databases. I know how an app fits together end to end, so I
@@ -128,7 +129,7 @@ function About() {
 
             {/* Key Skills */}
             <div className="mt-6">
-              <h4 className="font-semibold text-ink mb-3">Key Skills</h4>
+              <h3 className="font-semibold text-ink mb-3">Key Skills</h3>
               <div className="flex flex-wrap gap-2">
                 {[
                   'Application Security',
@@ -159,6 +160,8 @@ function About() {
           </div>
         </div>
       </div>
+
+      <Experience />
     </section>
   )
 }

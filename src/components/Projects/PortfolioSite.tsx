@@ -85,7 +85,7 @@ function PortfolioSite() {
               a specific page can be linked and shared.
             </p>
             <p className="text-ink-muted mb-4">
-              The CyberDiary and OWASP Top 10 sections are data-driven from typed
+              The Lab Notes and OWASP Top 10 sections are data-driven from typed
               content files, with a project filter that is reflected
               in the URL.
             </p>

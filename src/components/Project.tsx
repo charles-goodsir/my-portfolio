@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import Card from './ui/Card'
 import SectionHeader from './ui/SectionHeader'
 import Tag from './ui/Tag'
@@ -9,7 +10,7 @@ interface Project {
   technologies: string[]
 }
 
-const projects: Project[] = [
+const securityProjects: Project[] = [
   {
     id: 'appsec-homelab',
     title: 'AppSec Homelab',
@@ -32,17 +33,11 @@ const projects: Project[] = [
     title: 'Secure Azure Landing Zone',
     description:
       'A Terraform-managed Azure landing zone built pipeline-first: validate, Trivy scan, plan, and a manual approval gate before anything reaches Azure. The first resources are live',
-    technologies: [
-      'Terraform',
-      'Azure DevOps',
-      'Azure',
-      'Trivy',
-      'YAML',
-    ],
+    technologies: ['Terraform', 'Azure DevOps', 'Azure', 'Trivy', 'YAML'],
   },
   {
     id: 'portfolio',
-    title: 'Portfolio Website (You are here now!)',
+    title: 'Portfolio Site',
     description:
       'This site, built with React and TypeScript. It has an optional 3D capture-the-flag map, built with Three.js, where each page is a flag you drive to',
     technologies: [
@@ -54,6 +49,9 @@ const projects: Project[] = [
       'Vite',
     ],
   },
+]
+
+const earlierProjects: Project[] = [
   {
     id: 'detour',
     title: 'Detour',
@@ -65,7 +63,7 @@ const projects: Project[] = [
     id: 'finance-tracker',
     title: 'Finance Tracker 2.0',
     description:
-      'A comprehensive personal finance management application with FastAPI backend, AWS serverless architecture, and automated transaction tracking',
+      'A personal finance app with a FastAPI backend on AWS Lambda and automated transaction tracking',
     technologies: [
       'Python',
       'FastAPI',
@@ -105,24 +103,23 @@ const projects: Project[] = [
       'Vite',
     ],
   },
-  {
-    id: 'airbnb',
-    title: 'Airbnb Clone - Homepage',
-    description:
-      'A basic React homepage with interactive calendar and date selection functionality',
-    technologies: ['React', 'JavaScript', 'CSS', 'Date Picker', 'Material UI'],
-  },
 ]
 
 function Projects() {
   return (
     <section id="projects" className="max-w-[45rem] mx-auto py-16 px-4">
       <SectionHeader title="My Projects" />
+
+      <h2 className="text-sm font-semibold text-ink uppercase tracking-wide mb-4">
+        Security work
+      </h2>
       <ul className="space-y-4">
-        {projects.map((project) => (
+        {securityProjects.map((project) => (
           <li key={project.id}>
             <Card to={`/projects/${project.id}`}>
-              <h2 className="text-xl font-bold text-ink mb-2">{project.title}</h2>
+              <h3 className="text-xl font-bold text-ink mb-2">
+                {project.title}
+              </h3>
               <p className="text-ink-muted text-sm mb-4">
                 {project.description}
               </p>
@@ -135,6 +132,26 @@ function Projects() {
                 View details →
               </span>
             </Card>
+          </li>
+        ))}
+      </ul>
+
+      <h2 className="text-sm font-semibold text-ink uppercase tracking-wide mt-14 mb-2">
+        Earlier projects
+      </h2>
+      <ul className="divide-y divide-line border-y border-line">
+        {earlierProjects.map((project) => (
+          <li key={project.id} className="py-4">
+            <Link
+              to={`/projects/${project.id}`}
+              className="font-medium text-ink hover:text-primary hover:underline underline-offset-2"
+            >
+              {project.title}
+            </Link>
+            <p className="text-sm text-ink-muted mt-1">{project.description}</p>
+            <p className="text-xs text-ink-muted mt-1.5">
+              {project.technologies.join(' · ')}
+            </p>
           </li>
         ))}
       </ul>

@@ -31,8 +31,7 @@ const latestEntry = [...cyberDiaryEntries].sort((a, b) => b.date.localeCompare(a
 
 // What each flag's hologram says. Diary numbers come from the real data
 const previews: Record<string, string> = {
-  '/about': "My story and the roles I'm targeting. CV download.",
-  '/experience': 'Software Application Engineer at Datacom since 2021. Education and certifications.',
+  '/about': "My story, the roles I'm targeting, and my experience at Datacom since 2021. CV download.",
   '/projects': 'AppSec homelab, a secure Azure landing zone, and earlier web builds.',
   '/diary': `${cyberDiaryEntries.length} entries. Latest: ${latestEntry.title}`,
   '/owasp': 'My notes on each of the 10 risks.',

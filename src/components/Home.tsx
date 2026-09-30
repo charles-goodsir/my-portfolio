@@ -1,6 +1,14 @@
+import { Link } from 'react-router'
+import { cyberDiaryEntries } from '../data/cyberDiaryEntries'
+import { owaspTop10 } from '../data/owaspTop10'
 import Button from './ui/Button'
 import VisitorBadge from './ui/VisitorBadge'
 import { hasFinePointer } from './Play/device'
+
+// The data file is newest first.
+const latest = cyberDiaryEntries[0]
+const owaspCount = (progress: string) =>
+  owaspTop10.filter((r) => r.progress === progress).length
 
 function Home() {
   return (
@@ -8,19 +16,40 @@ function Home() {
       <div className="animate-fade-in">
         <h1 className="text-display font-bold text-ink mb-6">Hi, I'm Charles</h1>
         <p className="text-lg text-ink-muted mb-6">
-          Application Engineer · Building DevSecOps Capability
+          Software Application Engineer · Moving into DevSecOps and AppSec
         </p>
-        <p className="text-base text-ink-muted mb-10 max-w-[55ch]">
+        <p className="text-base text-ink-muted mb-6 max-w-[55ch]">
           Full-stack background, now wiring security into the pipelines I
           build in - CI/CD gates, SAST/DAST, and the application security
           work underneath both.
         </p>
+        <ul className="text-sm text-ink-muted space-y-1 mb-10">
+          <li>
+            Latest in Lab Notes:{' '}
+            <Link
+              to={`/diary/${latest.id}`}
+              className="text-primary hover:underline underline-offset-2"
+            >
+              {latest.title}
+            </Link>
+          </li>
+          <li>
+            OWASP Top 10:{' '}
+            <Link
+              to="/owasp"
+              className="text-primary hover:underline underline-offset-2"
+            >
+              {owaspCount('Completed')} completed, {owaspCount('In progress')}{' '}
+              in progress
+            </Link>
+          </li>
+        </ul>
         <div className="flex flex-col sm:flex-row gap-4">
           <Button to="/projects" variant="primary">
             View My Work
           </Button>
           <Button to="/diary" variant="secondary">
-            Cyber Diary
+            Lab Notes
           </Button>
           {/* The map needs a keyboard or mouse, so no button on phones */}
           {hasFinePointer && (

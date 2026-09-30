@@ -10,58 +10,48 @@ interface ExperienceItem {
 const experiences: ExperienceItem[] = [
   {
     title: 'Software Application Engineer - Finance Domain',
-    company: 'DATACOM SOLUTIONS (NZ)',
+    company: 'Datacom Solutions',
     location: 'Auckland, New Zealand',
-    duration: 'Sept 2021 - Current',
+    duration: 'Sep 2021 - Present',
     description: [
       'Designed, coded/configured, tested, and delivered enterprise CRM/ERP applications across multiple NZ and Australian regions',
       'Worked with C# and YAML in an Azure DevOps environment, including YAML-driven test-data generation that provisions cross-referenced data across local and cloud environments at build time',
-      'Built automation test suites using Gherkin/BDD scripts to validate end-to-end business logic - the same systematic verification mindset (input validation, edge cases, expected vs. actual behaviour) used in security testing',
-      'Partnered with BAs, developers, configurators, product managers, and clients across cross-functional teams to turn business requirements into secure, maintainable configuration',
+      'Built automation test suites in Gherkin/BDD to validate end-to-end business logic, reducing configuration defect rates by ~30% through standardised testing frameworks',
+      'Contributed to a week-long bug smash that brought down roughly 500 defects across the product',
+      'Ran planning sessions and live demos with customers for new work on an enterprise finance module across 3 councils',
+      'Worked with BAs, developers, configurators, product managers, and clients to turn business requirements into configuration',
       'Automated manual workflows for local government councils using in-house tooling, reducing risk from manual data handling',
       'Diagnosed and remodelled system configuration through root-cause analysis, cutting one job’s runtime from 2.5 minutes to 20 seconds',
       'Authored technical documentation in Confluence to support internal releases and onboarding, and led weekly CRM/ERP overview and training sessions',
       'Mentored associate analysts on delivery practice with ongoing one-on-one guidance',
     ],
     technologies: [
-      'GitHub',
-      'JSON',
+      'C#',
       'Azure DevOps',
-      'CI/CD Pipelines',
-      'GIT',
       'YAML',
-      'Automation Testing',
+      'Git',
+      'Gherkin/BDD',
       'Confluence',
-      'Agile Methodology',
     ],
   },
   {
     title: 'Service Desk Analyst',
-    company: 'DATACOM SOLUTIONS (NZ)',
+    company: 'Datacom Solutions',
     location: 'Wellington, New Zealand',
-    duration: 'Sept 2020 to Sept 2021',
+    duration: 'Sep 2020 - Sep 2021',
     description: [
-      'Provided first-line technical support for the Ministry of Business, Innovation and Employment, accurately logging and verifying case details for every call',
-      'Investigated, resolved, and escalated issues raised via phone, email, and callback within SLA windows - early exposure to structured incident handling and prioritisation',
-      'Escalated to the right specialist teams when outside first-line scope, and shared resolutions across sites to prevent repeat tickets',
-      'Built a foundation in clear, calm communication under pressure, which carries directly into reporting vulnerabilities and incidents to non-technical stakeholders',
+      'Resolved 200+ IT incidents per month across phone, email, and remote sessions for the Ministry of Business, Innovation and Employment, maintaining first-call resolution above 80%',
+      'Investigated, resolved, and escalated issues raised via phone, email, and callback within SLA windows',
+      'Reduced repeat support volume by 25% by identifying recurring issue patterns and authoring knowledge-base articles adopted across the wider team',
     ],
-    technologies: [
-      'Customer Support',
-      'Problem Resolution',
-      'Documentation',
-      'Communication',
-      'Ticketing Systems',
-    ],
+    technologies: [],
   },
 ]
 
 function Experience() {
   return (
-    <section id="experience" className="max-w-[45rem] mx-auto py-16 px-4">
-      <h1 className="text-3xl font-semibold text-ink mb-8">
-        Professional Experience
-      </h1>
+    <section id="experience" className="mt-16">
+      <h2 className="text-2xl font-semibold text-ink mb-6">Experience</h2>
 
       <div className="space-y-8">
         {experiences.map((exp, index) => (
@@ -98,127 +88,20 @@ function Experience() {
               </ul>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              {exp.technologies.map((tech) => (
-                <span
-                  key={tech}
-                  className="bg-sunken text-ink-muted px-3 py-1 rounded-full text-sm"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
+            {exp.technologies.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {exp.technologies.map((tech) => (
+                  <span
+                    key={tech}
+                    className="bg-sunken text-ink-muted px-3 py-1 rounded-full text-sm"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         ))}
-      </div>
-
-      {/* Skills Translation Section */}
-      <div className="mt-12">
-        <h2 className="text-2xl font-semibold text-ink mb-6">
-          Why I'm Ready for Application Security &amp; DevSecOps Roles
-        </h2>
-        <div className="bg-sunken rounded-lg shadow-card p-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <h4 className="text-lg font-bold text-ink mb-4">
-                Security Foundation
-              </h4>
-              <ul className="space-y-2 text-ink-muted">
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>CompTIA Security+ (SY0-701):</strong> Certified in
-                    July 2026, covering threats, vulnerabilities, identity,
-                    risk, and secure operations
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>AppSec homelab:</strong> Building a
-                    vulnerable-by-design .NET/React app wired into a CI/CD
-                    security pipeline (Semgrep SAST, OWASP Dependency-Check/Snyk
-                    SCA, OWASP ZAP DAST, gitleaks secret scanning), self-hosted
-                    on Ubuntu Server.{' '}
-                    <strong>
-                      Plans have been laid out and initial setup is in progress.
-                    </strong>
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Hands-on offensive practice:</strong> Working
-                    through PortSwigger's Web Security Academy with Burp Suite -
-                    SQL injection labs completed and documented, more in
-                    progress
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Code-level fluency:</strong> 4+ years of production
-                    .NET/C# and TypeScript/React means I can read and reason
-                    about the code I'd be securing, not just the vulnerability
-                    class
-                  </span>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-lg font-bold text-ink mb-4">
-                Engineering Foundation
-              </h4>
-              <ul className="space-y-2 text-ink-muted">
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Version control & pipeline tooling:</strong> Git
-                    and Azure DevOps day to day, including YAML-driven
-                    test-data generation for multi-region enterprise systems
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Full-stack ownership:</strong> Independently shipped
-                    Detour (React Native, TypeScript, Supabase), live on the App
-                    Store - end-to-end ownership from UI to auth and data layer
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Systematic testing mindset:</strong> BDD/Gherkin
-                    automation experience translates directly into writing and
-                    validating security test cases
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Cross-functional delivery:</strong> Proven at
-                    translating business requirements into working, documented
-                    solutions across BAs, developers, and product teams
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-6 p-4 bg-white rounded-lg border border-line">
-            <p className="text-ink-muted text-center font-medium">
-              <strong>
-                Full-stack training at Dev Academy Aotearoa, CompTIA Security+,
-                a self-directed AppSec homelab, and Web Security Academy
-                practice
-              </strong>{' '}
-              all point at the same target: Application Security Engineer,
-              Product Security Engineer, and DevSecOps Engineer roles, where
-              years of shipping production code do the work that security
-              theory on its own cannot.
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Education Section */}
@@ -230,13 +113,12 @@ function Experience() {
           <div className="bg-card border border-line rounded-lg shadow-card p-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
               <div>
-                <h4 className="text-xl font-bold text-ink">
+                <h3 className="text-xl font-bold text-ink">
                   CompTIA Security+ (SY0-701)
-                </h4>
+                </h3>
                 <p className="text-lg text-success font-semibold">
                   CompTIA · Certified
                 </p>
-                <p className="text-ink-muted">Jul 2026</p>
               </div>
               <div className="mt-2 md:mt-0">
                 <span className="bg-success/10 text-success px-3 py-1 rounded-full text-sm font-semibold">
@@ -246,17 +128,16 @@ function Experience() {
             </div>
             <p className="text-ink-muted">
               Covers threats, vulnerabilities, identity, risk, and secure
-              operations, complementing hands-on software and enterprise IT
-              work.
+              operations.
             </p>
           </div>
 
           <div className="bg-card border border-line rounded-lg shadow-card p-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
               <div>
-                <h4 className="text-xl font-bold text-ink">
+                <h3 className="text-xl font-bold text-ink">
                   Level 6 in Applied Software Development
-                </h4>
+                </h3>
                 <p className="text-lg text-success font-semibold">
                   Dev Academy Aotearoa
                 </p>
@@ -279,10 +160,10 @@ function Experience() {
           <div className="bg-card border border-line rounded-lg shadow-card p-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
               <div>
-                <h4 className="text-xl font-bold text-ink">
+                <h3 className="text-xl font-bold text-ink">
                   Bachelor of Arts, History, International Relations, Political
                   Science
-                </h4>
+                </h3>
                 <p className="text-lg text-success font-semibold">
                   Victoria University of Wellington
                 </p>
