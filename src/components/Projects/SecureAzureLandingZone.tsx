@@ -5,7 +5,16 @@ import trivyReportImg from '../../assets/SecureAzureLandingZone/SALZ14.webp'
 import activityLogImg from '../../assets/SecureAzureLandingZone/SALZ13.webp'
 import validateImg from '../../assets/SecureAzureLandingZone/SALZ4.webp'
 
-const technologies = ['Terraform', 'Azure DevOps', 'Azure', 'Trivy', 'OIDC', 'YAML']
+const technologies = [
+  'Terraform',
+  'Azure DevOps',
+  'Azure',
+  'Trivy',
+  'OIDC',
+  'Private Link',
+  'Log Analytics',
+  'YAML',
+]
 
 const images = [
   {
@@ -73,8 +82,8 @@ function SecureAzureLandingZone() {
             <h1 className="text-4xl font-bold text-ink">
               Secure Azure Landing Zone
             </h1>
-            <span className="inline-block bg-warn/10 text-warn px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
-              Ongoing
+            <span className="inline-block bg-success/10 text-success px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+              Complete
             </span>
           </div>
           <p className="text-xl text-ink-muted mb-6">
@@ -83,11 +92,12 @@ function SecureAzureLandingZone() {
             waits for a human approval before any infrastructure changes.
           </p>
           <p className="text-xl text-ink-muted mb-6">
-            The pipeline runs end to end and the first resources are live in
-            Azure: a resource group, a VNet and subnet behind a deny-by-default
-            NSG, a storage account, and a Key Vault. Nothing deploys until
-            Trivy passes the Terraform. My Lab Notes have the day-by-day
-            version, bugs included.
+            The storage account and Key Vault are closed to the internet and
+            reachable through private endpoints in the VNet, their access logs
+            go to Log Analytics, and a weekly pipeline checks that Azure still
+            matches the code. Nothing deploys until Trivy passes the
+            Terraform. My Lab Notes have the day-by-day version, bugs
+            included.
           </p>
 
           {/* Technologies */}
@@ -146,10 +156,11 @@ function SecureAzureLandingZone() {
             <p className="text-ink-muted">
               The pipeline authenticates to Azure with workload identity
               federation, so each run gets a short-lived OIDC token and no
-              client secret is stored anywhere. The scan stage has earned its
-              place already: it blocked the first deployment over a Key Vault
-              with no network ACL, and after I swapped tfsec for Trivy it
-              found four storage account problems tfsec had passed.
+              client secret is stored anywhere. The controls caught real
+              mistakes, not only tests: the scanner blocked six
+              misconfigurations in my own code, the branch ruleset rejected a
+              commit I pushed at <code>main</code> by accident, and reading a
+              plan before approving it caught two changes I hadn&apos;t made.
             </p>
           </div>
         </div>
@@ -157,7 +168,7 @@ function SecureAzureLandingZone() {
         {/* What's built so far */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
           <h2 className="text-2xl font-bold text-ink mb-6">
-            What&apos;s Built So Far
+            What&apos;s Built
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -166,7 +177,11 @@ function SecureAzureLandingZone() {
                 <li>• Validate: fmt -check, init, validate</li>
                 <li>• Security Scan: Trivy v0.74.0, checksum-verified, with set -euo pipefail so a failed check stops the install</li>
                 <li>• Plan: remote state in a separate rg-tfstate storage account, created by hand with az cli; plan published as an artifact</li>
-                <li>• Apply: manual approval gate, then deploys the approved plan</li>
+                <li>• Apply: manual approval gate, then deploys the approved plan. It only runs on main, so a PR shows its plan without deploying</li>
+                <li>• Provider lock file committed with <code>-lockfile=readonly</code>, and one checksum-verified Terraform install shared by every stage</li>
+                <li>• One sign-in template for Plan, Apply and the drift check, so the OIDC setup can&apos;t drift between copies</li>
+                <li>• Weekly drift check: <code>terraform plan -detailed-exitcode</code> every Monday, failing if Azure no longer matches the code</li>
+                <li>• Branch ruleset on main: PR required, pipeline check required, no bypass. Fork PR builds are off</li>
               </ul>
             </div>
             <div>
@@ -177,6 +192,8 @@ function SecureAzureLandingZone() {
                 <li>• VNet and subnet, with an NSG relying on Azure&apos;s implicit deny-all</li>
                 <li>• Storage account: TLS 1.2 minimum, HTTPS-only, no public access, network_rules deny default, infrastructure encryption</li>
                 <li>• Key Vault: RBAC authorization, purge protection, 7-day soft delete, network ACL deny default</li>
+                <li>• Private endpoints for blob storage and the Key Vault, in their own subnet, with private DNS zones so the normal hostnames resolve to 10.0.2.4 and 10.0.2.5 inside the VNet</li>
+                <li>• Log Analytics workspace, with diagnostic settings sending the vault&apos;s AuditEvent log and blob read, write and delete logs to it</li>
               </ul>
             </div>
             <div>
@@ -185,7 +202,7 @@ function SecureAzureLandingZone() {
               </h3>
               <ul className="space-y-2 text-ink-muted">
                 <li>• tfsec: Key Vault with no network ACL (CRITICAL) and no soft delete retention set (MEDIUM)</li>
-                <li>• Trivy: four storage account findings. Two fixed, two accepted with written #trivy:ignore reasons</li>
+                <li>• Trivy: four storage account findings tfsec had passed. Two fixed outright. Storage logging fixed with diagnostic settings, keeping its suppression with a written reason because the rule can&apos;t see them. Geo-redundancy accepted as a cost decision</li>
                 <li>• Replaced an unpinned curl | bash tfsec install with a checksum-verified Trivy release</li>
               </ul>
             </div>
@@ -198,6 +215,8 @@ function SecureAzureLandingZone() {
                 <li>• AzureCLI@2&apos;s login didn&apos;t carry over to Terraform&apos;s azurerm provider, fixed by exporting the ARM_* OIDC variables</li>
                 <li>• Deployment jobs don&apos;t auto-checkout the source repo the way regular jobs do</li>
                 <li>• A storage account replace failed halfway: Azure rejected the new account name 6 seconds after Terraform deleted the old one</li>
+                <li>• A Build.Reason typo made the Apply condition always true, so Apply would have run on every PR while the YAML looked right</li>
+                <li>• A diagnostic settings diff came back on every plan, from disabled metric entries Azure adds by itself</li>
               </ul>
             </div>
           </div>
@@ -207,11 +226,12 @@ function SecureAzureLandingZone() {
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
           <h2 className="text-2xl font-bold text-ink mb-6">Status</h2>
           <p className="text-ink-muted">
-            Active. The pipeline and first resources are done. Two known gaps
-            remain: everything is hardcoded until I write{' '}
-            <code>variables.tf</code>, and logging still needs diagnostic
-            settings sent to Log Analytics, which is also the proper fix for
-            the Storage Analytics finding I accepted for now.
+            Complete. Before using this in production I&apos;d add a second
+            reviewer on PRs, a self-hosted agent inside the VNet for any
+            data-plane work, nightly drift checks with alerting, variables for
+            names and region, and signature verification for the Trivy and
+            Terraform downloads, whose checksums currently come from the same
+            place as the binaries.
           </p>
         </div>
 

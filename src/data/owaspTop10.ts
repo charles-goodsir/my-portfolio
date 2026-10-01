@@ -95,6 +95,8 @@ export const owaspTop10: OwaspRisk[] = [
       'Found Dependabot had been failing silently for weeks: 12 fix branches existed with no PRs, because the repo blocked Actions from creating pull requests. I fixed the permission and deleted the stale branches so Dependabot rebuilt them as real PRs',
       'Added a Dependabot cooldown period (a Semgrep finding) and update grouping, so weekly runs open one PR per ecosystem',
       "Closed a shortcut I'd flagged: the landing zone pipeline installed tfsec by piping an unpinned script into bash. Replaced it with Trivy pinned to v0.74.0 and verified against the release's SHA-256 checksum, with set -euo pipefail so a failed check actually stops the install",
+      'Gave this portfolio the same supply chain checks: a CI workflow with npm audit and a gitleaks scan, every Action pinned to a full commit SHA, and Dependabot keeping the pins and packages current',
+      "Split Dependabot's npm updates so each major version gets its own PR, after one grouped PR of 16 updates failed npm ci because TypeScript 7 broke typescript-eslint's peer range. Only explicit minor and patch updates auto-merge, and only once CI passes",
     ],
     next: ['Generate an SBOM for the app'],
     tools: ['Dependabot', 'Trivy', 'gitleaks'],
@@ -114,6 +116,14 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Swapping tfsec for a checksum-verified Trivy',
         entryId: 'secure-azure-landing-zone-entry-9-tfsec-to-trivy',
+      },
+      {
+        label: 'Portfolio: tests, CI and a gitleaks scan',
+        entryId: 'portfolio-site-entry-1-redesign-tests-and-ci',
+      },
+      {
+        label: 'Portfolio: splitting Dependabot majors from auto-merge',
+        entryId: 'portfolio-site-entry-2-rulesets-signing-dependabot',
       },
     ],
   },
@@ -249,15 +259,21 @@ export const owaspTop10: OwaspRisk[] = [
     done: [
       'The landing zone pipeline publishes the terraform plan as an artifact, and Apply deploys that exact plan after a manual approval gate instead of re-planning, so what ships is what someone reviewed',
       'Every homelab GitHub Action is pinned to a full commit SHA, so a moved tag cannot swap in different code (more under A03)',
+      "Fixed this portfolio's branch rules: required checks had been switched on with an empty list, and Dependabot had a bypass that could push straight to main. One ruleset now requires CI, the secret scan and signed commits on every change to main, and my admin bypass only works through a PR",
+      'Set up SSH commit signing with my GitHub key, so GitHub marks my commits Verified and main rejects unsigned ones',
     ],
     next: [
       'The PortSwigger Insecure Deserialization path, and artifact signing with Sigstore/cosign',
     ],
-    tools: ['Azure DevOps approvals'],
+    tools: ['Azure DevOps approvals', 'GitHub rulesets', 'SSH commit signing'],
     relatedDiaryLinks: [
       {
         label: 'Landing zone: Apply stage and approval gate',
         entryId: 'secure-azure-landing-zone-entry-6-apply-stage-deployment-jobs',
+      },
+      {
+        label: 'Portfolio: branch rules and signed commits',
+        entryId: 'portfolio-site-entry-2-rulesets-signing-dependabot',
       },
     ],
   },
