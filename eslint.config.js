@@ -12,9 +12,16 @@ export default tseslint.config([
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
-      reactHooks.configs['recommended-latest'],
       reactRefresh.configs.vite,
     ],
+    // react-hooks v7's recommended set adds the React Compiler rules, which
+    // flag the normal react-three-fiber pattern of mutating objects in
+    // useFrame. Keep the two classic rules until the game code is reviewed.
+    plugins: { 'react-hooks': reactHooks },
+    rules: {
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
