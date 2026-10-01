@@ -32,7 +32,7 @@ const securityProjects: Project[] = [
     id: 'secure-azure-landing-zone',
     title: 'Secure Azure Landing Zone',
     description:
-      'A Terraform-managed Azure landing zone built pipeline-first: validate, Trivy scan, plan, and a manual approval gate before anything reaches Azure. The first resources are live',
+      'A Terraform-managed Azure landing zone built pipeline-first: validate, Trivy scan, plan, and a manual approval gate before anything reaches Azure. Finished, with private endpoints, audit logging to Log Analytics and a weekly drift check',
     technologies: ['Terraform', 'Azure DevOps', 'Azure', 'Trivy', 'YAML'],
   },
   {
