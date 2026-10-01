@@ -1,307 +1,153 @@
-interface ExperienceItem {
+interface TimelineItem {
+  kind: 'Work' | 'Certification' | 'Education'
   title: string
-  company: string
-  location: string
-  duration: string
-  description: string[]
-  technologies: string[]
+  org: string
+  location?: string
+  dates: string
+  /** Work shows its first two; everything else sits behind "More". */
+  points: string[]
+  technologies?: string[]
 }
 
-const experiences: ExperienceItem[] = [
+// Newest first, ongoing work at the top.
+const timeline: TimelineItem[] = [
   {
-    title: 'Software Application Engineer - Finance Domain',
-    company: 'DATACOM SOLUTIONS (NZ)',
+    kind: 'Work',
+    title: 'Application Engineer - Finance Domain',
+    org: 'Datacom Solutions',
     location: 'Auckland, New Zealand',
-    duration: 'Sept 2021 - Current',
-    description: [
-      'Designed, coded/configured, tested, and delivered enterprise CRM/ERP applications across multiple NZ and Australian regions',
-      'Worked with C# and YAML in an Azure DevOps environment, including YAML-driven test-data generation that provisions cross-referenced data across local and cloud environments at build time',
-      'Built automation test suites using Gherkin/BDD scripts to validate end-to-end business logic - the same systematic verification mindset (input validation, edge cases, expected vs. actual behaviour) used in security testing',
-      'Partnered with BAs, developers, configurators, product managers, and clients across cross-functional teams to turn business requirements into secure, maintainable configuration',
-      'Automated manual workflows for local government councils using in-house tooling, reducing risk from manual data handling',
-      'Diagnosed and remodelled system configuration through root-cause analysis, cutting one job’s runtime from 2.5 minutes to 20 seconds',
-      'Authored technical documentation in Confluence to support internal releases and onboarding, and led weekly CRM/ERP overview and training sessions',
-      'Mentored associate analysts on delivery practice with ongoing one-on-one guidance',
+    dates: 'Sep 2021 - Present',
+    points: [
+      'Helped cut configuration defect rates by ~30% by standardising testing, including Gherkin/BDD suites for end-to-end business logic',
+      'Helped clear roughly 500 defects in a week-long bug smash',
+      'Traced a slow job to its configuration and remodelled it, cutting its runtime from 2.5 minutes to 20 seconds',
+      "Built local council environments with .NET tooling and exported their configuration as JSON for the pipeline that builds each council's cloud environment. I watch each run to catch configuration that breaks the build",
+      'Delivered CRM/ERP applications for councils in NZ and Australia',
+      'Worked with YAML-driven test-data generation in Azure DevOps, using some C#, to provision cross-referenced data for local and cloud environments at build time',
+      'Ran planning sessions and live demos for a new enterprise finance module across 3 councils',
+      'Turned business requirements into configuration, working with BAs and clients',
+      'Wrote Confluence documentation for releases and onboarding, and led weekly CRM/ERP training sessions',
+      'Mentored associate analysts one-on-one',
     ],
     technologies: [
-      'GitHub',
+      '.NET',
       'JSON',
       'Azure DevOps',
-      'CI/CD Pipelines',
-      'GIT',
       'YAML',
-      'Automation Testing',
+      'Git',
+      'Gherkin/BDD',
       'Confluence',
-      'Agile Methodology',
     ],
   },
   {
-    title: 'Service Desk Analyst',
-    company: 'DATACOM SOLUTIONS (NZ)',
-    location: 'Wellington, New Zealand',
-    duration: 'Sept 2020 to Sept 2021',
-    description: [
-      'Provided first-line technical support for the Ministry of Business, Innovation and Employment, accurately logging and verifying case details for every call',
-      'Investigated, resolved, and escalated issues raised via phone, email, and callback within SLA windows - early exposure to structured incident handling and prioritisation',
-      'Escalated to the right specialist teams when outside first-line scope, and shared resolutions across sites to prevent repeat tickets',
-      'Built a foundation in clear, calm communication under pressure, which carries directly into reporting vulnerabilities and incidents to non-technical stakeholders',
+    kind: 'Certification',
+    title: 'CompTIA Security+ (SY0-701)',
+    org: 'CompTIA',
+    dates: 'Jul 2026',
+    points: [
+      'Exam domains: general security concepts; threats, vulnerabilities, and mitigations; security architecture; security operations; and security program management and oversight',
     ],
-    technologies: [
-      'Customer Support',
-      'Problem Resolution',
-      'Documentation',
-      'Communication',
-      'Ticketing Systems',
+  },
+  {
+    kind: 'Education',
+    title: 'Level 6 in Applied Software Development',
+    org: 'Dev Academy Aotearoa',
+    location: 'Auckland, New Zealand',
+    dates: 'Jul 2024 - Dec 2024',
+    points: [
+      'A 17-week, Level 6 full-stack diploma covering JavaScript, TypeScript, React, Node.js, and databases',
+      'Learned through daily pair programming and agile team projects',
+      'Led a team to build and deploy a full-stack app',
+    ],
+  },
+  {
+    kind: 'Work',
+    title: 'Service Desk Analyst',
+    org: 'Datacom Solutions',
+    location: 'Wellington, New Zealand',
+    dates: 'Sep 2020 - Sep 2021',
+    points: [
+      'Resolved 200+ IT incidents a month for the Ministry of Business, Innovation and Employment, with first-call resolution above 80%',
+      'Cut repeat support volume by 25% by spotting recurring issues and writing knowledge-base articles the wider team adopted',
+      'Triaged critical infrastructure incidents (network access, identity management, remote desktop) and escalated them to specialist teams within SLA',
+    ],
+  },
+  {
+    kind: 'Education',
+    title:
+      'Bachelor of Arts, History, International Relations, Political Science',
+    org: 'Victoria University of Wellington',
+    location: 'Wellington, New Zealand',
+    dates: 'Feb 2017 - Jan 2020',
+    points: [
+      'Studied history, international relations, and political science over three years',
+      'Wrote research essays built on primary sources, to deadline',
     ],
   },
 ]
 
+// Work shows its top two points; education and certifications show none.
+const shownFor = (item: TimelineItem) => (item.kind === 'Work' ? 2 : 0)
+
+function PointList({ points }: { points: string[] }) {
+  return (
+    <ul className="space-y-1.5">
+      {points.map((point) => (
+        <li key={point} className="text-ink-muted text-sm flex items-start">
+          <span className="text-primary mr-2 mt-0.5 shrink-0">•</span>
+          {point}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 function Experience() {
   return (
-    <section id="experience" className="max-w-[45rem] mx-auto py-16 px-4">
-      <h1 className="text-3xl font-semibold text-ink mb-8">
-        Professional Experience
-      </h1>
+    <section id="experience" className="mt-16">
+      <h2 className="text-2xl font-semibold text-ink mb-8">
+        Experience &amp; Education
+      </h2>
 
-      <div className="space-y-8">
-        {experiences.map((exp, index) => (
-          <div
-            key={index}
-            className="bg-card border border-line rounded-lg shadow-card p-6"
-          >
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-bold text-ink">{exp.title}</h3>
-                <p className="text-lg text-primary font-semibold">
-                  {exp.company}
-                </p>
-                <p className="text-ink-muted">{exp.location}</p>
-              </div>
-              <div className="mt-2 md:mt-0">
-                <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-semibold">
-                  {exp.duration}
-                </span>
-              </div>
-            </div>
+      <ol className="border-l-2 border-line ml-1.5 space-y-8">
+        {timeline.map((item) => (
+          <li key={item.title} className="relative pl-6">
+            <span
+              aria-hidden="true"
+              className={`absolute -left-[7px] top-1.5 w-3 h-3 rounded-full ring-4 ring-page ${
+                item.kind === 'Work' ? 'bg-primary' : 'bg-success'
+              }`}
+            />
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+              {item.dates} · {item.kind}
+            </p>
+            <h3 className="text-lg font-bold text-ink mt-1">{item.title}</h3>
+            <p className="text-sm text-ink-muted mb-3">
+              {item.org}
+              {item.location && ` · ${item.location}`}
+            </p>
 
-            <div className="mb-4">
-              <ul className="space-y-2">
-                {exp.description.map((desc, descIndex) => (
-                  <li
-                    key={descIndex}
-                    className="text-ink-muted flex items-start"
-                  >
-                    <span className="text-primary mr-2 mt-1">•</span>
-                    {desc}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <PointList points={item.points.slice(0, shownFor(item))} />
+            {item.points.length > shownFor(item) && (
+              <details className="mt-2 group">
+                <summary className="text-sm text-primary font-medium cursor-pointer hover:underline underline-offset-2 list-none [&::-webkit-details-marker]:hidden">
+                  <span className="group-open:hidden">More</span>
+                  <span className="hidden group-open:inline">Less</span>
+                </summary>
+                <div className="mt-1.5">
+                  <PointList points={item.points.slice(shownFor(item))} />
+                </div>
+              </details>
+            )}
 
-            <div className="flex flex-wrap gap-2">
-              {exp.technologies.map((tech) => (
-                <span
-                  key={tech}
-                  className="bg-sunken text-ink-muted px-3 py-1 rounded-full text-sm"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </div>
+            {item.technologies && (
+              <p className="text-xs text-ink-muted mt-3">
+                {item.technologies.join(' · ')}
+              </p>
+            )}
+          </li>
         ))}
-      </div>
-
-      {/* Skills Translation Section */}
-      <div className="mt-12">
-        <h2 className="text-2xl font-semibold text-ink mb-6">
-          Why I'm Ready for Application Security &amp; DevSecOps Roles
-        </h2>
-        <div className="bg-sunken rounded-lg shadow-card p-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <h4 className="text-lg font-bold text-ink mb-4">
-                Security Foundation
-              </h4>
-              <ul className="space-y-2 text-ink-muted">
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>CompTIA Security+ (SY0-701):</strong> Certified in
-                    July 2026, covering threats, vulnerabilities, identity,
-                    risk, and secure operations
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>AppSec homelab:</strong> Building a
-                    vulnerable-by-design .NET/React app wired into a CI/CD
-                    security pipeline (Semgrep SAST, OWASP Dependency-Check/Snyk
-                    SCA, OWASP ZAP DAST, gitleaks secret scanning), self-hosted
-                    on Ubuntu Server.{' '}
-                    <strong>
-                      Plans have been laid out and initial setup is in progress.
-                    </strong>
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Hands-on offensive practice:</strong> Working
-                    through PortSwigger's Web Security Academy with Burp Suite -
-                    SQL injection labs completed and documented, more in
-                    progress
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Code-level fluency:</strong> 4+ years of production
-                    .NET/C# and TypeScript/React means I can read and reason
-                    about the code I'd be securing, not just the vulnerability
-                    class
-                  </span>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-lg font-bold text-ink mb-4">
-                Engineering Foundation
-              </h4>
-              <ul className="space-y-2 text-ink-muted">
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Version control & pipeline tooling:</strong> Git
-                    and Azure DevOps day to day, including YAML-driven
-                    test-data generation for multi-region enterprise systems
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Full-stack ownership:</strong> Independently shipped
-                    Detour (React Native, TypeScript, Supabase), live on the App
-                    Store - end-to-end ownership from UI to auth and data layer
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Systematic testing mindset:</strong> BDD/Gherkin
-                    automation experience translates directly into writing and
-                    validating security test cases
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-primary mr-2 mt-1">•</span>
-                  <span>
-                    <strong>Cross-functional delivery:</strong> Proven at
-                    translating business requirements into working, documented
-                    solutions across BAs, developers, and product teams
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-6 p-4 bg-white rounded-lg border border-line">
-            <p className="text-ink-muted text-center font-medium">
-              <strong>
-                Full-stack training at Dev Academy Aotearoa, CompTIA Security+,
-                a self-directed AppSec homelab, and Web Security Academy
-                practice
-              </strong>{' '}
-              all point at the same target: Application Security Engineer,
-              Product Security Engineer, and DevSecOps Engineer roles, where
-              years of shipping production code do the work that security
-              theory on its own cannot.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Education Section */}
-      <div className="mt-12">
-        <h2 className="text-2xl font-semibold text-ink mb-6">
-          Education &amp; Certifications
-        </h2>
-        <div className="space-y-6">
-          <div className="bg-card border border-line rounded-lg shadow-card p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-              <div>
-                <h4 className="text-xl font-bold text-ink">
-                  CompTIA Security+ (SY0-701)
-                </h4>
-                <p className="text-lg text-success font-semibold">
-                  CompTIA · Certified
-                </p>
-                <p className="text-ink-muted">Jul 2026</p>
-              </div>
-              <div className="mt-2 md:mt-0">
-                <span className="bg-success/10 text-success px-3 py-1 rounded-full text-sm font-semibold">
-                  Jul 2026
-                </span>
-              </div>
-            </div>
-            <p className="text-ink-muted">
-              Covers threats, vulnerabilities, identity, risk, and secure
-              operations, complementing hands-on software and enterprise IT
-              work.
-            </p>
-          </div>
-
-          <div className="bg-card border border-line rounded-lg shadow-card p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-              <div>
-                <h4 className="text-xl font-bold text-ink">
-                  Level 6 in Applied Software Development
-                </h4>
-                <p className="text-lg text-success font-semibold">
-                  Dev Academy Aotearoa
-                </p>
-                <p className="text-ink-muted">Auckland, New Zealand</p>
-              </div>
-              <div className="mt-2 md:mt-0">
-                <span className="bg-success/10 text-success px-3 py-1 rounded-full text-sm font-semibold">
-                  Jul 2024 - Dec 2024
-                </span>
-              </div>
-            </div>
-            <p className="text-ink-muted">
-              17-week full-stack bootcamp: JavaScript, TypeScript, React,
-              Node.js, and databases, taught through daily pair programming and
-              agile team projects. Led a team to build and deploy a full-stack
-              app end to end.
-            </p>
-          </div>
-
-          <div className="bg-card border border-line rounded-lg shadow-card p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-              <div>
-                <h4 className="text-xl font-bold text-ink">
-                  Bachelor of Arts, History, International Relations, Political
-                  Science
-                </h4>
-                <p className="text-lg text-success font-semibold">
-                  Victoria University of Wellington
-                </p>
-                <p className="text-ink-muted">Wellington, New Zealand</p>
-              </div>
-              <div className="mt-2 md:mt-0">
-                <span className="bg-success/10 text-success px-3 py-1 rounded-full text-sm font-semibold">
-                  Feb 2017 - Jan 2020
-                </span>
-              </div>
-            </div>
-            <p className="text-ink-muted">
-              Three years of history, international relations, and political
-              science. Heavy on research, academic writing, and building an
-              argument from primary sources under deadline.
-            </p>
-          </div>
-        </div>
-      </div>
+      </ol>
     </section>
   )
 }

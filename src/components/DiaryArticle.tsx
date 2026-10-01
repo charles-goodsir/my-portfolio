@@ -1,20 +1,13 @@
-import { Link } from 'react-router'
 import type { DiaryEntry } from '../data/cyberDiaryEntries'
 import { formatDate, resolveScreenshot, scriptMap } from './diaryAssets'
 
 interface DiaryArticleProps {
   entry: DiaryEntry
-  /** When true, the title links to the entry's own page. */
-  linked?: boolean
   /** Heading level for the entry title. 'h1' on the standalone entry page. */
   titleAs?: 'h1' | 'h3'
 }
 
-function DiaryArticle({
-  entry,
-  linked = false,
-  titleAs = 'h3',
-}: DiaryArticleProps) {
+function DiaryArticle({ entry, titleAs = 'h3' }: DiaryArticleProps) {
   const Title = titleAs
   return (
     <article
@@ -28,18 +21,7 @@ function DiaryArticle({
         >
           {formatDate(entry.date)}
         </time>
-        <Title className="text-xl font-bold text-ink mt-1">
-          {linked ? (
-            <Link
-              to={`/diary/${entry.id}`}
-              className="hover:text-primary underline-offset-2 hover:underline"
-            >
-              {entry.title}
-            </Link>
-          ) : (
-            entry.title
-          )}
-        </Title>
+        <Title className="text-xl font-bold text-ink mt-1">{entry.title}</Title>
         <span className="inline-block mt-2 bg-primary/10 text-primary px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
           {entry.category}
         </span>
@@ -51,22 +33,25 @@ function DiaryArticle({
       </div>
 
       <div className="px-6 py-5 space-y-5">
-        <div>
-          <h4 className="text-sm font-semibold text-ink uppercase tracking-wide mb-2">
-            What I worked on
-          </h4>
-          <ul className="space-y-1.5">
-            {entry.workedOn.map((item) => (
-              <li
-                key={item}
-                className="text-ink-muted text-sm flex items-start"
-              >
-                <span className="text-primary mr-2 mt-0.5 shrink-0">•</span>
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
+        {/* On project entries the bullets repeat the body; lab entries use them as a summary. */}
+        {((entry.labs?.length ?? 0) > 0 || entry.body.length === 0) && (
+          <div>
+            <h4 className="text-sm font-semibold text-ink uppercase tracking-wide mb-2">
+              What I worked on
+            </h4>
+            <ul className="space-y-1.5">
+              {entry.workedOn.map((item) => (
+                <li
+                  key={item}
+                  className="text-ink-muted text-sm flex items-start"
+                >
+                  <span className="text-primary mr-2 mt-0.5 shrink-0">•</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {entry.body.length > 0 && (
           <div className="space-y-3">
@@ -94,16 +79,6 @@ function DiaryArticle({
               </div>
             ))}
           </div>
-        )}
-
-        {entry.screenshot && resolveScreenshot(entry.screenshot) && (
-          <img
-            src={resolveScreenshot(entry.screenshot)}
-            alt={`${entry.title} screenshot`}
-            loading="lazy"
-            decoding="async"
-            className="rounded border border-line w-full h-auto"
-          />
         )}
 
         {entry.screenshots && entry.screenshots.length > 0 && (
@@ -155,18 +130,13 @@ function DiaryArticle({
                       {lab.solution}
                     </pre>
                   </div>
-                  {((lab.screenshot && resolveScreenshot(lab.screenshot)) ||
-                    (lab.screenshots &&
-                      lab.screenshots.some((s) => resolveScreenshot(s)))) && (
+                  {lab.screenshots?.some((s) => resolveScreenshot(s)) && (
                     <div>
                       <p className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-1.5">
                         Screenshot
                       </p>
                       <div className="space-y-3">
-                        {[
-                          ...(lab.screenshot ? [lab.screenshot] : []),
-                          ...(lab.screenshots ?? []),
-                        ].map(
+                        {lab.screenshots.map(
                           (shot) =>
                             resolveScreenshot(shot) && (
                               <img
@@ -233,12 +203,9 @@ function DiaryArticle({
           </div>
         )}
 
-        {(entry.link || (entry.links && entry.links.length > 0)) && (
+        {entry.links && entry.links.length > 0 && (
           <div className="flex flex-col items-start gap-1.5 pt-1">
-            {[
-              ...(entry.link ? [entry.link] : []),
-              ...(entry.links ?? []),
-            ].map((ref) => (
+            {entry.links.map((ref) => (
               <a
                 key={ref.url}
                 href={ref.url}

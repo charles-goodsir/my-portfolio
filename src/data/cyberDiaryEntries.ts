@@ -4,9 +4,7 @@ export interface DiaryLab {
   solution: string
   /** Whether the lab was fully solved. Some blind/OAST labs are blocked behind Burp Pro. */
   status?: 'completed' | 'in-progress' | 'blocked'
-  /** Path to a reference screenshot, relative to src/assets, e.g. 'Burp/Lab10.webp' */
-  screenshot?: string
-  /** Additional reference screenshots, relative to src/assets. Rendered after `screenshot`. */
+  /** Reference screenshots, relative to src/assets, e.g. 'Burp/Lab10.webp' */
   screenshots?: string[]
   /** Path to an accompanying automation script, relative to src/assets, e.g. 'LabScripts/sqli_solver.py' */
   script?: string
@@ -16,9 +14,8 @@ export interface DiaryEntry {
   id: string
   /** ISO date string, e.g. '2026-07-28'. Used for sorting. */
   date: string
+  /** Project this entry belongs to, used for filtering (e.g. 'AppSec Homelab'). */
   category: string
-  /** Broad vulnerability class this entry belongs to, used for filtering (e.g. 'SQL Injection', 'XSS'). */
-  vulnTypes: string[]
   title: string
   /** What you actually did that day. */
   workedOn: string[]
@@ -30,11 +27,10 @@ export interface DiaryEntry {
   codeSnippets?: { label: string; code: string }[]
   tools?: string[]
   tags?: string[]
-  link?: { label: string; url: string }
-  /** Multiple external references, rendered as a list after `link`. */
+  /** External references, rendered as a list at the end. */
   links?: { label: string; url: string }[]
   milestone?: boolean
-  screenshot?: string
+  /** Paths relative to src/assets, e.g. 'Homelab/HomeLab3.webp'. */
   screenshots?: string[]
 }
 
@@ -44,10 +40,38 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'portfolio-site-entry-1-redesign-tests-and-ci',
+    date: '2026-10-01',
+    category: 'Portfolio Site',
+    title: 'Rebuilding the site, correcting my own copy, and adding tests and CI',
+    workedOn: [
+      'Turned Lab Notes from 52 full entries on one page into a shelf of project notebooks, with a short list of entries inside each',
+      'Renamed CyberDiary to Lab Notes and kept the /diary URLs, so links I had already shared still work',
+      'Gave the OWASP page a status grid and a page per risk, and split each risk into what I have done and what is next',
+      'Rewrote the About page, the Home page and my CV where they claimed pipeline work I have not done at my job',
+      'Added seven tests on Node 24\'s built-in runner and a GitHub Actions workflow with a gitleaks scan',
+    ],
+    body: [
+      'The Lab Notes page rendered all 52 entries in full, one after another. A recruiter landing on it saw a wall of text with a row of filters. It is now a shelf with one notebook per project, a short list of entries inside each, and a Start here box with the latest milestone from each project. I renamed it from CyberDiary to Lab Notes and kept the /diary URLs, so links I have already shared still work.',
+      'The OWASP page got the same treatment: a grid of the ten risks with their status, and a page for each one. I split every risk into what I have done and what is next, and cut 16 tools from the lists because nothing in these notes shows me using them.',
+      'The About page had a bigger problem than its length. It said I build CI/CD pipelines at work and add security checks to them. I don\'t. At Datacom I build local council environments with .NET tooling, export their configuration as JSON, and watch the pipeline that builds the cloud environment from it. The pipelines with security gates are in my own projects. I rewrote the About page, the Home page and my CV to say that.',
+      'Then I added tests and CI. The tests run on Node 24\'s built-in runner, so they need no new packages. They check what TypeScript can\'t see: entry IDs are unique, entries stay newest first, every screenshot and script path resolves, every OWASP link points at a real entry, and every nav page has a route and a flag in the CTF map. To prove they work, I added a nav page with no flag and moved an entry out of date order, and both tests failed. A GitHub Actions workflow now runs lint, the tests, a Linux build and npm audit on every PR, plus a gitleaks scan, with each Action pinned to a commit SHA and Dependabot keeping the pins current. It has not run yet; the first push will tell me whether it works.',
+      'Most of today was cutting. The cut that mattered most was a sentence on the About page claiming pipeline work I have not done at my job.',
+    ],
+    tools: ['React', 'TypeScript', 'Node.js test runner', 'GitHub Actions', 'gitleaks', 'Dependabot'],
+    tags: [
+      'Portfolio Site',
+      'redesign',
+      'testing',
+      'CI/CD pipeline',
+      'GitHub Actions',
+      'secret scanning',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-20-drift-detection-pipeline',
     date: '2026-09-30',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     milestone: true,
     title: 'A weekly drift check, and a config that would have passed review',
     workedOn: [
@@ -81,7 +105,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-18-keyvault-endpoint-plan-matched',
     date: '2026-09-30',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     title: 'The Key Vault endpoint, and a plan that finally matched',
     workedOn: [
       'Added the second private endpoint, for the Key Vault: the same pattern as blob with three different values, the vault\'s ID, the sub-resource vault, and the vault\'s DNS zone',
@@ -109,7 +132,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-17-diagnostic-diff-blocked-push',
     date: '2026-09-29',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     milestone: true,
     title: 'Fixing a diff that kept coming back, and a push that did not get through',
     workedOn: [
@@ -122,7 +144,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       'The diagnostic settings from the audit logging work had been showing up as changes on every plan. When you create a diagnostic setting, Azure records every metric category the resource supports, each one switched off. My code did not mention them, so every plan tried to remove them, and Azure kept reporting them anyway. The fix was to declare them in code: AllMetrics on the vault, and Capacity and Transaction on blob storage, all with enabled = false.',
       'I expected the next plan to show 2 changes, putting back entries the last apply had removed. It said No changes, and the apply after merging did nothing. The earlier apply had never removed them in the first place, because Azure keeps them whatever you send. That is why the diff kept coming back. My prediction was wrong, and the result proved the fix better than the prediction would have.',
-      'Getting it merged went wrong first. I made the branch from origin/main, and Git quietly set main as its upstream. When VS Code pushed my commit, it pushed to main. The ruleset I set up earlier rejected it twice with "Changes must be made through a pull request". That was the first time it blocked a real mistake rather than a test. I pushed the branch under its own name and went through a PR.',
+      'Getting it merged went wrong first. I made the branch from origin/main, and Git set main as its upstream without telling me. When VS Code pushed my commit, it pushed to main. The ruleset I set up earlier rejected it twice with "Changes must be made through a pull request". That was the first time it blocked a real mistake rather than a test. I pushed the branch under its own name and went through a PR.',
       'A control you have only tested on purpose has not been proven yet. The first time it catches a real mistake is when you find out it works.',
     ],
     screenshots: ['SecureAzureLandingZone/SALZ21.webp'],
@@ -138,7 +160,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-16-approve-known-diff-verify-endpoint',
     date: '2026-09-29',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     title: 'Approving a plan I knew was not clean, and checking the endpoint worked',
     workedOn: [
       'Merged the blob private endpoint with the diagnostic settings diff still in it, approving 7 to add, 2 to change, 0 to destroy on purpose, since the fix for the 2 was already planned for its own PR',
@@ -163,8 +184,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
   {
     id: 'ctf-map-entry-1-game-mode-and-hidden-flag',
     date: '2026-09-26',
-    category: 'CTF Map',
-    vulnTypes: ['CTF Map'],
+    category: 'Portfolio Site',
     title: 'A game mode for this site, with a real flag hidden in it (Just for fun)',
     workedOn: [
       'Added an optional 3D capture-the-flag map at /play: each page of the site is a flag, and you drive to one and press Enter to open it',
@@ -192,7 +212,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-15-private-endpoint-plan-drift',
     date: '2026-09-26',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     title: 'A private endpoint, and a plan with two changes I had not made',
     workedOn: [
       'Added the blob private endpoint in the new subnet and pointed it at the private DNS zone, so Azure writes the A record itself',
@@ -219,7 +238,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-14-private-dns-zones',
     date: '2026-09-26',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     title: 'Private DNS zones, and a plan that counted more than I had written',
     workedOn: [
       'Added two private DNS zones, privatelink.blob.core.windows.net and privatelink.vaultcore.azure.net, and linked each one to the VNet',
@@ -245,7 +263,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-13-private-endpoint-subnet',
     date: '2026-09-26',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     title: 'A subnet for private endpoints, and an NSG that does not do much yet',
     workedOn: [
       'Started the private endpoints work with the network they will sit in: a new subnet, salz-pe-subnet on 10.0.2.0/24, with the existing NSG associated',
@@ -272,7 +289,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-12-diagnostic-logging-azu-0057',
     date: '2026-09-25',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     title: 'Adding diagnostic logging, and testing a suppression honestly',
     workedOn: [
       'Added a Log Analytics workspace and two diagnostic settings: the Key Vault AuditEvent log, and the blob service read, write, and delete logs',
@@ -300,7 +316,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-11-terraform-install-template',
     date: '2026-09-25',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     title: 'Verifying the Terraform binary with a shared install template',
     workedOn: [
       'Found the pipeline downloaded the Terraform binary without a checksum, even though the binary is what checks the provider lock-file hashes',
@@ -332,7 +347,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-10-pr-gate-branch-protection',
     date: '2026-09-24',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     milestone: true,
     title: 'Gating main: PR trigger, skipped Apply, and a branch ruleset',
     workedOn: [
@@ -361,7 +375,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-19-provider-lock-file',
     date: '2026-09-24',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     title: 'Pinning the azurerm provider with the lock file',
     workedOn: [
       'Found that main.tf asks for azurerm ~> 3.0, a version range, and .terraform.lock.hcl was in .gitignore, so the pipeline resolved the range fresh on every run and trusted whatever the registry returned',
@@ -385,7 +398,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-9-tfsec-to-trivy',
     date: '2026-09-24',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     title: 'Swapping tfsec for Trivy, and a replacement that half-failed',
     workedOn: [
       "Replaced tfsec, installed by piping a script from GitHub's master branch into bash with no version pin or checksum, with Trivy v0.74.0 downloaded from the GitHub release and verified against its SHA-256 checksum file before extracting",
@@ -400,7 +412,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       "I also pasted the fixes onto the Key Vault instead of the storage account. terraform validate caught the settings the Key Vault doesn't support. It would not have caught the misplaced #trivy:ignore comments, because they're valid syntax attached to the wrong resource.",
       "Trivy found four problems on the storage account that tfsec had passed. I fixed two: a network_rules deny default and infrastructure encryption. I accepted the other two with inline #trivy:ignore comments and written reasons. GRS replication is a durability and cost choice for an account holding no data. Storage Analytics logging would only cover queues, which I don't use, so the proper fix is diagnostic settings sent to Log Analytics later.",
       "Infrastructure encryption can't be enabled on an existing account, so the plan showed a replace (-/+). Terraform deleted the account, then tried to create the new one 6 seconds later. Azure rejected it with StorageAccountAlreadyTaken, because globally unique names take time to be released after a deletion. The account was empty, so I renamed it and deployed a fresh plan.",
-      "Lesson: a replace is a delete followed by a create, and it can fail between the two. On an account holding real data, I'd plan that change as a migration.",
+      "A replace is a delete followed by a create, and it can fail between the two. On an account holding real data, I'd plan that change as a migration.",
     ],
     screenshots: [
       'SecureAzureLandingZone/SALZ23.webp',
@@ -420,7 +432,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-8-tfsec-fixes-first-apply',
     date: '2026-09-24',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     milestone: true,
     title: 'Fixing the tfsec findings and the first real deployment',
     workedOn: [
@@ -453,7 +464,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-7-main-tf-resource-by-resource',
     date: '2026-09-23',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     title: 'Writing the actual Terraform: main.tf, resource by resource',
     workedOn: [
       'Wrote the landing zone\'s real infrastructure by hand, validating after each addition: resource group, VNet + subnet, NSG (deny-by-default, no explicit rules, relying on Azure\'s implicit deny-all), NSG-subnet association, storage account, Key Vault',
@@ -538,7 +548,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-6-apply-stage-deployment-jobs',
     date: '2026-09-23',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     milestone: true,
     title: 'Azure DevOps pipeline: Apply stage, deployment jobs and manual approval',
     workedOn: [
@@ -573,7 +582,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-5-plan-stage-oidc-auth',
     date: '2026-09-23',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     milestone: true,
     title: 'Azure DevOps pipeline: Plan stage, bootstrap and OIDC auth debugging',
     workedOn: [
@@ -615,8 +623,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
   {
     id: 'visitor-map-entry-1-build-and-rate-limit',
     date: '2026-09-23',
-    category: 'Visitor Map',
-    vulnTypes: ['Visitor Map'],
+    category: 'Portfolio Site',
     milestone: true,
     title: 'Small feature, first backend: a visitor map with a rate limit',
     workedOn: [
@@ -655,7 +662,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'appsec-homelab-entry-21-azure-pipelines-lan-self-hosted-agent',
     date: '2026-09-19',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab'],
     milestone: true,
     title: 'Getting Azure Pipelines fully working: LAN reachability and a self-hosted agent',
     workedOn: [
@@ -708,7 +714,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'appsec-homelab-entry-20-azure-pipelines-migration-dependabot-gap',
     date: '2026-09-19',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab'],
     milestone: true,
     title: 'Migrating to Azure Pipelines, and finding a silent Dependabot gap',
     workedOn: [
@@ -742,7 +747,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-4-security-scan-tfsec',
     date: '2026-09-18',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     title: 'Azure DevOps pipeline: SecurityScan stage with tfsec',
     workedOn: [
       'Added a SecurityScan stage, dependsOn: Validate, so it only runs after validation passes',
@@ -777,7 +781,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-3-init-validate-complete',
     date: '2026-09-18',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     milestone: true,
     title: 'Azure DevOps pipeline: Validate stage complete',
     workedOn: [
@@ -812,7 +815,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-2-fmt-check-directory-collision',
     date: '2026-09-18',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     title: 'Azure DevOps pipeline: terraform fmt -check deletes its own source folder',
     workedOn: [
       'Added a terraform fmt -check -diff step, scoped to workingDirectory: terraform',
@@ -842,7 +844,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-1-validate-stage',
     date: '2026-09-17',
     category: 'Secure Azure Landing Zone',
-    vulnTypes: ['Secure Azure Landing Zone'],
     milestone: true,
     title: 'Azure DevOps pipeline: Validate stage, installing Terraform',
     workedOn: [
@@ -881,7 +882,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'appsec-homelab-entry-19-terraform-azure-deploy',
     date: '2026-09-17',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab'],
     milestone: true,
     title: 'Terraform + Azure: my first real IaC deployment',
     workedOn: [
@@ -913,16 +913,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'DevOps',
       'infrastructure as code',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-18-azure-terraform-setup',
     date: '2026-09-16',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab'],
     title: 'Setting up Terraform and Azure CLI for the first IaC piece',
     workedOn: [
       'Started Phase 3 of the homelab roadmap: a small Terraform-managed Azure resource, to close the most commonly-flagged skill gap in DevOps job postings',
@@ -949,16 +950,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'infrastructure as code',
       'toolchain debugging',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-17-risk-assessment',
     date: '2026-09-16',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab'],
     title:
       'A lightweight risk assessment of the homelab, mapped to NIST CSF 2.0',
     workedOn: [
@@ -973,16 +975,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'This is the part of the job I have not had much reason to practice day to day: taking real technical controls and describing them the way a risk register would, rather than the way an engineer would. Worth doing on purpose rather than meeting it for the first time in an actual GRC role.',
     ],
     tags: ['AppSec homelab', 'risk assessment', 'NIST CSF', 'GRC'],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab/blob/main/homelab-risk-assessment.md',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab/blob/main/homelab-risk-assessment.md',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-16-plaintext-password-fix',
     date: '2026-09-16',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab', 'Cryptographic Failures'],
     milestone: true,
     title: 'Fixing plaintext password storage - the last seeded vulnerability',
     workedOn: [
@@ -1030,16 +1033,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'PBKDF2',
       'OWASP Top 10',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-15-readme-audit-xss-reverify',
     date: '2026-09-16',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab', 'XSS'],
     title: 'Auditing the README against the code, and re-proving the XSS fix',
     workedOn: [
       "Checked the homelab README's vulnerability claims against the actual code and found it had gone stale: both seeded SQLi bugs were already fixed (in earlier sessions) but still listed as live exploits, and the reflected XSS claim didn't hold up either - the code was already safe JSX text interpolation, not the raw-HTML render the README described",
@@ -1075,16 +1079,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'output encoding',
       'documentation',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-14-cicd-pipeline',
     date: '2026-09-11',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab'],
     milestone: true,
     title:
       'Building a real CI/CD security pipeline (and chasing a moving IP address)',
@@ -1109,7 +1114,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       "DAST had an interesting constraint: the mini PC is LAN-only by design, never exposed to the internet, so a GitHub-hosted runner physically can't reach it. Rather than standing up a self-hosted runner, ran ZAP through the same SSH connection used for the deploy, so the scan executes on the LAN side where the target is actually reachable, then SCP the HTML report back and attach it to the workflow run as a downloadable artifact. Good enough for now - a self-hosted runner on the mini PC is the more correct long-term answer if DAST needs to become its own independent job.",
       "Phase 4 was making results visible without digging through logs. A nightly cron run, because dependency advisories update daily and a package clean yesterday can have a new CVE today with zero code changes on my end. A summary job with if: always() that reads every other job's result via needs.* and writes a pass/fail table to the run's $GITHUB_STEP_SUMMARY, so the pipeline's outcome is one glance instead of eight job logs. A Mermaid pipeline diagram in the README, which GitHub renders natively with no image asset needed, showing the parallel gates feeding staging, DAST folded into that stage, and the required-reviewer pause before production.",
     ],
-    screenshot: 'Homelab/HomeLabCICD1.webp',
+    screenshots: ['Homelab/HomeLabCICD1.webp'],
     tools: [
       'GitHub Actions',
       'Semgrep',
@@ -1130,16 +1135,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'least privilege',
       'SHA pinning',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'portswigger-auth-labs-1-5',
     date: '2026-09-08',
     category: 'PortSwigger Labs',
-    vulnTypes: ['Authentication'],
     title:
       'Authentication labs 1-5 (username enumeration, 2FA bypass, password reset logic)',
     workedOn: [
@@ -1164,7 +1170,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: 'Username: albuquerque\nPassword: mustang',
         status: 'completed',
-        screenshot: 'Burp/Lab1Authentication.webp',
+        screenshots: ['Burp/Lab1Authentication.webp'],
       },
       {
         title: 'Lab 2: 2FA simple bypass',
@@ -1176,7 +1182,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           'After reaching the 2FA prompt, navigate directly to /my-account.',
         status: 'completed',
-        screenshot: 'Burp/Lab2Authentication.webp',
+        screenshots: ['Burp/Lab2Authentication.webp'],
       },
       {
         title: 'Lab 3: Password reset broken logic',
@@ -1188,7 +1194,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           'POST to the reset endpoint with temp-forgot-password-token=<any valid token>&username=carlos&new-password-1=test&new-password-2=test',
         status: 'completed',
-        screenshot: 'Burp/Lab3Authentication.webp',
+        screenshots: ['Burp/Lab3Authentication.webp'],
       },
       {
         title: 'Lab 4: Username enumeration via subtly different responses',
@@ -1199,7 +1205,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: 'Username: Agenda\nPassword: Access',
         status: 'completed',
-        screenshot: 'Burp/Lab4Authentication.webp',
+        screenshots: ['Burp/Lab4Authentication.webp'],
       },
       {
         title: 'Lab 5: Username enumeration via response timing',
@@ -1211,7 +1217,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           'Username: vagrant\nPassword: moon\n\nAccount lockout bypassed with an X-Forwarded-For header on the login request.',
         status: 'completed',
-        screenshot: 'Burp/Lab5Authentication.webp',
+        screenshots: ['Burp/Lab5Authentication.webp'],
       },
     ],
     tools: ['Burp Suite', 'Burp Intruder', 'Burp Repeater', 'Web Browser'],
@@ -1224,16 +1230,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'response timing',
       'X-Forwarded-For',
     ],
-    link: {
-      label: 'Authentication vulnerabilities',
-      url: 'https://portswigger.net/web-security/authentication',
-    },
+    links: [
+      {
+        label: 'Authentication vulnerabilities',
+        url: 'https://portswigger.net/web-security/authentication',
+      },
+    ],
   },
   {
     id: 'portswigger-xss-labs-25-30',
     date: '2026-09-07',
     category: 'PortSwigger Labs',
-    vulnTypes: ['XSS'],
     milestone: true,
     title: 'Cross-Site Scripting (XSS) labs 25-30: XSS path complete',
     workedOn: [
@@ -1285,7 +1292,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           'LAB-ID.web-security-academy.net/?search=<svg><a><animate attributeName=href values=javascript:alert(1) /><text x=20 y=20>Click me</text></a>\n\n(URL-encoded in the search param.)',
         status: 'completed',
-        screenshot: 'Burp/Lab27XSS.webp',
+        screenshots: ['Burp/Lab27XSS.webp'],
       },
       {
         title:
@@ -1334,16 +1341,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'SVG',
       'exploit server',
     ],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'portswigger-xss-labs-21-24',
     date: '2026-09-07',
     category: 'PortSwigger Labs',
-    vulnTypes: ['XSS'],
     title:
       'Cross-Site Scripting (XSS) labs 21-24 (template literal, cookie/password theft, CSRF via XSS)',
     workedOn: [
@@ -1419,16 +1427,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'exploit server',
       'Burp Collaborator',
     ],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'portswigger-xss-labs-15-20',
     date: '2026-09-06',
     category: 'PortSwigger Labs',
-    vulnTypes: ['XSS'],
     title:
       'Cross-Site Scripting (XSS) labs 15-20 (custom tags, SVG, canonical link, JS string escaping, stored onclick)',
     workedOn: [
@@ -1457,7 +1466,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           '<script>\nlocation = "https://LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+onfocus%3Dalert%28document.cookie%29%20tabindex=1%3E#x";\n</script>\n\nDelivered from the exploit server.',
         status: 'completed',
-        screenshot: 'Burp/Lab15XSS.webp',
+        screenshots: ['Burp/Lab15XSS.webp'],
       },
       {
         title: 'Lab 16: Reflected XSS with some SVG markup allowed',
@@ -1481,7 +1490,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           "https://LAB-ID.web-security-academy.net/?'accesskey='x'onclick='alert(1)\n\nVictim presses the access key to fire it.",
         status: 'completed',
-        screenshot: 'Burp/Lab17XSS.webp',
+        screenshots: ['Burp/Lab17XSS.webp'],
       },
       {
         title:
@@ -1531,16 +1540,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'HTML entities',
       'exploit server',
     ],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'portswigger-xss-labs-12-14',
     date: '2026-09-06',
     category: 'PortSwigger Labs',
-    vulnTypes: ['XSS'],
     title:
       'Cross-Site Scripting (XSS) labs 12-14 (DOM eval sink, stored DOM, tag/attribute brute-forcing)',
     workedOn: [
@@ -1569,7 +1579,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           'p3p\\"-alert()}//\n\nFull URL: https://LAB-ID.web-security-academy.net/?search=p3p\\%22-alert()}//',
         status: 'completed',
-        screenshot: 'Burp/Lab12XSS.webp',
+        screenshots: ['Burp/Lab12XSS.webp'],
       },
       {
         title: 'Lab 13: Stored DOM XSS',
@@ -1610,16 +1620,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'WAF bypass',
       'exploit server',
     ],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-13-product-search-xss-fix',
     date: '2026-09-05',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab', 'XSS'],
     title: 'Exploiting and fixing the product search XSS',
     workedOn: [
       'Tried a manual XSS against the product search input, which the codebase already showed was vulnerable',
@@ -1655,16 +1666,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
     tools: ['React', 'JSX', 'Chrome DevTools'],
     tags: ['AppSec homelab', 'XSS', 'reflected XSS', 'output encoding'],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-12-product-search-sqli-fix',
     date: '2026-09-05',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab', 'SQL Injection'],
     title: 'Fixing the ProductsController SQL injection',
     workedOn: [
       'Fixed the SQL injection in the product search endpoint (ProductsController.cs), the other of the two SQLi bugs seeded in the app and the one Semgrep does flag',
@@ -1700,16 +1712,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'parameterized queries',
       'OWASP Top 10',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-11-login-bypass-fix',
     date: '2026-09-05',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab', 'SQL Injection'],
     title: 'Exploiting and fixing a SQL injection login bypass',
     workedOn: [
       'Tried a manual SQL injection against the login endpoint of my own appsec-homelab app, using PortSwigger technique on a codebase I built myself',
@@ -1751,16 +1764,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'authentication bypass',
       'parameterized queries',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-10-zap-remediation-final',
     date: '2026-09-03',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab'],
     title: 'ZAP remediation, final round',
     workedOn: [
       'Added the last batch of response headers to frontend/nginx.conf: Cross-Origin-Opener-Policy, Cross-Origin-Resource-Policy, Cross-Origin-Embedder-Policy, and a Permissions-Policy that disables geolocation, camera, and microphone',
@@ -1811,7 +1825,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'appsec-homelab-entry-9-first-zap-scan',
     date: '2026-09-03',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab'],
     title: 'First ZAP baseline scan',
     workedOn: [
       'Ran the first OWASP ZAP baseline scan against the app deployed on the mini PC, adding the DAST layer alongside Semgrep (SAST) and gitleaks (secrets)',
@@ -1851,7 +1864,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'appsec-homelab-entry-8-docker-deploy',
     date: '2026-09-03',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab'],
     title: 'Docker deployment and a separate GitHub key',
     workedOn: [
       'Switched the mini PC to a text-only boot (multi-user.target) to free the RAM the desktop environment was using, and confirmed SSH still connects after the reboot',
@@ -1868,7 +1880,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Where things stand: the mini PC boots headless into a text console and runs Docker, and the homelab app is containerized and reachable on port 8080 from devices on my home network. Next is to confirm the app loads from my Mac, then start pointing OWASP ZAP at it for the DAST layer of the pipeline.',
       'The scoped ufw rule is a small thing, but it is the kind of default worth keeping visible in the eventual writeup. Running a deliberately vulnerable app on the network means being deliberate about what can reach it.',
     ],
-    screenshot: 'Homelab/HomeLab2.webp',
+    screenshots: ['Homelab/HomeLab2.webp'],
     tools: ['systemd', 'OpenSSH', 'Docker Compose', 'ufw', 'Git'],
     tags: [
       'AppSec homelab',
@@ -1883,7 +1895,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'appsec-homelab-entry-7-mini-pc-setup',
     date: '2026-09-02',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab'],
     title: 'Mini PC setup and SSH hardening',
     workedOn: [
       'Set up the mini PC (shipped with Linux Mint) as the base for the AppSec homelab, and decided to keep Mint rather than wipe to Ubuntu Server',
@@ -1902,7 +1913,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Still to do: a DHCP reservation on the router for 192.168.88.13 so the IP stops shifting, then deploy the homelab vulnerable app on this box and point OWASP ZAP at it to complete the DAST layer of the CI/CD pipeline.',
       'Most of today went on ruling out bootloader, driver, network, and firewall causes before landing on the simple ones: a bad cable, a stale IP, a wrong username. That is what the work usually looks like. Writing up the diagnosis path in the repo is worth more than a list of the commands that ran.',
     ],
-    screenshot: 'Homelab/HomeLab1.webp',
+    screenshots: ['Homelab/HomeLab1.webp'],
     tools: ['Linux Mint', 'GRUB', 'OpenSSH', 'ufw', 'fail2ban'],
     tags: [
       'AppSec homelab',
@@ -1917,7 +1928,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'portswigger-xss-labs-6-8',
     date: '2026-09-02',
     category: 'PortSwigger Labs',
-    vulnTypes: ['XSS'],
     title:
       'Cross-Site Scripting (XSS) labs 6-8 (jQuery sinks + encoded attribute)',
     workedOn: [
@@ -1945,7 +1955,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           '/feedback?returnPath=javascript:alert(document.cookie)\n\nSet as the returnPath param; the alert fires on clicking the Back link.',
         status: 'completed',
-        screenshot: 'Burp/Lab6XSS.webp',
+        screenshots: ['Burp/Lab6XSS.webp'],
       },
       {
         title:
@@ -1964,8 +1974,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           '<iframe src="https://LAB-ID.web-security-academy.net/#" onload="this.src+=\'<img src=x onerror=print()>\'"></iframe>\n\nDelivered from the exploit server.',
         status: 'completed',
-        screenshot: 'Burp/Lab7XSS.webp',
-        screenshots: ['Burp/Lab7XSS2.webp'],
+        screenshots: ['Burp/Lab7XSS.webp', 'Burp/Lab7XSS2.webp'],
       },
       {
         title:
@@ -1977,8 +1986,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: "p3p\" onmouseover='alert()'",
         status: 'completed',
-        screenshot: 'Burp/Lab8XSS.webp',
-        screenshots: ['Burp/Lab8XSS2.webp'],
+        screenshots: ['Burp/Lab8XSS.webp', 'Burp/Lab8XSS2.webp'],
       },
       {
         title:
@@ -1991,8 +1999,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: 'javascript:alert()',
         status: 'completed',
-        screenshot: 'Burp/Lab9XSS.webp',
-        screenshots: ['Burp/Lab9XSS2.webp'],
+        screenshots: ['Burp/Lab9XSS.webp', 'Burp/Lab9XSS2.webp'],
       },
       {
         title:
@@ -2007,7 +2014,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           "p3p'; alert(); let cake = 'test\n\nAlso works as a self-contained break-in: '-alert()-'",
         status: 'completed',
-        screenshot: 'Burp/Lab10XSS.webp',
+        screenshots: ['Burp/Lab10XSS.webp'],
       },
       {
         title:
@@ -2021,7 +2028,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: "{{ $eval.constructor('alert()')() }}",
         status: 'completed',
-        screenshot: 'Burp/Lab11XSS.webp',
+        screenshots: ['Burp/Lab11XSS.webp'],
       },
     ],
     tools: ['Burp Suite', 'Web Browser', 'Chrome DevTools'],
@@ -2035,16 +2042,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'hashchange',
       'javascript: URI',
     ],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'portswigger-xss-labs-2-5',
     date: '2026-09-01',
     category: 'PortSwigger Labs',
-    vulnTypes: ['XSS'],
     title: 'Cross-Site Scripting (XSS) labs 2-5 (stored XSS + DOM XSS)',
     workedOn: [
       'Back into the PortSwigger XSS path after a holiday break - completed Labs 2 through 5',
@@ -2092,8 +2100,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         solution:
           "?productId=1&storeId=p3p</select><img src='1' onerror='alert()'>\n\nURL-encoded:\n?productId=1&storeId=p3p%3C/select%3E%3Cimg%20src=%271%27%20onerror=%27alert()%27%3E",
         status: 'completed',
-        screenshot: 'Burp/Lab4XSS.webp',
-        screenshots: ['Burp/Lab4XSS2.webp'],
+        screenshots: ['Burp/Lab4XSS.webp', 'Burp/Lab4XSS2.webp'],
       },
       {
         title: 'Lab 5: DOM XSS in innerHTML sink using source location.search',
@@ -2104,7 +2111,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: "<img src='0' onerror='alert()'>",
         status: 'completed',
-        screenshot: 'Burp/Lab5XSS.webp',
+        screenshots: ['Burp/Lab5XSS.webp'],
       },
     ],
     tools: ['Burp Suite', 'Web Browser', 'Chrome DevTools'],
@@ -2116,16 +2123,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'innerHTML',
       'JavaScript',
     ],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-6-documented-false-negative',
     date: '2026-08-06',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab', 'SQL Injection'],
     title: 'Leaving the AuthController SQLi as a documented false negative',
     workedOn: [
       'Reverted AuthController.cs back to its original, realistic [FromBody] login endpoint after the Entry 5 investigation',
@@ -2139,16 +2147,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
     tools: ['Semgrep', '.NET / C#', 'GitHub Actions'],
     tags: ['AppSec homelab', 'SQL injection', 'Semgrep', 'SAST limitations'],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-5-semgrep-frombody-gap',
     date: '2026-08-06',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab', 'SQL Injection'],
     title: 'Why Semgrep caught one SQLi and missed the other',
     workedOn: [
       'Investigated why Semgrep flagged the SQL injection in ProductsController.cs but not the structurally identical one in AuthController.cs',
@@ -2176,16 +2185,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'SAST limitations',
       'taint analysis',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
   },
   {
     id: 'appsec-homelab-entry-4-first-pipeline-run',
     date: '2026-08-01',
     category: 'AppSec Homelab',
-    vulnTypes: ['AppSec Homelab', 'SQL Injection', 'XSS'],
     title: 'Building the vulnerable app and running the first pipeline scan',
     workedOn: [
       'Built a bare-bones vulnerable-by-design app (.NET/C# backend, TypeScript/React frontend) to test what I learned in the PortSwigger SQLi and XSS labs',
@@ -2217,10 +2227,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Semgrep',
       'software supply chain',
     ],
-    link: {
-      label: 'appsec-homelab repo',
-      url: 'https://github.com/charles-goodsir/appsec-homelab',
-    },
+    links: [
+      {
+        label: 'appsec-homelab repo',
+        url: 'https://github.com/charles-goodsir/appsec-homelab',
+      },
+    ],
     screenshots: [
       'Homelab/SQLiHomeLabDay1.webp',
       'Homelab/XSSHomeLabDay1.webp',
@@ -2232,7 +2244,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'portswigger-xss-labs-1',
     date: '2026-07-30',
     category: 'PortSwigger Labs',
-    vulnTypes: ['XSS'],
     title: 'Cross-Site Scripting (XSS) lab 1 (reflected XSS)',
     workedOn: [
       'Started the PortSwigger Cross-Site Scripting (XSS) learning path',
@@ -2242,7 +2253,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'First attempt at XSS after finishing the SQL injection path. Different mental model to SQLi - instead of manipulating a database query, the goal is getting the browser itself to execute a script that gets reflected back into the page unencoded.',
       'Went in with a rough idea from JavaScript that a <script> tag triggers execution, but the specifics of what actually fires in a browser context took a bit of trial and error.',
     ],
-    screenshot: 'Burp/Lab1XSS.webp',
+    screenshots: ['Burp/Lab1XSS.webp'],
     labs: [
       {
         title: 'Lab 1: Reflected XSS into HTML context with nothing encoded',
@@ -2257,16 +2268,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
     tools: ['Web Browser', 'Burp Suite'],
     tags: ['XSS', 'reflected XSS', 'JavaScript'],
-    link: {
-      label: 'Cross-site scripting (XSS)',
-      url: 'https://portswigger.net/web-security/cross-site-scripting',
-    },
+    links: [
+      {
+        label: 'Cross-site scripting (XSS)',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+      },
+    ],
   },
   {
     id: 'portswigger-sqli-path-complete',
     date: '2026-07-30',
     category: 'PortSwigger Labs',
-    vulnTypes: ['SQL Injection'],
     milestone: true,
     title: 'SQL Injection learning path: complete (Community Edition)',
     workedOn: [
@@ -2277,7 +2289,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Closing out the SQL injection learning path for now. Went from basic WHERE-clause tautologies through UNION attacks on Oracle, MySQL, and PostgreSQL, blind SQLi via conditional responses, conditional errors, and time delays, and a WAF bypass using XML encoding via Hackvertor.',
       'Labs 15 and 16 need Burp Collaborator, which sits behind a Professional licence. Flagging them as blocked rather than skipping past quietly - revisiting once I upgrade or find a trial window.',
     ],
-    screenshot: 'Burp/CompletedSQLiLabs.webp',
+    screenshots: ['Burp/CompletedSQLiLabs.webp'],
     tools: [
       'Burp Suite',
       'Burp Proxy',
@@ -2286,17 +2298,18 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Python',
     ],
     tags: ['SQL injection', 'milestone', 'PortSwigger Web Security Academy'],
-    link: {
-      label: 'SQL injection labs',
-      url: 'https://portswigger.net/web-security/sql-injection',
-    },
+    links: [
+      {
+        label: 'SQL injection labs',
+        url: 'https://portswigger.net/web-security/sql-injection',
+      },
+    ],
   },
 
   {
     id: 'portswigger-sqli-labs-13-17',
     date: '2026-07-30',
     category: 'PortSwigger Labs',
-    vulnTypes: ['SQL Injection'],
     title:
       'SQL Injection labs 13-17 (error-based, time-based blind, WAF bypass)',
     workedOn: [
@@ -2383,16 +2396,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'WAF bypass',
       'PostgreSQL',
     ],
-    link: {
-      label: 'SQL injection labs',
-      url: 'https://portswigger.net/web-security/sql-injection',
-    },
+    links: [
+      {
+        label: 'SQL injection labs',
+        url: 'https://portswigger.net/web-security/sql-injection',
+      },
+    ],
   },
   {
     id: 'portswigger-sqli-labs-11-12',
     date: '2026-07-29',
     category: 'PortSwigger Labs',
-    vulnTypes: ['SQL Injection'],
     title: 'SQL Injection labs 11-12 (blind, conditional responses and errors)',
     workedOn: [
       'Completed labs 11 and 12 on the PortSwigger SQL injection path',
@@ -2444,16 +2458,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'conditional errors',
       'Oracle',
     ],
-    link: {
-      label: 'SQL injection labs',
-      url: 'https://portswigger.net/web-security/sql-injection',
-    },
+    links: [
+      {
+        label: 'SQL injection labs',
+        url: 'https://portswigger.net/web-security/sql-injection',
+      },
+    ],
   },
   {
     id: 'portswigger-sqli-labs-1-10',
     date: '2026-07-28',
     category: 'PortSwigger Labs',
-    vulnTypes: ['SQL Injection'],
     title: 'SQL Injection labs 1-10 (Burp Suite)',
     workedOn: [
       'Completed labs 1-10 on the PortSwigger SQL injection path',
@@ -2597,7 +2612,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
         ],
         solution: "' UNION SELECT NULL, username || password FROM users--",
         status: 'completed',
-        screenshot: 'Burp/Lab10.webp',
+        screenshots: ['Burp/Lab10.webp'],
       },
     ],
     tools: ['Burp Suite', 'Burp Proxy', 'Burp Repeater'],
@@ -2609,9 +2624,11 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'PostgreSQL',
       'login bypass',
     ],
-    link: {
-      label: 'SQL injection labs',
-      url: 'https://portswigger.net/web-security/sql-injection',
-    },
+    links: [
+      {
+        label: 'SQL injection labs',
+        url: 'https://portswigger.net/web-security/sql-injection',
+      },
+    ],
   },
 ]

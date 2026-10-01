@@ -78,15 +78,25 @@ def build():
         Paragraph(esc(lines[0].strip()), name),
         Paragraph(fmt(lines[1].strip()).replace("•", "&nbsp;&nbsp;•&nbsp;&nbsp;"), contact),
     ]
-    # Each section (heading + rule + its content) is buffered and appended as a
-    # single KeepTogether, so a section never splits across the page break -
-    # if it doesn't fit in the space left, the whole thing moves to the next page.
+    # Each entry (a role line with its bullets) is buffered and appended as a
+    # single KeepTogether, so an entry never splits across the page break. A
+    # section heading stays glued to its first entry. Keeping whole sections
+    # together left page 1 half empty once Projects grew too big to fit.
     current: list = []
+    has_entry = False
 
     def flush():
+        nonlocal has_entry
         if current:
             story.append(KeepTogether(current[:]))
             current.clear()
+        has_entry = False
+
+    def start_entry():
+        nonlocal has_entry
+        if has_entry:
+            flush()
+        has_entry = True
 
     i = 2
     while i < len(lines):
@@ -112,11 +122,13 @@ def build():
             i = j
         elif (" | " in s and i + 1 < len(lines) and "|" in lines[i + 1]
               and lines[i + 1].strip() and not lines[i + 1].strip().startswith("•")):
-            current.append(Paragraph(esc(s), role))
-            current.append(Paragraph(esc(lines[i + 1].strip()), meta))
+            start_entry()
+            current.append(Paragraph(fmt(s), role))
+            current.append(Paragraph(fmt(lines[i + 1].strip()), meta))
             i += 2
         elif " | " in s:
-            current.append(Paragraph(esc(s), role))
+            start_entry()
+            current.append(Paragraph(fmt(s), role))
             i += 1
         else:
             current.append(Paragraph(fmt(s), plain))

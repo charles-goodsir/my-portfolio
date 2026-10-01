@@ -8,9 +8,9 @@ A personal portfolio site built with React and TypeScript, showing my move from 
 
 ## About
 
-I'm a Software Application Engineer at Datacom (Auckland, NZ) with 4+ years working in .NET/C#, TypeScript, React, and Azure on enterprise CRM/ERP systems. I'm currently pivoting toward DevOps and DevSecOps, with application security as the specialty inside that. That's backed by CompTIA Security+ (SY0-701), hands-on practice through PortSwigger's Web Security Academy and Burp Suite, and IaC/CI-CD work with Terraform and GitHub Actions.
+I'm an Application Engineer at Datacom (Auckland, NZ) with 5+ years configuring and delivering enterprise CRM/ERP systems for councils. I'm moving into DevOps and DevSecOps, with a focus on application security. That's backed by CompTIA Security+ (SY0-701), hands-on practice through PortSwigger's Web Security Academy and Burp Suite, and IaC/CI-CD work with Terraform and GitHub Actions.
 
-This site doubles as a running log of that pivot. It's not just a static resume, it's evidence of the work.
+This site doubles as a running log of that move, with the work behind each claim in the Lab Notes.
 
 ### What's on here
 

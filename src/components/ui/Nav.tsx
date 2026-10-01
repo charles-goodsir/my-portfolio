@@ -32,12 +32,12 @@ function Nav() {
 
   return (
     <header className="bg-card border-b border-line sticky top-0 z-10">
-      <div className="max-w-[45rem] mx-auto flex justify-between items-center p-4">
-        <NavLink to="/" end className="text-xl font-bold text-ink">
+      <div className="max-w-[45rem] mx-auto flex justify-between md:justify-start md:gap-10 items-center p-4">
+        <NavLink to="/" end className="text-xl font-bold text-ink whitespace-nowrap">
           Charles Goodsir
         </NavLink>
 
-        <nav className="hidden md:flex md:gap-5 md:text-sm">
+        <nav className="hidden md:flex md:gap-5 md:text-sm md:whitespace-nowrap">
           {navItems.map((item) => (
             <NavLink
               key={item.to}

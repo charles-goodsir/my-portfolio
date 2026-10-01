@@ -86,7 +86,7 @@ function SecureAzureLandingZone() {
             The pipeline runs end to end and the first resources are live in
             Azure: a resource group, a VNet and subnet behind a deny-by-default
             NSG, a storage account, and a Key Vault. Nothing deploys until
-            Trivy passes the Terraform. The CyberDiary has the day-by-day
+            Trivy passes the Terraform. My Lab Notes have the day-by-day
             version, bugs included.
           </p>
 
@@ -105,10 +105,10 @@ function SecureAzureLandingZone() {
           {/* Project Links */}
           <div className="flex flex-wrap gap-4">
             <Link
-              to="/diary?vuln=Secure%20Azure%20Landing%20Zone"
+              to="/diary?project=Secure%20Azure%20Landing%20Zone"
               className="bg-ink text-card px-6 py-3 rounded-lg hover:opacity-90 transition-colors duration-300 font-semibold"
             >
-              Full write-up in the CyberDiary
+              Full write-up in my Lab Notes
             </Link>
             <a
               href="https://github.com/charles-goodsir/secure-azure-landing-zone"

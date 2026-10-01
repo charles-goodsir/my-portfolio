@@ -85,9 +85,9 @@ function PortfolioSite() {
               a specific page can be linked and shared.
             </p>
             <p className="text-ink-muted mb-4">
-              The CyberDiary and OWASP Top 10 sections are data-driven from typed
-              content files, with a vulnerability-type filter that is reflected
-              in the URL.
+              The Lab Notes and OWASP Top 10 sections are data-driven from typed
+              content files. The URL records which Lab Notes project you're
+              viewing, so you can share a filtered view.
             </p>
             <p className="text-ink-muted">
               The build adds a Content Security Policy. GitHub Pages cannot send

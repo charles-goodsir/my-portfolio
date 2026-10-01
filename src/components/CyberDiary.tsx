@@ -1,117 +1,174 @@
-import { useMemo } from 'react'
-import { useSearchParams } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { cyberDiaryEntries } from '../data/cyberDiaryEntries'
-import DiaryArticle from './DiaryArticle'
+import { formatDate } from './diaryAssets'
 import SectionHeader from './ui/SectionHeader'
 
+// One notebook per project, ordered by latest entry; the data file is newest first.
+const notebooks = [
+  ...new Set(cyberDiaryEntries.map((entry) => entry.category)),
+].map((name) => ({
+  name,
+  entries: cyberDiaryEntries.filter((entry) => entry.category === name),
+}))
+
+// Latest milestone from each notebook.
+const highlights = notebooks.flatMap((n) =>
+  n.entries.filter((entry) => entry.milestone).slice(0, 1),
+)
+
+// Cover colours cycle through this list; fixed, so white text stays readable in both themes.
+const covers = ['bg-teal-800', 'bg-indigo-800', 'bg-rose-900', 'bg-amber-800']
+
+// Shown on hover/focus over a book and as the notebook page intro.
+const descriptions: Record<string, string> = {
+  'Secure Azure Landing Zone':
+    'Terraform on Azure, shipped through a gated pipeline',
+  'AppSec Homelab': 'A .NET/React app I seeded with bugs, then fixed',
+  'PortSwigger Labs': 'Burp labs: SQL injection, XSS and authentication',
+  'Portfolio Site': 'The visitor map and CTF mode on this site',
+}
+
+const entryCount = (n: number) => `${n} ${n === 1 ? 'entry' : 'entries'}`
+
 function CyberDiary() {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
+  const project = searchParams.get('project')
 
-  const selectedVulnTypes = useMemo(() => {
-    const raw = searchParams.get('vuln')
-    return raw ? raw.split(',').filter(Boolean) : []
-  }, [searchParams])
+  if (project) {
+    const notebook = notebooks.find((n) => n.name === project)
 
-  const milestoneOnly = searchParams.get('milestone') === '1'
-
-  const setSelected = (next: string[]) => {
-    const params: Record<string, string> = {}
-    if (next.length) params.vuln = next.join(',')
-    if (milestoneOnly) params.milestone = '1'
-    setSearchParams(params, { replace: true })
-  }
-
-  const toggleMilestoneOnly = () => {
-    const params: Record<string, string> = {}
-    if (selectedVulnTypes.length) params.vuln = selectedVulnTypes.join(',')
-    if (!milestoneOnly) params.milestone = '1'
-    setSearchParams(params, { replace: true })
-  }
-
-  const toggleVulnType = (vulnType: string) => {
-    if (vulnType === 'All') {
-      setSelected([])
-      return
-    }
-    setSelected(
-      selectedVulnTypes.includes(vulnType)
-        ? selectedVulnTypes.filter((v) => v !== vulnType)
-        : [...selectedVulnTypes, vulnType],
+    return (
+      <section id="cyberdiary" className="max-w-[45rem] mx-auto py-16 px-4">
+        <Link
+          to="/diary"
+          className="mb-8 inline-flex items-center text-primary hover:underline underline-offset-2"
+        >
+          ← All notebooks
+        </Link>
+        {notebook ? (
+          <>
+            <SectionHeader
+              title={notebook.name}
+              intro={[
+                descriptions[notebook.name],
+                entryCount(notebook.entries.length),
+              ]
+                .filter(Boolean)
+                .join('. ')}
+            />
+            <ul className="divide-y divide-line border-y border-line">
+              {notebook.entries.map((entry) => (
+                <li key={entry.id} className="py-4">
+                  <Link
+                    to={`/diary/${entry.id}`}
+                    className="font-medium text-ink hover:text-primary hover:underline underline-offset-2"
+                  >
+                    {entry.title}
+                  </Link>
+                  <p className="text-xs text-ink-muted mt-1">
+                    <time dateTime={entry.date}>{formatDate(entry.date)}</time>
+                    {entry.milestone && (
+                      <span className="ml-2 text-success font-semibold">
+                        ✓ Milestone
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-sm text-ink-muted mt-1.5 line-clamp-2">
+                    {entry.body.at(-1) ?? entry.workedOn[0]}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p className="text-ink-muted text-center py-12">
+            No notebook called “{project}”.
+          </p>
+        )}
+      </section>
     )
   }
-
-  const vulnTypesList = useMemo(() => {
-    const unique = [
-      ...new Set(cyberDiaryEntries.flatMap((entry) => entry.vulnTypes)),
-    ]
-    return ['All', ...unique]
-  }, [])
-
-  const entries = useMemo(() => {
-    const filtered = cyberDiaryEntries
-      .filter(
-        (entry) =>
-          selectedVulnTypes.length === 0 ||
-          entry.vulnTypes.some((vt) => selectedVulnTypes.includes(vt)),
-      )
-      .filter((entry) => !milestoneOnly || entry.milestone)
-
-    return [...filtered].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    )
-  }, [selectedVulnTypes, milestoneOnly])
 
   return (
     <section id="cyberdiary" className="max-w-[45rem] mx-auto py-16 px-4">
       <SectionHeader
-        title="CyberDiary"
-        intro="A running log of security labs and practice. Newest entries first."
+        title="Lab Notes"
+        intro="A running log of security labs and practice, one notebook per project."
       />
 
-      <div className="flex flex-wrap gap-2 mb-10">
-        {vulnTypesList.map((vulnType) => {
-          const isActive =
-            vulnType === 'All'
-              ? selectedVulnTypes.length === 0
-              : selectedVulnTypes.includes(vulnType)
-
-          return (
-            <button
-              key={vulnType}
-              onClick={() => toggleVulnType(vulnType)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
-                isActive
-                  ? 'bg-primary text-on-primary'
-                  : 'bg-sunken text-ink-muted hover:opacity-80'
-              }`}
+      <ul className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-8">
+        {notebooks.map((n, i) => (
+          <li key={n.name} className="group relative">
+            <Link
+              to={`/diary?project=${encodeURIComponent(n.name)}`}
+              aria-describedby={
+                descriptions[n.name] ? `notebook-desc-${i}` : undefined
+              }
+              className={`relative flex flex-col aspect-[3/4] ${covers[i % covers.length]} text-white rounded-l-sm rounded-r-md pl-6 pr-3 py-4 shadow-[3px_3px_0_0_#f8fafc,4px_4px_0_0_#cbd5e1,6px_6px_0_0_#f8fafc,7px_7px_0_0_#cbd5e1] motion-safe:transition-transform duration-200 hover:-translate-y-1`}
             >
-              {vulnType}
-            </button>
-          )
-        })}
-        <button
-          onClick={toggleMilestoneOnly}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
-            milestoneOnly
-              ? 'bg-primary text-on-primary'
-              : 'bg-sunken text-ink-muted hover:opacity-80'
-          }`}
-        >
-          Milestones
-        </button>
-      </div>
+              {/* Spine */}
+              <span
+                aria-hidden="true"
+                className="absolute inset-y-0 left-0 w-3 bg-black/30 rounded-l-sm border-r border-white/20"
+              />
+              <span className="mt-4 min-h-[3.5rem] flex items-center justify-center bg-[#fdfbf5] text-slate-900 rounded-sm px-2 py-2 text-center shadow-sm">
+                <span className="text-sm font-semibold leading-snug">
+                  {n.name}
+                </span>
+              </span>
+              <span className="mt-auto text-xs text-white/85 leading-relaxed">
+                {entryCount(n.entries.length)}
+                <br />
+                Latest{' '}
+                <time dateTime={n.entries[0].date}>
+                  {formatDate(n.entries[0].date, {
+                    day: 'numeric',
+                    month: 'short',
+                  })}
+                </time>
+              </span>
+            </Link>
+            {descriptions[n.name] && (
+              <span
+                id={`notebook-desc-${i}`}
+                role="tooltip"
+                className="pointer-events-none absolute left-0 right-0 top-full z-10 mt-4 bg-card border border-line rounded-lg shadow-card px-3 py-2 text-sm text-ink-muted leading-snug opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible motion-safe:transition-opacity duration-200"
+              >
+                {descriptions[n.name]}
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
 
-      <div className="space-y-10">
-        {entries.length === 0 ? (
-          <p className="text-ink-muted text-center py-12">
-            No entries for this category yet.
-          </p>
-        ) : (
-          entries.map((entry) => (
-            <DiaryArticle key={entry.id} entry={entry} linked />
-          ))
-        )}
-      </div>
+      {highlights.length > 0 && (
+        <nav
+          aria-labelledby="diary-highlights"
+          className="mt-12 bg-card border border-line rounded-lg px-6 py-5"
+        >
+          <h2
+            id="diary-highlights"
+            className="text-sm font-semibold text-ink uppercase tracking-wide mb-3"
+          >
+            Start here
+          </h2>
+          <ul className="space-y-3">
+            {highlights.map((entry) => (
+              <li key={entry.id}>
+                <Link
+                  to={`/diary/${entry.id}`}
+                  className="text-primary font-medium hover:underline underline-offset-2"
+                >
+                  {entry.title}
+                </Link>
+                <p className="text-xs text-ink-muted mt-0.5">
+                  {entry.category} · {formatDate(entry.date)}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
     </section>
   )
 }
