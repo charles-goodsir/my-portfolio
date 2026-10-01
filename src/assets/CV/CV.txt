@@ -1,22 +1,24 @@
-CHARLES GOODSIR
-Auckland, NZ • [goodsirces@gmail.com](mailto:goodsirces@gmail.com) • +64 278144772 • [LinkedIn](https://www.linkedin.com/in/charles-goodsir-430b0b254/) • [GitHub](https://github.com/charles-goodsir) • [Portfolio](https://charlesgoodsir.com/) • [Detour App](https://apps.apple.com/us/app/detour/id6743507600)
+Charles Goodsir
+[goodsirces@gmail.com](mailto:goodsirces@gmail.com) • [LinkedIn](https://www.linkedin.com/in/charles-goodsir-430b0b254/) • [GitHub](https://github.com/charles-goodsir) • [charlesgoodsir.com](https://charlesgoodsir.com/) • Auckland, NZ
 
 PROFESSIONAL SUMMARY
-Application Engineer with 5+ years configuring and delivering enterprise CRM/ERP systems for NZ and AU councils, moving into DevOps and DevSecOps with a focus on application security. CompTIA Security+ (SY0-701) certified. Completed the PortSwigger Web Security Academy SQL injection and XSS paths in Burp Suite, and started authentication. Built a gated CI/CD security pipeline (SAST, secrets scanning, SCA, container scanning, DAST) around a vulnerable-by-design ASP.NET Core / React app, and a Terraform-managed Azure landing zone that deploys through a scanned, approval-gated Azure DevOps pipeline. Built and shipped Detour, a cross-platform mobile app live on the App Store, on my own. Open to roles in Australia (Melbourne, Brisbane), the UK, and New Zealand, and to remote work from Auckland.
+Application engineer with 5+ years delivering enterprise CRM/ERP systems for NZ and AU councils, now moving into application security and DevOps. I built a gated CI/CD security pipeline around a vulnerable-by-design app, and a Terraform-managed Azure landing zone that only deploys through a scanned, approved plan. Security+ certified, PortSwigger SQLi and XSS paths complete. Targeting roles in Australia, the UK and New Zealand, or remote from Auckland.
 
-EXPERIENCE
+CORE COMPETENCIES
+Application Security · Secure CI/CD Pipelines · SAST / DAST / SCA · Terraform & Azure · Vulnerability Remediation · Burp Suite & OWASP Top 10 · Risk Assessment (NIST CSF 2.0)
+
+WORK EXPERIENCE
 
 Application Engineer, Finance Domain | Datacom Solutions
 Auckland, NZ | Sep 2021 - Present
-• Helped cut configuration defect rates by ~30% for NZ & AU council clients by standardising
-  testing, including Gherkin/BDD suites for end-to-end business logic.
-• Cleared roughly 500 defects with the team in a week-long bug smash.
-• Ran planning sessions and live demos for a new enterprise finance module across 3 councils.
-• Mentored junior engineers on testing and configuration standards.
-• Built local council environments with .NET tooling and exported their configuration as JSON for
-  the pipeline that builds each council's cloud environment.
-• Worked with YAML-driven test-data generation in Azure DevOps, using some C#, to provision
-  cross-referenced data for local and cloud environments at build time.
+• Helped cut configuration defect rates by ~30% for NZ and AU council clients by standardising testing.
+• Cleared roughly 500 defects in a week-long team bug smash.
+• Ran planning sessions and live demos for a new enterprise finance module across 3 councils, and
+  mentored junior engineers on testing and configuration standards.
+• Built local council environments with .NET tooling and exported their configuration as JSON for the
+  pipeline that builds each council's cloud environment.
+• Authored YAML-driven test-data configuration in Azure DevOps, layered on an existing C# codebase, to
+  provision cross-referenced data for local and cloud environments at build time.
 
 Service Desk Analyst | Datacom Solutions (MBIE)
 Wellington, NZ | Sep 2020 - Sep 2021
@@ -24,66 +26,63 @@ Wellington, NZ | Sep 2020 - Sep 2021
   first-call resolution above 80%.
 • Cut repeat support volume by 25% by spotting recurring issues and writing knowledge-base articles
   the wider team adopted.
-• Triaged critical infrastructure incidents (network access, identity management, remote desktop) and
+• Triaged critical incidents across network access, identity management and remote desktop, and
   escalated them to specialist teams within SLA.
 
 PROJECTS
 
-Secure Azure Landing Zone | [github.com/charles-goodsir/secure-azure-landing-zone](https://github.com/charles-goodsir/secure-azure-landing-zone) | 2026 - Present
-• Built a Terraform-managed Azure landing zone pipeline-first: an Azure DevOps pipeline validates,
-  runs a Trivy scan, plans, and waits for manual approval before any change reaches Azure.
-• Set up workload identity federation (OIDC) for the pipeline's Azure login, so I store no client
-  secret, and made Apply deploy the exact plan I reviewed.
-• Fixed scanner findings in the Terraform, including a CRITICAL Key Vault with no network ACL, and
-  accepted two Trivy findings with written reasons.
-• Added a weekly drift-detection pipeline (terraform plan -detailed-exitcode) that fails when Azure
-  no longer matches the code, and private endpoints for blob storage and Key Vault.
-Terraform, Azure, Azure DevOps, Trivy, OIDC, YAML
+appsec-homelab | [github.com/charles-goodsir/appsec-homelab](https://github.com/charles-goodsir/appsec-homelab) | Complete
+• Built a vulnerable-by-design ASP.NET Core / React app with four seeded vulnerabilities (SQL injection
+  x2, reflected XSS, plaintext passwords), then exploited, fixed and re-tested each one using
+  parameterized queries and salted PBKDF2 hashing.
+• Built a CI/CD security pipeline (secrets, SAST, SCA, container scanning) with a reviewer-approval
+  gate, then moved it from GitHub Actions to Azure Pipelines on a self-hosted agent.
+• Traced a Semgrep false negative (a missed, structurally identical injection) to a rule that ignores
+  [FromBody]-bound input, and hardened the nginx config over three OWASP ZAP rounds, cutting warnings
+  from 8 to 3.
+• Wrote a NIST CSF 2.0-mapped risk assessment of the app.
+ASP.NET Core 8, React, nginx, Docker, Azure Pipelines, Semgrep, gitleaks, Trivy, OWASP ZAP
 
-appsec-homelab | [github.com/charles-goodsir/appsec-homelab](https://github.com/charles-goodsir/appsec-homelab) | 2026
-• Built a vulnerable-by-design ASP.NET Core 8 / React app with four seeded vulnerabilities,
-  including SQL injection, reflected XSS, and plaintext password storage, then exploited, fixed, and
-  re-tested each one.
-• Built a CI/CD security pipeline with parallel jobs (secrets, SAST, build, SCA, test, container
-  scanning) and a reviewer-approval gate before production, then moved it from GitHub Actions to
-  Azure Pipelines with a self-hosted agent that deploys over the LAN.
-• Traced a Semgrep false negative to its root cause: the rule does not treat [FromBody]-bound objects
-  as a tainted source, so Semgrep missed a structurally identical injection.
-• Ran DAST with OWASP ZAP against the running app on a self-hosted Linux box, and cut ZAP warnings
-  from 8 to 3 over three rounds of security header fixes.
-ASP.NET Core 8, React, Docker, GitHub Actions, Azure Pipelines, Semgrep, gitleaks, Trivy, OWASP ZAP
+Secure Azure Landing Zone | [github.com/charles-goodsir/secure-azure-landing-zone](https://github.com/charles-goodsir/secure-azure-landing-zone) | Complete
+• Deployed a locked-down Azure environment (deny-by-default NSG, Key Vault with RBAC, private endpoints)
+  through a 5-stage pipeline: validate, Trivy scan, plan, manual approval, apply.
+• Used OIDC workload identity federation so the pipeline stores no client secret. Apply runs only the
+  saved plan a reviewer approved.
+• Fixed 5 of 6 scanner findings, including a CRITICAL Key Vault with no network ACL, and accepted the
+  sixth (geo-redundancy on an account holding no data) with a written reason.
+• Added weekly drift detection, and caught a misspelled condition that would have run Apply on every
+  pull request.
+Terraform, Azure, Azure DevOps, Trivy, OIDC
 
-PortSwigger Web Security Academy | Burp Suite Community | 2026 - Present
-• SQL injection: full path complete, including blind SQLi. Wrote Python solver scripts for the
-  time-based and boolean labs, handling Oracle vs PostgreSQL syntax and cookie-appended injection.
-• Cross-site scripting: full path complete, including AngularJS sandbox escapes and CSP bypasses.
-• Authentication: in progress, covering username enumeration, 2FA bypass, password-reset flaws, and
-  lockout bypass.
-• Next: JWT, access control / IDOR, CSRF, SSRF.
+PortSwigger Web Security Academy | Burp Suite Community | In Progress
+• SQL injection and XSS paths complete, including blind SQLi (with Python solver scripts), AngularJS
+  sandbox escapes and CSP bypasses.
+• Authentication in progress; JWT, access control, CSRF and SSRF next.
 Burp Suite, Python
 
-Detour - Cross-Platform Mobile App (Solo Developer) | Live on App Store | 2024 - Present
-• Built a full-stack mobile app handling auth, geolocation, real-time data, and social features.
-• Implemented Supabase Auth with row-level security policies, so users can only access their own
-  data.
-• Got geolocation queries under 200ms by optimising PostGIS spatial indexes on a self-managed
-  Postgres instance.
-• Took it from architecture and security design to App Store approval on my own, shipping updates
-  over the air through Expo EAS.
-React Native, TypeScript, Supabase, Firestore, PostGIS
+Detour: Cross-Platform Mobile App | [Live on App Store](https://apps.apple.com/us/app/detour/id6743507600) | 2024 - Present
+• Built and shipped a mobile app on my own, from architecture and security design to App Store approval,
+  with Supabase Auth and row-level security policies restricting each user to their own data.
+React Native, TypeScript, Supabase, PostGIS
 
-EDUCATION & CERTIFICATIONS
+Finance Tracker 2.0 | Personal project | Complete
+• FastAPI backend on AWS Lambda behind API Gateway, deployed with AWS SAM, with DynamoDB storage and
+  EventBridge scheduled jobs.
+Python, FastAPI, AWS Lambda, API Gateway, SAM, DynamoDB, EventBridge
 
-CompTIA Security+ (SY0-701) | CompTIA | 2026
+EDUCATION
 
 Level 6 Diploma in Applied Software Development | Dev Academy Aotearoa | 2024
 
 BA in History, International Relations & Political Science | Victoria University of Wellington | 2020
 
+CERTIFICATIONS
+
+CompTIA Security+ (SY0-701) | CompTIA | 2026
+
 SKILLS
-Languages: C# (working knowledge), TypeScript, JavaScript, Python, SQL, Bash, YAML, HTML/CSS
-Security: Burp Suite, Semgrep (SAST), gitleaks, Trivy, OWASP ZAP, Dependabot, OWASP Top 10, NIST CSF 2.0, CSP & security headers
-Cloud & Infra: .NET tooling, Azure, Azure DevOps, Terraform, Docker, Linux, nginx, Cloudflare Workers, AWS, Supabase (Postgres + PostGIS), Firestore, CI/CD (Azure Pipelines, GitHub Actions, Expo EAS), Git
-Frameworks: React Native, React, Node.js, ASP.NET Core
-Tools: Confluence, Jira, Miro
-Practices: Agile/Scrum, Gherkin/BDD, incident triage, technical documentation, mentoring
+Languages: TypeScript, JavaScript, Python, SQL, Bash, YAML/JSON, HTML/CSS
+Security: Burp Suite, Semgrep, gitleaks, Trivy, OWASP ZAP, Dependabot, OWASP Top 10, NIST CSF 2.0, CSP & security headers
+Cloud & Infra: Azure, Azure DevOps, Terraform, Docker, Linux, nginx, AWS, Supabase (Postgres + PostGIS), GitHub Actions, Git
+Frameworks: React, React Native, Node.js, ASP.NET Core, FastAPI
+Practices: Agile/Scrum, incident triage, technical documentation, mentoring
