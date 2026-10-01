@@ -30,10 +30,7 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="experience" element={<Navigate to="/about" replace />} />
           <Route path="projects" element={<Projects />} />
-          <Route
-            path="projects/appsec-homelab"
-            element={<AppSecHomelab />}
-          />
+          <Route path="projects/appsec-homelab" element={<AppSecHomelab />} />
           <Route
             path="projects/secure-azure-landing-zone"
             element={<SecureAzureLandingZone />}

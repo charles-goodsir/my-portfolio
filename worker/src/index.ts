@@ -11,7 +11,8 @@ const DEV_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
 function corsHeaders(requestOrigin: string | null, env: Env): HeadersInit {
   const allowed =
     requestOrigin &&
-    (requestOrigin === env.ALLOWED_ORIGIN || DEV_ORIGINS.includes(requestOrigin))
+    (requestOrigin === env.ALLOWED_ORIGIN ||
+      DEV_ORIGINS.includes(requestOrigin))
       ? requestOrigin
       : env.ALLOWED_ORIGIN
   return {

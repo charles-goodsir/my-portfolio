@@ -30,9 +30,7 @@ function FlightTracker() {
         {/* Project Header */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <h1 className="text-4xl font-bold text-ink">
-              Flight Tracker
-            </h1>
+            <h1 className="text-4xl font-bold text-ink">Flight Tracker</h1>
             <span className="inline-block bg-success/10 text-success px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
               Complete
             </span>
@@ -90,15 +88,15 @@ function FlightTracker() {
             <p className="text-ink-muted mb-4">
               Flight Tracker is a Python script that runs on a cron job every 3
               hours on an AWS Lightsail VM, checks a flight API for status
-              changes on the flights I'm tracking, and posts updates to
-              Discord and Telegram.
+              changes on the flights I'm tracking, and posts updates to Discord
+              and Telegram.
             </p>
             <p className="text-ink-muted">
-              It watches departure and arrival times, delays, gate changes,
-              and cancellations, and only notifies when something actually
-              changes rather than posting on every run. I built it because I
-              was tired of refreshing a flight-status app manually before a
-              trip — the notifications find me now instead.
+              It watches departure and arrival times, delays, gate changes, and
+              cancellations, and only notifies when something actually changes
+              rather than posting on every run. I built it because I was tired
+              of refreshing a flight-status app manually before a trip — the
+              notifications find me now instead.
             </p>
           </div>
         </div>
@@ -121,9 +119,7 @@ function FlightTracker() {
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-ink mb-3">
-                Data Flow
-              </h3>
+              <h3 className="text-lg font-semibold text-ink mb-3">Data Flow</h3>
               <ul className="space-y-2 text-ink-muted">
                 <li>• Flight API data fetching</li>
                 <li>• Data parsing and validation</li>
@@ -136,9 +132,7 @@ function FlightTracker() {
 
         {/* Key Features */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
-          <h2 className="text-2xl font-bold text-ink mb-6">
-            Key Features
-          </h2>
+          <h2 className="text-2xl font-bold text-ink mb-6">Key Features</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-lg font-semibold text-ink mb-3">

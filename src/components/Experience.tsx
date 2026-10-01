@@ -28,14 +28,7 @@ const timeline: TimelineItem[] = [
       'Wrote Confluence documentation for releases and onboarding, and led weekly CRM/ERP training sessions',
       'Mentored associate analysts one-on-one',
     ],
-    technologies: [
-      '.NET',
-      'JSON',
-      'Azure DevOps',
-      'YAML',
-      'Git',
-      'Confluence',
-    ],
+    technologies: ['.NET', 'JSON', 'Azure DevOps', 'YAML', 'Git', 'Confluence'],
   },
   {
     kind: 'Certification',

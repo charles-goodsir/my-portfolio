@@ -101,9 +101,9 @@ function Detour() {
           <div className="prose prose-lg max-w-none">
             <p className="text-ink-muted mb-4">
               Detour is a React Native app for discovering places nearby and
-              building a route between them, live on the App Store. I
-              designed, built, and shipped it independently, including the
-              App Store submission.
+              building a route between them, live on the App Store. I designed,
+              built, and shipped it independently, including the App Store
+              submission.
             </p>
             <p className="text-ink-muted">
               Google Maps API handles search, location, and routing; Firebase
@@ -116,14 +116,10 @@ function Detour() {
 
         {/* Features */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
-          <h2 className="text-2xl font-bold text-ink mb-6">
-            Key Features
-          </h2>
+          <h2 className="text-2xl font-bold text-ink mb-6">Key Features</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-semibold text-ink mb-3">
-                Discovery
-              </h3>
+              <h3 className="text-lg font-semibold text-ink mb-3">Discovery</h3>
               <ul className="space-y-2 text-ink-muted">
                 <li>• Browse local attractions and points of interest</li>
                 <li>• Filter by category, distance, and rating</li>
@@ -162,9 +158,7 @@ function Detour() {
 
         {/* Screenshots */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8">
-          <h2 className="text-2xl font-bold text-ink mb-6">
-            App Screenshots
-          </h2>
+          <h2 className="text-2xl font-bold text-ink mb-6">App Screenshots</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {images.map((image) => (
               <ScreenshotFigure

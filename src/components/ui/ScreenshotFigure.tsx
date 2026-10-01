@@ -43,7 +43,9 @@ function ScreenshotFigure({
         />
       </button>
       {caption && (
-        <figcaption className="mt-2 text-xs text-ink-muted">{caption}</figcaption>
+        <figcaption className="mt-2 text-xs text-ink-muted">
+          {caption}
+        </figcaption>
       )}
       <dialog
         ref={dialogRef}

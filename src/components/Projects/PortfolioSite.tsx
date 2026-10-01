@@ -101,11 +101,12 @@ function PortfolioSite() {
           <h2 className="text-2xl font-bold text-ink mb-6">CTF Map</h2>
           <div className="prose prose-lg max-w-none">
             <p className="text-ink-muted mb-4">
-              The Play CTF Map button on the home page opens a 3D arena styled on
-              the grid from Tron. You drive a small program called the Bit around
-              it, and each page of the site is a flag. Get close to one and press
-              Enter to open that page. It needs a keyboard or a mouse, so it is
-              not offered on phones, and the normal site stays the default.
+              The Play CTF Map button on the home page opens a 3D arena styled
+              on the grid from Tron. You drive a small program called the Bit
+              around it, and each page of the site is a flag. Get close to one
+              and press Enter to open that page. It needs a keyboard or a mouse,
+              so it is not offered on phones, and the normal site stays the
+              default.
             </p>
             <p className="text-ink-muted mb-4">
               All the 3D code is in its own chunk that only downloads when
@@ -132,7 +133,10 @@ function PortfolioSite() {
                 Play the map
               </Button>
             )}
-            <Button to="/diary/ctf-map-entry-1-game-mode-and-hidden-flag" variant="secondary">
+            <Button
+              to="/diary/ctf-map-entry-1-game-mode-and-hidden-flag"
+              variant="secondary"
+            >
               Read the diary entry
             </Button>
           </div>

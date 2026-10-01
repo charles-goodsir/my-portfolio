@@ -33,7 +33,12 @@ const lookTarget = new Vector3() // where the camera is pointing
 const lookGoal = new Vector3()
 
 // size: 1 for a click, bigger for the finale's grid pulse. seconds: how long it lasts
-export type RippleState = { position: Vector3; start: number; size: number; seconds: number }
+export type RippleState = {
+  position: Vector3
+  start: number
+  size: number
+  seconds: number
+}
 
 // One glowing ring on the floor, reused for every ripple: each one moves it
 // and restarts it. Only one at a time, which is all you ever see anyway
@@ -50,7 +55,9 @@ export function Ripple({ ripple }: { ripple: RefObject<RippleState> }) {
 
     mesh.current.position.copy(ripple.current.position)
     // Grows from small to 2 × size wide. Reduced motion: full size, just fades
-    mesh.current.scale.setScalar(size * (reduceMotion ? 2 : 0.2 + progress * 1.8))
+    mesh.current.scale.setScalar(
+      size * (reduceMotion ? 2 : 0.2 + progress * 1.8),
+    )
     material.current.opacity = 1 - progress
   })
 
@@ -173,10 +180,12 @@ export function Player({
     // Lean into the direction of travel, and ease back upright on stopping
     if (tilt.current) {
       const lean = moving ? 0.4 : 0
-      tilt.current.rotation.x += (lean - tilt.current.rotation.x) * (1 - Math.exp(-8 * delta))
+      tilt.current.rotation.x +=
+        (lean - tilt.current.rotation.x) * (1 - Math.exp(-8 * delta))
       // Gentle hover
       if (!reduceMotion) {
-        tilt.current.position.y = HOVER_HEIGHT + Math.sin(clock.elapsedTime * 2) * 0.08
+        tilt.current.position.y =
+          HOVER_HEIGHT + Math.sin(clock.elapsedTime * 2) * 0.08
       }
     }
 
@@ -188,7 +197,9 @@ export function Player({
     // Which flag (if any) is in range? Only tell React when that changes,
     // not 60 times a second
     const flag =
-      flags.find((f) => f.position.distanceTo(player.position) < PREVIEW_RANGE) ?? null
+      flags.find(
+        (f) => f.position.distanceTo(player.position) < PREVIEW_RANGE,
+      ) ?? null
     if (flag !== near.current) {
       near.current = flag
       onNear(flag)
@@ -214,7 +225,10 @@ export function Player({
     if (captured && !reduceMotion) {
       // Exit dive: swoop at the flag, turn to look at its cloth, widen the lens
       const ease = 1 - Math.exp(-3 * delta)
-      camera.position.lerp(scratch.copy(captured.position).add(DIVE_OFFSET), ease)
+      camera.position.lerp(
+        scratch.copy(captured.position).add(DIVE_OFFSET),
+        ease,
+      )
       lookGoal.copy(captured.position).setY(2.6)
       lookTarget.lerp(lookGoal, ease * 2)
       camera.lookAt(lookTarget)

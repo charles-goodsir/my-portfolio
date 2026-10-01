@@ -27,12 +27,16 @@ export function saveCaptured(routes: string[]) {
   }
 }
 
-const latestEntry = [...cyberDiaryEntries].sort((a, b) => b.date.localeCompare(a.date))[0]
+const latestEntry = [...cyberDiaryEntries].sort((a, b) =>
+  b.date.localeCompare(a.date),
+)[0]
 
 // What each flag's hologram says. Diary numbers come from the real data
 const previews: Record<string, string> = {
-  '/about': "My story, the roles I'm targeting, and my experience at Datacom since 2021. CV download.",
-  '/projects': 'AppSec homelab, a secure Azure landing zone, and earlier web builds.',
+  '/about':
+    "My story, the roles I'm targeting, and my experience at Datacom since 2021. CV download.",
+  '/projects':
+    'AppSec homelab, a secure Azure landing zone, and earlier web builds.',
   '/diary': `${cyberDiaryEntries.length} entries. Latest: ${latestEntry.title}`,
   '/owasp': 'My notes on each of the 10 risks.',
   '/contact': 'Email, LinkedIn and GitHub.',
@@ -43,9 +47,11 @@ export const flags = navItems
   .filter((item) => item.to !== '/')
   .map((item, i, all) => {
     const angle = (i / all.length) * Math.PI * 2
-    const position = new Vector3(Math.sin(angle), 0, -Math.cos(angle)).multiplyScalar(
-      FLAG_RING_RADIUS,
-    )
+    const position = new Vector3(
+      Math.sin(angle),
+      0,
+      -Math.cos(angle),
+    ).multiplyScalar(FLAG_RING_RADIUS)
     return {
       ...item,
       preview: previews[item.to] ?? '',

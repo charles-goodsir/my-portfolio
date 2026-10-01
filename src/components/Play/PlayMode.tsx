@@ -97,7 +97,10 @@ function BootScreen({
   // Type one more character, waiting as long as that character asks for
   useEffect(() => {
     if (!started || typed >= BOOT_TEXT.length) return
-    const timer = setTimeout(() => setTyped(typed + 1), delayFor(BOOT_TEXT[typed]))
+    const timer = setTimeout(
+      () => setTyped(typed + 1),
+      delayFor(BOOT_TEXT[typed]),
+    )
     return () => clearTimeout(timer)
   }, [typed, started])
 

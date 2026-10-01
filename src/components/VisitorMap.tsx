@@ -26,9 +26,7 @@ function VisitorMap() {
         <p className="text-ink-muted mb-6">
           {stats ? (
             <>
-              <span className="text-3xl font-bold text-ink">
-                {stats.total}
-              </span>{' '}
+              <span className="text-3xl font-bold text-ink">{stats.total}</span>{' '}
               visits this fortnight
             </>
           ) : (

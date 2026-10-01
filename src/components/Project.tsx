@@ -16,7 +16,14 @@ const securityProjects: Project[] = [
     title: 'Secure Expense Claims',
     description:
       'In progress. An expense claims app on Azure, built from a STRIDE threat model, then hardened, attacked and monitored. So far: the threat model and a .NET 10 API and React frontend in non-root containers',
-    technologies: ['.NET 10', 'React', 'TypeScript', 'Docker', 'Azure', 'STRIDE'],
+    technologies: [
+      '.NET 10',
+      'React',
+      'TypeScript',
+      'Docker',
+      'Azure',
+      'STRIDE',
+    ],
   },
   {
     id: 'appsec-homelab',
