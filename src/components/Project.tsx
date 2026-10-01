@@ -15,7 +15,7 @@ const securityProjects: Project[] = [
     id: 'appsec-homelab',
     title: 'AppSec Homelab',
     description:
-      'A deliberately vulnerable ASP.NET Core / React app that I built, broke, and fixed, wrapped in two parallel CI/CD security pipelines (GitHub Actions and Azure Pipelines) with staged deployment gates and a piece of Terraform-managed infrastructure on Azure',
+      'A vulnerable-by-design ASP.NET Core / React app that I built, broke, and fixed, wrapped in two parallel CI/CD security pipelines (GitHub Actions and Azure Pipelines) with staged deployment gates and a piece of Terraform-managed infrastructure on Azure',
     technologies: [
       'ASP.NET Core 8',
       'React',

@@ -21,7 +21,7 @@ const inProgress = count('In progress')
 const planned = count('Planned')
 const completed = count('Completed')
 const linkedIds = new Set(owaspTop10.flatMap((r) => (r.relatedDiaryLinks ?? []).map((l) => l.entryId)))
-const updated = fmtDate(new Date().toISOString().slice(0, 10))
+const updated = fmtDate(new Date().toLocaleDateString('en-CA')) // local YYYY-MM-DD
 
 const risk = (r) => {
   const isNew = r.summary.startsWith('New in 2025.')
@@ -231,7 +231,7 @@ const html = `<title>Learning the OWASP Top 10</title>
       <div class="stat stat--done"><span class="stat__n">${completed}</span><span class="stat__label">Completed</span></div>
       <div class="stat stat--active"><span class="stat__n">${inProgress}</span><span class="stat__label">In progress</span></div>
       <div class="stat stat--planned"><span class="stat__n">${planned}</span><span class="stat__label">Planned</span></div>
-      <div class="stat stat--muted"><span class="stat__n">${linkedIds.size}</span><span class="stat__label">Diary entries linked</span></div>
+      <div class="stat stat--muted"><span class="stat__n">${linkedIds.size}</span><span class="stat__label">Lab Notes entries linked</span></div>
     </div>
   </section>
 

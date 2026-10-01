@@ -3,7 +3,7 @@ export interface OwaspRisk {
   title: string
   summary: string
   whyItMatters: string
-  /** What I've actually done. */
+  /** What I've done. */
   done: string[]
   /** What's still to do. */
   next?: string[]
@@ -157,8 +157,8 @@ export const owaspTop10: OwaspRisk[] = [
     done: [
       'Completed the PortSwigger SQL injection path (Community Edition - 2 labs remain blocked behind Burp Pro/Collaborator)',
       'Completed the PortSwigger XSS path, including the expert-level AngularJS sandbox escapes and CSP bypasses (3 labs remain blocked behind Pro or a lab-state issue)',
-      'Built a deliberately vulnerable .NET/React app, reproduced the SQL injection login bypass and reflected XSS in my own code, then fixed both with parameterized queries and JSX text interpolation, and re-tested each fix against the original exploit',
-      'Wired Semgrep into a GitHub Actions pipeline - it correctly caught the seeded ProductsController.cs SQLi but not the structurally identical one in AuthController.cs, traced to the rule not treating [FromBody]-bound objects as a tainted source, documented as a known false negative',
+      'Built a vulnerable-by-design .NET/React app, reproduced the SQL injection login bypass and reflected XSS in my own code, then fixed both with parameterized queries and JSX text interpolation, and re-tested each fix against the original exploit',
+      'Wired Semgrep into a GitHub Actions pipeline. It caught the seeded ProductsController.cs SQLi and missed the structurally identical one in AuthController.cs. I traced the miss to the rule not treating [FromBody]-bound objects as a tainted source and documented it as a known false negative',
       'Moved on to the Authentication path next rather than Command/NoSQL injection - higher priority given how much of it maps to real login-flow bugs',
     ],
     tools: ['Burp Suite', 'Semgrep'],

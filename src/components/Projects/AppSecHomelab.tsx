@@ -100,7 +100,7 @@ function AppSecHomelab() {
             </span>
           </div>
           <p className="text-xl text-ink-muted mb-6">
-            A deliberately vulnerable ASP.NET Core / React app that I built,
+            A vulnerable-by-design ASP.NET Core / React app that I built,
             broke, and fixed myself, wrapped in two parallel CI/CD security
             pipelines - GitHub Actions and Azure Pipelines - each running
             SAST, secrets scanning, SCA, container scanning, and DAST behind
@@ -111,7 +111,7 @@ function AppSecHomelab() {
             All four seeded vulnerabilities are fixed and re-verified, and
             both pipelines run clean end to end, including a self-hosted
             Azure Pipelines agent so DAST can reach the mini PC over the LAN.
-            I'm calling this one done for now - my Lab Notes have the full
+            I'm calling this one done for now. My Lab Notes have the full
             day-by-day trail, bugs included, and I may come back to extend it
             later.
           </p>

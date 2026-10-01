@@ -14,14 +14,16 @@ function Home() {
   return (
     <section className="max-w-[45rem] mx-auto px-4 py-24">
       <div className="animate-fade-in">
-        <h1 className="text-display font-bold text-ink mb-6">Hi, I'm Charles</h1>
+        <h1 className="text-display font-bold text-ink mb-6">
+          Hi, I'm Charles
+        </h1>
         <p className="text-lg text-ink-muted mb-6">
-          Software Application Engineer · Moving into DevSecOps and AppSec
+          Application Engineer · Moving into DevSecOps and AppSec
         </p>
         <p className="text-base text-ink-muted mb-6 max-w-[55ch]">
-          Full-stack background, now wiring security into the pipelines I
-          build in - CI/CD gates, SAST/DAST, and the application security
-          work underneath both.
+          I come from full-stack development. In my own projects I build CI/CD
+          pipelines with security gates, SAST and DAST, and fix the application
+          security issues they find.
         </p>
         <ul className="text-sm text-ink-muted space-y-1 mb-10">
           <li>

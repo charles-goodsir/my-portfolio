@@ -40,6 +40,35 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'portfolio-site-entry-1-redesign-tests-and-ci',
+    date: '2026-10-01',
+    category: 'Portfolio Site',
+    title: 'Rebuilding the site, correcting my own copy, and adding tests and CI',
+    workedOn: [
+      'Turned Lab Notes from 52 full entries on one page into a shelf of project notebooks, with a short list of entries inside each',
+      'Renamed CyberDiary to Lab Notes and kept the /diary URLs, so links I had already shared still work',
+      'Gave the OWASP page a status grid and a page per risk, and split each risk into what I have done and what is next',
+      'Rewrote the About page, the Home page and my CV where they claimed pipeline work I have not done at my job',
+      'Added seven tests on Node 24\'s built-in runner and a GitHub Actions workflow with a gitleaks scan',
+    ],
+    body: [
+      'The Lab Notes page rendered all 52 entries in full, one after another. A recruiter landing on it saw a wall of text with a row of filters. It is now a shelf with one notebook per project, a short list of entries inside each, and a Start here box with the latest milestone from each project. I renamed it from CyberDiary to Lab Notes and kept the /diary URLs, so links I have already shared still work.',
+      'The OWASP page got the same treatment: a grid of the ten risks with their status, and a page for each one. I split every risk into what I have done and what is next, and cut 16 tools from the lists because nothing in these notes shows me using them.',
+      'The About page had a bigger problem than its length. It said I build CI/CD pipelines at work and add security checks to them. I don\'t. At Datacom I build local council environments with .NET tooling, export their configuration as JSON, and watch the pipeline that builds the cloud environment from it. The pipelines with security gates are in my own projects. I rewrote the About page, the Home page and my CV to say that.',
+      'Then I added tests and CI. The tests run on Node 24\'s built-in runner, so they need no new packages. They check what TypeScript can\'t see: entry IDs are unique, entries stay newest first, every screenshot and script path resolves, every OWASP link points at a real entry, and every nav page has a route and a flag in the CTF map. To prove they work, I added a nav page with no flag and moved an entry out of date order, and both tests failed. A GitHub Actions workflow now runs lint, the tests, a Linux build and npm audit on every PR, plus a gitleaks scan, with each Action pinned to a commit SHA and Dependabot keeping the pins current. It has not run yet; the first push will tell me whether it works.',
+      'Most of today was cutting. The cut that mattered most was a sentence on the About page claiming pipeline work I have not done at my job.',
+    ],
+    tools: ['React', 'TypeScript', 'Node.js test runner', 'GitHub Actions', 'gitleaks', 'Dependabot'],
+    tags: [
+      'Portfolio Site',
+      'redesign',
+      'testing',
+      'CI/CD pipeline',
+      'GitHub Actions',
+      'secret scanning',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-20-drift-detection-pipeline',
     date: '2026-09-30',
     category: 'Secure Azure Landing Zone',
