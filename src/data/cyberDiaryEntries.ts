@@ -40,6 +40,61 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-1-threat-model-scaffold',
+    date: '2026-10-01',
+    category: 'Secure Expense Claims',
+    title: 'A threat model before any code, and a scaffold so CI has something real to check',
+    workedOn: [
+      'Started a new project that puts a real app on secure Azure infrastructure, then hardens, attacks and monitors it',
+      'Wrote a STRIDE threat model before any app code: 6 assets, 5 trust boundaries and 24 threats, each with a planned control and the phase it lands in',
+      'Scaffolded a .NET 10 API with a health endpoint and one integration test, plus a React and TypeScript frontend',
+      'Wrote Dockerfiles that run as non-root users, and built and tested both images on the mini PC',
+    ],
+    body: [
+      'This project joins my two previous ones. The homelab was an app with a security pipeline, and the landing zone was locked-down Azure infrastructure. This one is an expense claims app on Azure: employees submit claims with receipts, managers approve them, and finance pays them. I picked it because money, approvals and file uploads give me real access-control rules to break later, which a CRUD demo wouldn\'t.',
+      'Before any app code, I wrote a STRIDE threat model with 24 threats, each tied to a control and the phase that builds it. Two threats shape the design. A manager must not approve their own claim, which is a separation-of-duties rule I need to test on purpose. And a request for someone else\'s claim returns 404, so a 403 can\'t confirm the claim exists and IDs can\'t be enumerated.',
+      'The plan wanted CI to build, test and scan the API and frontend in the first phase, but there was no app yet. The homelab got around this with a test job that only printed a message. This time I scaffolded the templates first: a .NET 10 API with a /health endpoint, one integration test that starts the whole API in memory, and a Vite React app. NuGet lock files are committed and restored in locked mode, the same idea as the Terraform lock file in the landing zone. I chose Postgres for the database.',
+      'A few things didn\'t go to plan. My Mac only had the .NET 8 SDK, so I installed .NET 10, the current LTS. The Vite template now uses oxlint instead of ESLint. Docker Desktop wasn\'t running, so I built the images on the mini PC over SSH, which is how I found Docker getting around its firewall. The API image is Microsoft\'s chiseled Ubuntu image, with no shell, running as user 1654 at 181 MB. The frontend runs on unprivileged nginx as user 101. Both answered their health checks, and the mini PC builds amd64 images, the same architecture Azure Container Apps runs.',
+      'Next is CI, with Trivy failing on HIGH and CRITICAL findings from the first run, so the images have to start clean.',
+    ],
+    tools: ['.NET 10', 'ASP.NET Core', 'xUnit', 'React', 'Vite', 'Docker', 'STRIDE'],
+    tags: [
+      'Secure Expense Claims',
+      'threat modelling',
+      'STRIDE',
+      'Docker',
+      'CI/CD pipeline',
+    ],
+  },
+  {
+    id: 'appsec-homelab-entry-22-docker-bypassed-ufw',
+    date: '2026-10-01',
+    category: 'AppSec Homelab',
+    title: 'My firewall said deny, and Docker answered anyway',
+    workedOn: [
+      'Pointed a Docker context at the mini PC over SSH so I could build images there instead of on my Mac',
+      'Found that containers published on ports ufw doesn\'t allow were still reachable from my Mac',
+      'Added a DOCKER-USER rule so published container ports follow the same LAN-only limit as ufw, and tested it with a port that had answered before',
+      'Removed the ufw rules that allowed SSH from anywhere, including over IPv6',
+      'Corrected my risk assessment, which said password login was disabled',
+    ],
+    body: [
+      'I needed to build the Docker images for my new project, and Docker Desktop wasn\'t running on my Mac, so I pointed a Docker context at the mini PC over SSH. Getting there took a few tries. The mini PC had moved from 192.168.88.13 to .18, so my SSH config pointed at nothing. I ran the first docker --context command inside an SSH session on the mini PC, where the name homelab means nothing. And Docker\'s SSH connection can\'t answer a passphrase prompt, so it failed until I loaded my key into the macOS agent with the passphrase in Keychain.',
+      'Once it worked, I ran the test containers on 8081 and 8082, because the homelab app already has 8080. Both answered from my Mac. ufw was active with default deny, and the only app port it allowed was 8080. Docker publishes ports with DNAT, so that traffic goes through the FORWARD chain and never hits ufw\'s INPUT rules. Over IPv6 it was different: 8080 timed out from my Mac, because Docker hands IPv6 to a proxy on the host and ufw filters that.',
+      'The fix is a block in /etc/ufw/after.rules for the DOCKER-USER chain, which Docker checks before its own rules. It allows replies to connections the containers opened, allows 192.168.88.0/24 to reach original port 8080, and drops anything else new coming in on the Wi-Fi interface. NAT has already rewritten the port to the container\'s by then, so the rule matches on conntrack\'s original destination port. After a reload, 8080 still returned 200 from my Mac, and containers could still reach the internet. The first run of the 8081 test was invalid because the test container mapped the wrong port, so I reran it and also curled it from the mini PC itself: 200 locally and a timeout from my Mac, so the firewall was what blocked it.',
+      'I also removed the ufw rules that allowed SSH from anywhere. The mini PC has public IPv6 addresses, and I haven\'t checked yet whether my router blocks inbound IPv6. SSH now only answers over IPv4 from the LAN. I kept password login on as a fallback in case I lose the key, which meant my risk assessment was wrong: it said key-only auth with passwords disabled. I corrected it and added the Docker bypass and the IPv6 check as gaps.',
+      'ufw status showed exactly what I expected, and it still didn\'t describe what was reachable. I only found out because a port I never opened answered.',
+    ],
+    tools: ['ufw', 'iptables', 'Docker', 'SSH'],
+    tags: [
+      'AppSec Homelab',
+      'firewall',
+      'Docker',
+      'network security',
+      'risk assessment',
+    ],
+  },
+  {
     id: 'secure-azure-landing-zone-entry-22-wrap-up',
     date: '2026-10-01',
     category: 'Secure Azure Landing Zone',

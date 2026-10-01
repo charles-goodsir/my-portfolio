@@ -11,21 +11,21 @@ const notebooks = [
   entries: cyberDiaryEntries.filter((entry) => entry.category === name),
 }))
 
-// Latest milestone from each notebook.
-const highlights = notebooks.flatMap((n) =>
-  n.entries.filter((entry) => entry.milestone).slice(0, 1),
+// Latest milestone from each notebook, or its latest entry until it has one.
+const highlights = notebooks.map(
+  (n) => n.entries.find((entry) => entry.milestone) ?? n.entries[0],
 )
 
 // Cover colours cycle through this list; fixed, so white text stays readable in both themes.
-const covers = ['bg-teal-800', 'bg-indigo-800', 'bg-rose-900', 'bg-amber-800']
+const covers = ['bg-teal-800', 'bg-indigo-800', 'bg-rose-900', 'bg-amber-800', 'bg-sky-800']
 
 // Shown on hover/focus over a book and as the notebook page intro.
 const descriptions: Record<string, string> = {
-  'Secure Azure Landing Zone':
-    'Terraform on Azure, shipped through a gated pipeline',
+  'Secure Azure Landing Zone': 'Terraform on Azure, shipped through a gated pipeline',
   'AppSec Homelab': 'A .NET/React app I seeded with bugs, then fixed',
   'PortSwigger Labs': 'Burp labs: SQL injection, XSS and authentication',
   'Portfolio Site': 'The visitor map and CTF mode on this site',
+  'Secure Expense Claims': 'An expense app on Azure, threat-modelled, attacked and monitored',
 }
 
 const entryCount = (n: number) => `${n} ${n === 1 ? 'entry' : 'entries'}`

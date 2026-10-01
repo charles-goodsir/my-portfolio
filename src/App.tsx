@@ -12,6 +12,7 @@ import VisitorRiskAssessment from './components/VisitorRiskAssessment'
 import NotFound from './components/NotFound'
 import AppSecHomelab from './components/Projects/AppSecHomelab'
 import SecureAzureLandingZone from './components/Projects/SecureAzureLandingZone'
+import SecureExpenseClaims from './components/Projects/SecureExpenseClaims'
 import Detour from './components/Projects/Detour'
 import FlightTracker from './components/Projects/FlightTracker'
 import NewsDashboard from './components/Projects/NewsDashboard'
@@ -36,6 +37,10 @@ function App() {
           <Route
             path="projects/secure-azure-landing-zone"
             element={<SecureAzureLandingZone />}
+          />
+          <Route
+            path="projects/secure-expense-claims"
+            element={<SecureExpenseClaims />}
           />
           <Route path="projects/detour" element={<Detour />} />
           <Route path="projects/finance-tracker" element={<FinanceTracker />} />
