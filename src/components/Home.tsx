@@ -53,6 +53,14 @@ function Home() {
           <Button to="/diary" variant="secondary">
             Lab Notes
           </Button>
+          <a
+            href="https://github.com/charles-goodsir"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-lg px-6 py-3 font-semibold transition-colors border border-primary text-primary hover:bg-primary/10"
+          >
+            GitHub
+          </a>
           {/* The map needs a keyboard or mouse, so no button on phones */}
           {hasFinePointer && (
             <Button to="/play" variant="secondary">
