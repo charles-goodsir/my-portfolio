@@ -95,9 +95,8 @@ function SecureAzureLandingZone() {
             The storage account and Key Vault are closed to the internet and
             reachable through private endpoints in the VNet, their access logs
             go to Log Analytics, and a weekly pipeline checks that Azure still
-            matches the code. Nothing deploys until Trivy passes the
-            Terraform. My Lab Notes have the day-by-day version, bugs
-            included.
+            matches the code. Nothing deploys until Trivy passes the Terraform.
+            My Lab Notes have the day-by-day version, bugs included.
           </p>
 
           {/* Technologies */}
@@ -140,18 +139,17 @@ function SecureAzureLandingZone() {
             <p className="text-ink-muted mb-4">
               Everything in the AppSec Homelab was stood up by hand, then
               wrapped in CI/CD afterwards. For this one I built the pipeline
-              first, so every piece of infrastructure gets validated and
-              scanned before it reaches Azure.
+              first, so every piece of infrastructure gets validated and scanned
+              before it reaches Azure.
             </p>
             <p className="text-ink-muted mb-4">
               The pipeline has four stages. Validate runs{' '}
               <code>terraform fmt -check</code>, <code>init</code>, and{' '}
-              <code>validate</code>. Security Scan runs Trivy, pinned to
-              v0.74.0 and checked against its release checksum. Plan runs
-              against remote state and publishes the plan file as an
-              artifact. Apply is a deployment job on a production Environment
-              with an approval check, and it deploys that exact plan instead
-              of re-planning.
+              <code>validate</code>. Security Scan runs Trivy, pinned to v0.74.0
+              and checked against its release checksum. Plan runs against remote
+              state and publishes the plan file as an artifact. Apply is a
+              deployment job on a production Environment with an approval check,
+              and it deploys that exact plan instead of re-planning.
             </p>
             <p className="text-ink-muted">
               The pipeline authenticates to Azure with workload identity
@@ -175,13 +173,36 @@ function SecureAzureLandingZone() {
               <h3 className="text-lg font-semibold text-ink mb-3">Pipeline</h3>
               <ul className="space-y-2 text-ink-muted">
                 <li>• Validate: fmt -check, init, validate</li>
-                <li>• Security Scan: Trivy v0.74.0, checksum-verified, with set -euo pipefail so a failed check stops the install</li>
-                <li>• Plan: remote state in a separate rg-tfstate storage account, created by hand with az cli; plan published as an artifact</li>
-                <li>• Apply: manual approval gate, then deploys the approved plan. It only runs on main, so a PR shows its plan without deploying</li>
-                <li>• Provider lock file committed with <code>-lockfile=readonly</code>, and one checksum-verified Terraform install shared by every stage</li>
-                <li>• One sign-in template for Plan, Apply and the drift check, so the OIDC setup can&apos;t drift between copies</li>
-                <li>• Weekly drift check: <code>terraform plan -detailed-exitcode</code> every Monday, failing if Azure no longer matches the code</li>
-                <li>• Branch ruleset on main: PR required, pipeline check required, no bypass. Fork PR builds are off</li>
+                <li>
+                  • Security Scan: Trivy v0.74.0, checksum-verified, with set
+                  -euo pipefail so a failed check stops the install
+                </li>
+                <li>
+                  • Plan: remote state in a separate rg-tfstate storage account,
+                  created by hand with az cli; plan published as an artifact
+                </li>
+                <li>
+                  • Apply: manual approval gate, then deploys the approved plan.
+                  It only runs on main, so a PR shows its plan without deploying
+                </li>
+                <li>
+                  • Provider lock file committed with{' '}
+                  <code>-lockfile=readonly</code>, and one checksum-verified
+                  Terraform install shared by every stage
+                </li>
+                <li>
+                  • One sign-in template for Plan, Apply and the drift check, so
+                  the OIDC setup can&apos;t drift between copies
+                </li>
+                <li>
+                  • Weekly drift check:{' '}
+                  <code>terraform plan -detailed-exitcode</code> every Monday,
+                  failing if Azure no longer matches the code
+                </li>
+                <li>
+                  • Branch ruleset on main: PR required, pipeline check
+                  required, no bypass. Fork PR builds are off
+                </li>
               </ul>
             </div>
             <div>
@@ -189,11 +210,28 @@ function SecureAzureLandingZone() {
                 Infrastructure (live in salz-rg)
               </h3>
               <ul className="space-y-2 text-ink-muted">
-                <li>• VNet and subnet, with an NSG relying on Azure&apos;s implicit deny-all</li>
-                <li>• Storage account: TLS 1.2 minimum, HTTPS-only, no public access, network_rules deny default, infrastructure encryption</li>
-                <li>• Key Vault: RBAC authorization, purge protection, 7-day soft delete, network ACL deny default</li>
-                <li>• Private endpoints for blob storage and the Key Vault, in their own subnet, with private DNS zones so the normal hostnames resolve to 10.0.2.4 and 10.0.2.5 inside the VNet</li>
-                <li>• Log Analytics workspace, with diagnostic settings sending the vault&apos;s AuditEvent log and blob read, write and delete logs to it</li>
+                <li>
+                  • VNet and subnet, with an NSG relying on Azure&apos;s
+                  implicit deny-all
+                </li>
+                <li>
+                  • Storage account: TLS 1.2 minimum, HTTPS-only, no public
+                  access, network_rules deny default, infrastructure encryption
+                </li>
+                <li>
+                  • Key Vault: RBAC authorization, purge protection, 7-day soft
+                  delete, network ACL deny default
+                </li>
+                <li>
+                  • Private endpoints for blob storage and the Key Vault, in
+                  their own subnet, with private DNS zones so the normal
+                  hostnames resolve to 10.0.2.4 and 10.0.2.5 inside the VNet
+                </li>
+                <li>
+                  • Log Analytics workspace, with diagnostic settings sending
+                  the vault&apos;s AuditEvent log and blob read, write and
+                  delete logs to it
+                </li>
               </ul>
             </div>
             <div>
@@ -201,9 +239,21 @@ function SecureAzureLandingZone() {
                 Findings Fixed
               </h3>
               <ul className="space-y-2 text-ink-muted">
-                <li>• tfsec: Key Vault with no network ACL (CRITICAL) and no soft delete retention set (MEDIUM)</li>
-                <li>• Trivy: four storage account findings tfsec had passed. Two fixed outright. Storage logging fixed with diagnostic settings, keeping its suppression with a written reason because the rule can&apos;t see them. Geo-redundancy accepted as a cost decision</li>
-                <li>• Replaced an unpinned curl | bash tfsec install with a checksum-verified Trivy release</li>
+                <li>
+                  • tfsec: Key Vault with no network ACL (CRITICAL) and no soft
+                  delete retention set (MEDIUM)
+                </li>
+                <li>
+                  • Trivy: four storage account findings tfsec had passed. Two
+                  fixed outright. Storage logging fixed with diagnostic
+                  settings, keeping its suppression with a written reason
+                  because the rule can&apos;t see them. Geo-redundancy accepted
+                  as a cost decision
+                </li>
+                <li>
+                  • Replaced an unpinned curl | bash tfsec install with a
+                  checksum-verified Trivy release
+                </li>
               </ul>
             </div>
             <div>
@@ -211,12 +261,31 @@ function SecureAzureLandingZone() {
                 Real Bugs Along the Way
               </h3>
               <ul className="space-y-2 text-ink-muted">
-                <li>• The install script&apos;s cleanup deleted my checked-out terraform/ source folder</li>
-                <li>• AzureCLI@2&apos;s login didn&apos;t carry over to Terraform&apos;s azurerm provider, fixed by exporting the ARM_* OIDC variables</li>
-                <li>• Deployment jobs don&apos;t auto-checkout the source repo the way regular jobs do</li>
-                <li>• A storage account replace failed halfway: Azure rejected the new account name 6 seconds after Terraform deleted the old one</li>
-                <li>• A Build.Reason typo made the Apply condition always true, so Apply would have run on every PR while the YAML looked right</li>
-                <li>• A diagnostic settings diff came back on every plan, from disabled metric entries Azure adds by itself</li>
+                <li>
+                  • The install script&apos;s cleanup deleted my checked-out
+                  terraform/ source folder
+                </li>
+                <li>
+                  • AzureCLI@2&apos;s login didn&apos;t carry over to
+                  Terraform&apos;s azurerm provider, fixed by exporting the
+                  ARM_* OIDC variables
+                </li>
+                <li>
+                  • Deployment jobs don&apos;t auto-checkout the source repo the
+                  way regular jobs do
+                </li>
+                <li>
+                  • A storage account replace failed halfway: Azure rejected the
+                  new account name 6 seconds after Terraform deleted the old one
+                </li>
+                <li>
+                  • A Build.Reason typo made the Apply condition always true, so
+                  Apply would have run on every PR while the YAML looked right
+                </li>
+                <li>
+                  • A diagnostic settings diff came back on every plan, from
+                  disabled metric entries Azure adds by itself
+                </li>
               </ul>
             </div>
           </div>

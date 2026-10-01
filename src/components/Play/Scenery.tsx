@@ -34,7 +34,10 @@ export function Walls() {
     walls.forEach(([x, z], i) => {
       const wall = refs.current[i]
       if (!wall) return
-      const outside = x === 0 ? Math.sign(z) * camera.position.z > HALF : Math.sign(x) * camera.position.x > HALF
+      const outside =
+        x === 0
+          ? Math.sign(z) * camera.position.z > HALF
+          : Math.sign(x) * camera.position.x > HALF
       wall.visible = !outside
     })
   })
@@ -94,7 +97,9 @@ export function Traffic() {
       if (!mesh) return
       // % in JS keeps the sign, so add the loop back on to wrap negatives too
       const travelled = clock.elapsedTime * streak.speed + streak.offset
-      const along = (((travelled % STREAK_LOOP) + STREAK_LOOP) % STREAK_LOOP) - STREAK_LOOP / 2
+      const along =
+        (((travelled % STREAK_LOOP) + STREAK_LOOP) % STREAK_LOOP) -
+        STREAK_LOOP / 2
       if (streak.along === 'x') mesh.position.set(along, 0.05, streak.line)
       else mesh.position.set(streak.line, 0.05, along)
 
@@ -192,24 +197,50 @@ function buildStands() {
 
       // The step itself: a solid black block down to the ground
       const block = side.alongZ
-        ? new BoxGeometry(STEP_DEPTH, height, span).translate(side.x * depthCentre, height / 2, 0)
-        : new BoxGeometry(span, height, STEP_DEPTH).translate(0, height / 2, side.z * depthCentre)
+        ? new BoxGeometry(STEP_DEPTH, height, span).translate(
+            side.x * depthCentre,
+            height / 2,
+            0,
+          )
+        : new BoxGeometry(span, height, STEP_DEPTH).translate(
+            0,
+            height / 2,
+            side.z * depthCentre,
+          )
       blocks.push(block)
 
       // Lit strip along its front edge. The top step's edge is the rim: that one glows
       const edge = side.alongZ
-        ? new BoxGeometry(0.08, 0.08, 2 * distance).translate(side.x * distance, height, 0)
-        : new BoxGeometry(2 * distance, 0.08, 0.08).translate(0, height, side.z * distance)
+        ? new BoxGeometry(0.08, 0.08, 2 * distance).translate(
+            side.x * distance,
+            height,
+            0,
+          )
+        : new BoxGeometry(2 * distance, 0.08, 0.08).translate(
+            0,
+            height,
+            side.z * distance,
+          )
       const colour = tier === TIERS - 1 ? NEON_CYAN : TIER_EDGE
       const vertices = edge.attributes.position.count
       edge.setAttribute(
         'color',
-        new Float32BufferAttribute(Array.from({ length: vertices }, () => [colour.r, colour.g, colour.b]).flat(), 3),
+        new Float32BufferAttribute(
+          Array.from({ length: vertices }, () => [
+            colour.r,
+            colour.g,
+            colour.b,
+          ]).flat(),
+          3,
+        ),
       )
       edges.push(edge)
     }
   })
-  const merged = { blocks: mergeGeometries(blocks), edges: mergeGeometries(edges) }
+  const merged = {
+    blocks: mergeGeometries(blocks),
+    edges: mergeGeometries(edges),
+  }
   for (const piece of [...blocks, ...edges]) piece.dispose() // the merged copies are all that's needed
   return merged
 }
@@ -308,7 +339,11 @@ function buildSign() {
       [...row].forEach((cell, x) => {
         if (cell !== '#') return
         // Centred on x = 0, with row 0 at the top
-        positions.push((letter * 6 + x - columns / 2) * SIGN_DOT, (6 - y) * SIGN_DOT, 0)
+        positions.push(
+          (letter * 6 + x - columns / 2) * SIGN_DOT,
+          (6 - y) * SIGN_DOT,
+          0,
+        )
       }),
     )
     letterEnds.push(positions.length / 3)
@@ -332,14 +367,24 @@ export function NameSign({ booted }: { booted: boolean }) {
     switchedOnAt.current ??= clock.elapsedTime
     const lettersOn = reduceMotion
       ? SIGN_TEXT.length
-      : Math.floor((clock.elapsedTime - switchedOnAt.current) / SECONDS_PER_LETTER) + 1
+      : Math.floor(
+          (clock.elapsedTime - switchedOnAt.current) / SECONDS_PER_LETTER,
+        ) + 1
     const { letterEnds } = sign
-    sign.geometry.setDrawRange(0, letterEnds[Math.min(lettersOn, letterEnds.length) - 1])
+    sign.geometry.setDrawRange(
+      0,
+      letterEnds[Math.min(lettersOn, letterEnds.length) - 1],
+    )
   })
 
   return (
     <points geometry={sign.geometry} position={[0, SIGN_BASE, -SIGN_DISTANCE]}>
-      <pointsMaterial color={SIGN_COLOUR} size={0.45} sizeAttenuation fog={false} />
+      <pointsMaterial
+        color={SIGN_COLOUR}
+        size={0.45}
+        sizeAttenuation
+        fog={false}
+      />
     </points>
   )
 }

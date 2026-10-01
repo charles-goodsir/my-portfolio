@@ -38,7 +38,13 @@ export function Radar({
       viewBox={`${-EDGE} ${-EDGE} ${EDGE * 2} ${EDGE * 2}`}
       className="absolute bottom-16 right-4 h-32 w-32"
     >
-      <circle r={EDGE - 0.5} fill="rgb(0 0 0 / 0.85)" stroke="#2dd4bf" strokeOpacity={0.4} strokeWidth={0.4} />
+      <circle
+        r={EDGE - 0.5}
+        fill="rgb(0 0 0 / 0.85)"
+        stroke="#2dd4bf"
+        strokeOpacity={0.4}
+        strokeWidth={0.4}
+      />
       {/* The arena walls */}
       <rect
         x={-HALF}
@@ -56,10 +62,22 @@ export function Radar({
           global CSS stops the spin */}
       <g
         className="animate-spin"
-        style={{ transformBox: 'fill-box', transformOrigin: 'center', animationDuration: '4s' }}
+        style={{
+          transformBox: 'fill-box',
+          transformOrigin: 'center',
+          animationDuration: '4s',
+        }}
       >
         <circle r={EDGE - 0.5} fill="none" />
-        <line x1={0} y1={0} x2={0} y2={-(EDGE - 0.5)} stroke="#2dd4bf" strokeOpacity={0.5} strokeWidth={0.4} />
+        <line
+          x1={0}
+          y1={0}
+          x2={0}
+          y2={-(EDGE - 0.5)}
+          stroke="#2dd4bf"
+          strokeOpacity={0.5}
+          strokeWidth={0.4}
+        />
       </g>
 
       {flags.map((flag) => (

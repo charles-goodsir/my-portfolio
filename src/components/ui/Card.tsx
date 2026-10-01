@@ -8,8 +8,7 @@ interface CardProps {
   className?: string
 }
 
-const base =
-  'block bg-card border border-line rounded-lg shadow-card p-6'
+const base = 'block bg-card border border-line rounded-lg shadow-card p-6'
 
 function Card({ children, to, className = '' }: CardProps) {
   if (to) {

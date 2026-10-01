@@ -48,9 +48,7 @@ function NewsDashboard() {
         {/* Project Header */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <h1 className="text-4xl font-bold text-ink">
-              News Dashboard
-            </h1>
+            <h1 className="text-4xl font-bold text-ink">News Dashboard</h1>
             <span className="inline-block bg-success/10 text-success px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
               Complete
             </span>
@@ -108,24 +106,22 @@ function NewsDashboard() {
           <div className="prose prose-lg max-w-none">
             <p className="text-ink-muted mb-4">
               News Dashboard pairs Python scripts that scrape news sites and
-              pull crypto and weather data with a React/TypeScript frontend
-              that reads it back out. The scripts run on a schedule, clean and
-              store what they collect, and the frontend adds category
-              filtering and a dashboard view on top.
+              pull crypto and weather data with a React/TypeScript frontend that
+              reads it back out. The scripts run on a schedule, clean and store
+              what they collect, and the frontend adds category filtering and a
+              dashboard view on top.
             </p>
             <p className="text-ink-muted">
-              I built it to get comfortable owning both ends of a pipeline —
-              the thing that collects the data and the thing that displays it
-              — instead of just consuming someone else's API.
+              I built it to get comfortable owning both ends of a pipeline — the
+              thing that collects the data and the thing that displays it —
+              instead of just consuming someone else's API.
             </p>
           </div>
         </div>
 
         {/* Features */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
-          <h2 className="text-2xl font-bold text-ink mb-6">
-            Key Features
-          </h2>
+          <h2 className="text-2xl font-bold text-ink mb-6">Key Features</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-lg font-semibold text-ink mb-3">

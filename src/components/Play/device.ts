@@ -5,7 +5,9 @@
 
 // If the visitor asked for less motion, animations they didn't cause are
 // skipped and the camera jumps instead of gliding
-export const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+export const reduceMotion = window.matchMedia(
+  '(prefers-reduced-motion: reduce)',
+).matches
 
 // True when there's a mouse or trackpad. False on phones and touch-only
 // tablets, where the map isn't offered: it needs a keyboard or a mouse

@@ -18,9 +18,12 @@ function contentSecurityPolicy(): Plugin {
         // Allow each inline <script> (the GitHub Pages redirect shim) by the
         // hash of its exact contents, worked out on every build. Editing the
         // shim just produces a new hash, it can't silently break the site
-        const inlineScripts = html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)
+        const inlineScripts = html.matchAll(
+          /<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g,
+        )
         const hashes = [...inlineScripts].map(
-          ([, body]) => `'sha256-${createHash('sha256').update(body).digest('base64')}'`,
+          ([, body]) =>
+            `'sha256-${createHash('sha256').update(body).digest('base64')}'`,
         )
 
         const policy = [

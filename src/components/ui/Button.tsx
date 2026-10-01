@@ -18,7 +18,12 @@ const styles: Record<Variant, string> = {
 const base =
   'inline-flex items-center justify-center rounded-lg px-6 py-3 font-semibold transition-colors'
 
-function Button({ children, to, variant = 'primary', className = '' }: ButtonProps) {
+function Button({
+  children,
+  to,
+  variant = 'primary',
+  className = '',
+}: ButtonProps) {
   return (
     <Link to={to} className={`${base} ${styles[variant]} ${className}`}>
       {children}

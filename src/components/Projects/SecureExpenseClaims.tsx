@@ -56,8 +56,8 @@ function SecureExpenseClaims() {
           <p className="text-xl text-ink-muted mb-6">
             It joins my two previous projects: the AppSec Homelab was an app
             with a security pipeline, and the Secure Azure Landing Zone was
-            locked-down Azure infrastructure. My Lab Notes have the
-            day-by-day version, bugs included.
+            locked-down Azure infrastructure. My Lab Notes have the day-by-day
+            version, bugs included.
           </p>
 
           {/* Technologies */}
@@ -98,16 +98,16 @@ function SecureExpenseClaims() {
           </h2>
           <div className="prose prose-lg max-w-none">
             <p className="text-ink-muted mb-4">
-              I picked expense claims because money, approvals and file
-              uploads give me real access-control rules to break later, which
-              a CRUD demo wouldn&apos;t.
+              I picked expense claims because money, approvals and file uploads
+              give me real access-control rules to break later, which a CRUD
+              demo wouldn&apos;t.
             </p>
             <p className="text-ink-muted">
               Before any app code, I wrote a STRIDE threat model: 6 assets, 5
               trust boundaries and 24 threats, each tied to a control and the
-              phase that builds it. A manager must not approve their own
-              claim, and a request for someone else&apos;s claim returns 404
-              rather than 403, so claim IDs can&apos;t be enumerated.
+              phase that builds it. A manager must not approve their own claim,
+              and a request for someone else&apos;s claim returns 404 rather
+              than 403, so claim IDs can&apos;t be enumerated.
             </p>
           </div>
         </div>
@@ -118,11 +118,20 @@ function SecureExpenseClaims() {
             What&apos;s Built So Far
           </h2>
           <ul className="space-y-2 text-ink-muted">
-            <li>• STRIDE threat model with a planned control and phase for every threat</li>
-            <li>• .NET 10 API with a /health endpoint and an integration test that starts the whole API in memory</li>
+            <li>
+              • STRIDE threat model with a planned control and phase for every
+              threat
+            </li>
+            <li>
+              • .NET 10 API with a /health endpoint and an integration test that
+              starts the whole API in memory
+            </li>
             <li>• React and TypeScript frontend scaffolded with Vite</li>
             <li>• NuGet lock files committed and restored in locked mode</li>
-            <li>• API image on Microsoft&apos;s chiseled Ubuntu base: no shell, runs as user 1654</li>
+            <li>
+              • API image on Microsoft&apos;s chiseled Ubuntu base: no shell,
+              runs as user 1654
+            </li>
             <li>• Frontend on unprivileged nginx, running as user 101</li>
           </ul>
         </div>

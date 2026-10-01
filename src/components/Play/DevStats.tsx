@@ -4,7 +4,11 @@
 import { useEffect, useRef, type RefObject } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 
-export function DevStats({ output }: { output: RefObject<HTMLParagraphElement | null> }) {
+export function DevStats({
+  output,
+}: {
+  output: RefObject<HTMLParagraphElement | null>
+}) {
   const gl = useThree((state) => state.gl)
   const frames = useRef(0)
   const seconds = useRef(0)

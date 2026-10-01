@@ -10,17 +10,28 @@ import { cyberDiaryEntries } from '../src/data/cyberDiaryEntries.ts'
 
 const SITE = 'https://charlesgoodsir.com'
 const esc = (s) =>
-  String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 const slug = (p) => (p ?? 'Not started').toLowerCase().replace(/\s+/g, '-')
 const fmtDate = (iso) =>
-  new Date(iso + 'T00:00:00Z').toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
+  new Date(iso + 'T00:00:00Z').toLocaleDateString('en-NZ', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  })
 
 const entries = new Map(cyberDiaryEntries.map((e) => [e.id, e]))
 const count = (p) => owaspTop10.filter((r) => r.progress === p).length
 const inProgress = count('In progress')
 const planned = count('Planned')
 const completed = count('Completed')
-const linkedIds = new Set(owaspTop10.flatMap((r) => (r.relatedDiaryLinks ?? []).map((l) => l.entryId)))
+const linkedIds = new Set(
+  owaspTop10.flatMap((r) => (r.relatedDiaryLinks ?? []).map((l) => l.entryId)),
+)
 const updated = fmtDate(new Date().toLocaleDateString('en-CA')) // local YYYY-MM-DD
 
 const risk = (r) => {
@@ -56,18 +67,30 @@ const risk = (r) => {
           <p class="field__label">Why it matters</p>
           <p>${esc(r.whyItMatters)}</p>
         </div>
-        ${r.done.length ? `<div class="field">
+        ${
+          r.done.length
+            ? `<div class="field">
           <p class="field__label">What I've done</p>
           <ul>${r.done.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>
-        </div>` : ''}
-        ${r.next?.length ? `<div class="field">
+        </div>`
+            : ''
+        }
+        ${
+          r.next?.length
+            ? `<div class="field">
           <p class="field__label">Next</p>
           <ul>${r.next.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>
-        </div>` : ''}
-        ${r.tools.length ? `<div class="field">
+        </div>`
+            : ''
+        }
+        ${
+          r.tools.length
+            ? `<div class="field">
           <p class="field__label">Tools</p>
           <div class="chips">${r.tools.map((t) => `<span class="chip">${esc(t)}</span>`).join('')}</div>
-        </div>` : ''}
+        </div>`
+            : ''
+        }
         ${logged ? `<div class="field"><p class="field__label">Logged in my Lab Notes</p><div class="logged">${logged}</div></div>` : ''}
       </div>
     </li>`
@@ -248,4 +271,8 @@ const html = `<title>Learning the OWASP Top 10</title>
 
 const out = join(tmpdir(), 'owasp-progress.html')
 writeFileSync(out, html)
-console.log('wrote', out, `(${completed} completed, ${inProgress} in progress, ${planned} planned, ${linkedIds.size} entries linked)`)
+console.log(
+  'wrote',
+  out,
+  `(${completed} completed, ${inProgress} in progress, ${planned} planned, ${linkedIds.size} entries linked)`,
+)

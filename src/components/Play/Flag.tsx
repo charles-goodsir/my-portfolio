@@ -32,7 +32,12 @@ function HoloPart({
   return (
     <mesh {...meshProps}>
       {children}
-      <meshBasicMaterial color={color} transparent opacity={0.08} depthWrite={false} />
+      <meshBasicMaterial
+        color={color}
+        transparent
+        opacity={0.08}
+        depthWrite={false}
+      />
       <Edges color={color} />
     </mesh>
   )
@@ -153,7 +158,8 @@ function Flag({
     const now = clock.elapsedTime
 
     // Turn the hologram symbol slowly
-    if (symbol.current && !reduceMotion) symbol.current.rotation.y += delta * 0.8
+    if (symbol.current && !reduceMotion)
+      symbol.current.rotation.y += delta * 0.8
 
     // Bob the cloth up and down. Offsetting by x means the flags bob out of step
     if (cloth.current && !reduceMotion) {
@@ -171,7 +177,8 @@ function Flag({
     clothMaterial.current?.color.copy(WHITE_HOT).lerp(NEON_CYAN, progress)
 
     // Beam brightens and widens
-    if (beamMaterial.current) beamMaterial.current.opacity = 0.15 + progress * 0.5
+    if (beamMaterial.current)
+      beamMaterial.current.opacity = 0.15 + progress * 0.5
     if (beam.current && !reduceMotion) {
       const width = 1 + progress * 3
       beam.current.scale.set(width, 1, width)
@@ -198,7 +205,10 @@ function Flag({
       {/* Cloth: a thin glowing box hanging off the top of the pole */}
       <mesh ref={cloth} position={[0.6, 2.6, 0]}>
         <boxGeometry args={[1.2, 0.8, 0.05]} />
-        <meshBasicMaterial ref={clothMaterial} color={owned ? NEON_CYAN : NEON_ORANGE} />
+        <meshBasicMaterial
+          ref={clothMaterial}
+          color={owned ? NEON_CYAN : NEON_ORANGE}
+        />
       </mesh>
 
       {/* Beam: a tall, faint, open-ended tube into the sky. Additive blending
@@ -239,10 +249,14 @@ function Flag({
           >
             <span className={`block text-sm ${HUD_GLOW}`}>{label}</span>
             <span className="mt-1 block text-xs text-[#94a3b8]">{preview}</span>
-            <span className="mt-2 block text-xs text-[#f59e0b]">Enter ↵ or click to go in</span>
+            <span className="mt-2 block text-xs text-[#f59e0b]">
+              Enter ↵ or click to go in
+            </span>
           </button>
         ) : (
-          <div className={`pointer-events-none whitespace-nowrap px-2 py-0.5 text-xs ${HUD_PANEL} ${HUD_GLOW}`}>
+          <div
+            className={`pointer-events-none whitespace-nowrap px-2 py-0.5 text-xs ${HUD_PANEL} ${HUD_GLOW}`}
+          >
             {label}
             {owned && ' ✓'}
           </div>

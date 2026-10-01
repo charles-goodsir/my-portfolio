@@ -96,7 +96,15 @@ function voice(
   },
 ) {
   const ctx = context!
-  const { length, volume, cutoff, cutoffEnd = cutoff, attack = 0.005, detune = 0, out = music } = options
+  const {
+    length,
+    volume,
+    cutoff,
+    cutoffEnd = cutoff,
+    attack = 0.005,
+    detune = 0,
+    out = music,
+  } = options
   const oscillator = ctx.createOscillator()
   oscillator.type = type
   oscillator.frequency.value = frequency
@@ -141,7 +149,14 @@ function noiseHit(
 }
 
 // A sine wave whose pitch drops fast: the ear hears a thump. Used for the kick drum
-function thump(time: number, from: number, to: number, length: number, volume: number, out: AudioNode = music) {
+function thump(
+  time: number,
+  from: number,
+  to: number,
+  length: number,
+  volume: number,
+  out: AudioNode = music,
+) {
   const ctx = context!
   const oscillator = ctx.createOscillator()
   oscillator.frequency.setValueAtTime(from, time)
@@ -154,8 +169,20 @@ function thump(time: number, from: number, to: number, length: number, volume: n
   oscillator.stop(time + length + 0.05)
 }
 
-const pluck = (midi: number, time: number, volume = 0.035, out: AudioNode = music) =>
-  voice('sawtooth', hz(midi), time, { length: 0.18, volume, cutoff: 1800, cutoffEnd: 250, echo: true, out })
+const pluck = (
+  midi: number,
+  time: number,
+  volume = 0.035,
+  out: AudioNode = music,
+) =>
+  voice('sawtooth', hz(midi), time, {
+    length: 0.18,
+    volume,
+    cutoff: 1800,
+    cutoffEnd: 250,
+    echo: true,
+    out,
+  })
 
 const currentChord = () => CHORDS[Math.floor(stepCount / 16) % CHORDS.length]
 
@@ -172,13 +199,24 @@ function playStep(time: number) {
     // Sub bass: a pure low sine an octave under the bass, held all bar. You
     // feel it more than hear it on headphones. Laptop speakers mostly can't
     // play it, which is why the saw bass below exists too
-    voice('sine', hz(chord.bass - 12), time, { length: barLength, volume: 0.3, cutoff: 400, attack: 0.05 })
+    voice('sine', hz(chord.bass - 12), time, {
+      length: barLength,
+      volume: 0.3,
+      cutoff: 400,
+      attack: 0.05,
+    })
 
     // Pad: the chord an octave down, two slightly detuned saws per note, dark
     // and swelling in slowly
     for (const midi of chord.arp.slice(0, 3)) {
       for (const detune of [-10, 10]) {
-        voice('sawtooth', hz(midi - 12), time, { length: barLength, volume: 0.018, cutoff: 500, attack: 0.8, detune })
+        voice('sawtooth', hz(midi - 12), time, {
+          length: barLength,
+          volume: 0.018,
+          cutoff: 500,
+          attack: 0.8,
+          detune,
+        })
       }
     }
 
@@ -187,7 +225,14 @@ function playStep(time: number) {
     if (bar >= DRUMS_FROM_BAR && bar % 4 === 0) {
       for (const midi of [chord.bass, chord.bass + 7, chord.bass + 12]) {
         for (const detune of [-15, 0, 15]) {
-          voice('sawtooth', hz(midi), time, { length: 2.5, volume: 0.05, cutoff: 150, cutoffEnd: 1400, attack: 0.25, detune })
+          voice('sawtooth', hz(midi), time, {
+            length: 2.5,
+            volume: 0.05,
+            cutoff: 150,
+            cutoffEnd: 1400,
+            attack: 0.25,
+            detune,
+          })
         }
       }
     }
@@ -198,13 +243,20 @@ function playStep(time: number) {
   if (bar >= BASS_FROM_BAR && step % 2 === 0) {
     const midi = chord.bass + (step % 4 === 2 ? 12 : 0)
     for (const detune of [-8, 8]) {
-      voice('sawtooth', hz(midi), time, { length: STEP * 1.8, volume: 0.16, cutoff: 900, cutoffEnd: 120, detune })
+      voice('sawtooth', hz(midi), time, {
+        length: STEP * 1.8,
+        volume: 0.16,
+        cutoff: 900,
+        cutoffEnd: 120,
+        detune,
+      })
     }
   }
 
   // Four-on-the-floor kick, deep and long. Hi-hat on the off-beats
   if (bar >= DRUMS_FROM_BAR && step % 4 === 0) thump(time, 120, 35, 0.45, 0.8)
-  if (bar >= DRUMS_FROM_BAR && step % 4 === 2) noiseHit(time, 0.05, 0.03, 'highpass', 7000)
+  if (bar >= DRUMS_FROM_BAR && step % 4 === 2)
+    noiseHit(time, 0.05, 0.03, 'highpass', 7000)
 }
 
 // Web Audio plays notes at exact times, but only if they're scheduled in
@@ -316,14 +368,23 @@ export function charTick(char: string) {
 // Click on the floor: a short bright blip with an echo
 export function blip() {
   if (!enabled || !context) return
-  voice('square', hz(76), context.currentTime, { length: 0.08, volume: 0.04, cutoff: 3000, cutoffEnd: 600, echo: true, out: mix })
+  voice('square', hz(76), context.currentTime, {
+    length: 0.08,
+    volume: 0.04,
+    cutoff: 3000,
+    cutoffEnd: 600,
+    echo: true,
+    out: mix,
+  })
 }
 
 // Capturing a flag: a fast run up the current chord
 export function chime() {
   if (!enabled || !context) return
   const now = context.currentTime
-  currentChord().arp.forEach((midi, i) => pluck(midi + 12, now + i * STEP * 0.5, 0.1, mix))
+  currentChord().arp.forEach((midi, i) =>
+    pluck(midi + 12, now + i * STEP * 0.5, 0.1, mix),
+  )
 }
 
 // The finale: a two-octave run up the chord, a big swelling chord and a crash
@@ -331,10 +392,20 @@ export function fanfare() {
   if (!enabled || !context) return
   const now = context.currentTime
   const { arp, bass } = currentChord()
-  ;[...arp, ...arp.map((midi) => midi + 12)].forEach((midi, i) => pluck(midi, now + i * STEP * 0.5, 0.1, mix))
+  ;[...arp, ...arp.map((midi) => midi + 12)].forEach((midi, i) =>
+    pluck(midi, now + i * STEP * 0.5, 0.1, mix),
+  )
   for (const midi of [bass, ...arp.slice(0, 3)]) {
     for (const detune of [-12, 12]) {
-      voice('sawtooth', hz(midi), now, { length: 3, volume: 0.05, cutoff: 200, cutoffEnd: 4000, attack: 0.4, detune, out: mix })
+      voice('sawtooth', hz(midi), now, {
+        length: 3,
+        volume: 0.05,
+        cutoff: 200,
+        cutoffEnd: 4000,
+        attack: 0.4,
+        detune,
+        out: mix,
+      })
     }
   }
   noiseHit(now, 2.5, 0.15, 'lowpass', 6000, mix)

@@ -43,7 +43,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-expense-claims-entry-1-threat-model-scaffold',
     date: '2026-10-01',
     category: 'Secure Expense Claims',
-    title: 'A threat model before any code, and a scaffold so CI has something real to check',
+    title:
+      'A threat model before any code, and a scaffold so CI has something real to check',
     workedOn: [
       'Started a new project that puts a real app on secure Azure infrastructure, then hardens, attacks and monitors it',
       'Wrote a STRIDE threat model before any app code: 6 assets, 5 trust boundaries and 24 threats, each with a planned control and the phase it lands in',
@@ -51,13 +52,21 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Wrote Dockerfiles that run as non-root users, and built and tested both images on the mini PC',
     ],
     body: [
-      'This project joins my two previous ones. The homelab was an app with a security pipeline, and the landing zone was locked-down Azure infrastructure. This one is an expense claims app on Azure: employees submit claims with receipts, managers approve them, and finance pays them. I picked it because money, approvals and file uploads give me real access-control rules to break later, which a CRUD demo wouldn\'t.',
-      'Before any app code, I wrote a STRIDE threat model with 24 threats, each tied to a control and the phase that builds it. Two threats shape the design. A manager must not approve their own claim, which is a separation-of-duties rule I need to test on purpose. And a request for someone else\'s claim returns 404, so a 403 can\'t confirm the claim exists and IDs can\'t be enumerated.',
+      "This project joins my two previous ones. The homelab was an app with a security pipeline, and the landing zone was locked-down Azure infrastructure. This one is an expense claims app on Azure: employees submit claims with receipts, managers approve them, and finance pays them. I picked it because money, approvals and file uploads give me real access-control rules to break later, which a CRUD demo wouldn't.",
+      "Before any app code, I wrote a STRIDE threat model with 24 threats, each tied to a control and the phase that builds it. Two threats shape the design. A manager must not approve their own claim, which is a separation-of-duties rule I need to test on purpose. And a request for someone else's claim returns 404, so a 403 can't confirm the claim exists and IDs can't be enumerated.",
       'The plan wanted CI to build, test and scan the API and frontend in the first phase, but there was no app yet. The homelab got around this with a test job that only printed a message. This time I scaffolded the templates first: a .NET 10 API with a /health endpoint, one integration test that starts the whole API in memory, and a Vite React app. NuGet lock files are committed and restored in locked mode, the same idea as the Terraform lock file in the landing zone. I chose Postgres for the database.',
-      'A few things didn\'t go to plan. My Mac only had the .NET 8 SDK, so I installed .NET 10, the current LTS. The Vite template now uses oxlint instead of ESLint. Docker Desktop wasn\'t running, so I built the images on the mini PC over SSH, which is how I found Docker getting around its firewall. The API image is Microsoft\'s chiseled Ubuntu image, with no shell, running as user 1654 at 181 MB. The frontend runs on unprivileged nginx as user 101. Both answered their health checks, and the mini PC builds amd64 images, the same architecture Azure Container Apps runs.',
+      "A few things didn't go to plan. My Mac only had the .NET 8 SDK, so I installed .NET 10, the current LTS. The Vite template now uses oxlint instead of ESLint. Docker Desktop wasn't running, so I built the images on the mini PC over SSH, which is how I found Docker getting around its firewall. The API image is Microsoft's chiseled Ubuntu image, with no shell, running as user 1654 at 181 MB. The frontend runs on unprivileged nginx as user 101. Both answered their health checks, and the mini PC builds amd64 images, the same architecture Azure Container Apps runs.",
       'Next is CI, with Trivy failing on HIGH and CRITICAL findings from the first run, so the images have to start clean.',
     ],
-    tools: ['.NET 10', 'ASP.NET Core', 'xUnit', 'React', 'Vite', 'Docker', 'STRIDE'],
+    tools: [
+      '.NET 10',
+      'ASP.NET Core',
+      'xUnit',
+      'React',
+      'Vite',
+      'Docker',
+      'STRIDE',
+    ],
     tags: [
       'Secure Expense Claims',
       'threat modelling',
@@ -73,17 +82,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     title: 'My firewall said deny, and Docker answered anyway',
     workedOn: [
       'Pointed a Docker context at the mini PC over SSH so I could build images there instead of on my Mac',
-      'Found that containers published on ports ufw doesn\'t allow were still reachable from my Mac',
+      "Found that containers published on ports ufw doesn't allow were still reachable from my Mac",
       'Added a DOCKER-USER rule so published container ports follow the same LAN-only limit as ufw, and tested it with a port that had answered before',
       'Removed the ufw rules that allowed SSH from anywhere, including over IPv6',
       'Corrected my risk assessment, which said password login was disabled',
     ],
     body: [
-      'I needed to build the Docker images for my new project, and Docker Desktop wasn\'t running on my Mac, so I pointed a Docker context at the mini PC over SSH. Getting there took a few tries. The mini PC had moved from 192.168.88.13 to .18, so my SSH config pointed at nothing. I ran the first docker --context command inside an SSH session on the mini PC, where the name homelab means nothing. And Docker\'s SSH connection can\'t answer a passphrase prompt, so it failed until I loaded my key into the macOS agent with the passphrase in Keychain.',
-      'Once it worked, I ran the test containers on 8081 and 8082, because the homelab app already has 8080. Both answered from my Mac. ufw was active with default deny, and the only app port it allowed was 8080. Docker publishes ports with DNAT, so that traffic goes through the FORWARD chain and never hits ufw\'s INPUT rules. Over IPv6 it was different: 8080 timed out from my Mac, because Docker hands IPv6 to a proxy on the host and ufw filters that.',
-      'The fix is a block in /etc/ufw/after.rules for the DOCKER-USER chain, which Docker checks before its own rules. It allows replies to connections the containers opened, allows 192.168.88.0/24 to reach original port 8080, and drops anything else new coming in on the Wi-Fi interface. NAT has already rewritten the port to the container\'s by then, so the rule matches on conntrack\'s original destination port. After a reload, 8080 still returned 200 from my Mac, and containers could still reach the internet. The first run of the 8081 test was invalid because the test container mapped the wrong port, so I reran it and also curled it from the mini PC itself: 200 locally and a timeout from my Mac, so the firewall was what blocked it.',
-      'I also removed the ufw rules that allowed SSH from anywhere. The mini PC has public IPv6 addresses, and I haven\'t checked yet whether my router blocks inbound IPv6. SSH now only answers over IPv4 from the LAN. I kept password login on as a fallback in case I lose the key, which meant my risk assessment was wrong: it said key-only auth with passwords disabled. I corrected it and added the Docker bypass and the IPv6 check as gaps.',
-      'ufw status showed exactly what I expected, and it still didn\'t describe what was reachable. I only found out because a port I never opened answered.',
+      "I needed to build the Docker images for my new project, and Docker Desktop wasn't running on my Mac, so I pointed a Docker context at the mini PC over SSH. Getting there took a few tries. The mini PC had moved from 192.168.88.13 to .18, so my SSH config pointed at nothing. I ran the first docker --context command inside an SSH session on the mini PC, where the name homelab means nothing. And Docker's SSH connection can't answer a passphrase prompt, so it failed until I loaded my key into the macOS agent with the passphrase in Keychain.",
+      "Once it worked, I ran the test containers on 8081 and 8082, because the homelab app already has 8080. Both answered from my Mac. ufw was active with default deny, and the only app port it allowed was 8080. Docker publishes ports with DNAT, so that traffic goes through the FORWARD chain and never hits ufw's INPUT rules. Over IPv6 it was different: 8080 timed out from my Mac, because Docker hands IPv6 to a proxy on the host and ufw filters that.",
+      "The fix is a block in /etc/ufw/after.rules for the DOCKER-USER chain, which Docker checks before its own rules. It allows replies to connections the containers opened, allows 192.168.88.0/24 to reach original port 8080, and drops anything else new coming in on the Wi-Fi interface. NAT has already rewritten the port to the container's by then, so the rule matches on conntrack's original destination port. After a reload, 8080 still returned 200 from my Mac, and containers could still reach the internet. The first run of the 8081 test was invalid because the test container mapped the wrong port, so I reran it and also curled it from the mini PC itself: 200 locally and a timeout from my Mac, so the firewall was what blocked it.",
+      "I also removed the ufw rules that allowed SSH from anywhere. The mini PC has public IPv6 addresses, and I haven't checked yet whether my router blocks inbound IPv6. SSH now only answers over IPv4 from the LAN. I kept password login on as a fallback in case I lose the key, which meant my risk assessment was wrong: it said key-only auth with passwords disabled. I corrected it and added the Docker bypass and the IPv6 check as gaps.",
+      "ufw status showed exactly what I expected, and it still didn't describe what was reachable. I only found out because a port I never opened answered.",
     ],
     tools: ['ufw', 'iptables', 'Docker', 'SSH'],
     tags: [
@@ -99,7 +108,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-10-01',
     category: 'Secure Azure Landing Zone',
     milestone: true,
-    title: 'Finishing the landing zone: what it caught, and what it still isn\'t',
+    title:
+      "Finishing the landing zone: what it caught, and what it still isn't",
     workedOn: [
       'Finished the landing zone: a gated Terraform pipeline, private endpoints, audit logging and a weekly drift check',
       'Went back over which controls caught real mistakes rather than the tests I set up for them',
@@ -108,12 +118,19 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
     body: [
       'The landing zone is finished. It is a small Azure environment in Terraform that can only be deployed through the pipeline: validate, a Trivy scan, plan, a manual approval, then apply of the exact plan I approved. The storage account and Key Vault are closed to the internet and reachable through private endpoints in the VNet, their access logs go to Log Analytics, and a weekly check fails if Azure drifts from the code. The pipeline signs in with OIDC, so no secret is stored anywhere.',
-      'Looking back, the controls caught real mistakes, not only the ones I set up to test them. The scanner blocked six misconfigurations in code I had written. The branch ruleset rejected a commit I pushed at main by accident, because I had made the branch from origin/main. And reading a plan before approving it turned up two changes I hadn\'t made, which turned out to be a diff that came back on every plan.',
-      'It isn\'t production-ready, and I can say where. Each checksum comes from the same place as its download, so it catches a corrupted file but not someone who controls the release. Signature verification would close that, with cosign for Trivy and GPG for HashiCorp. The provider lock file trusts its first download. Trivy\'s rules update on every run, which is how new findings appeared without any code change. With a team I would also want a second reviewer on PRs, a self-hosted agent inside the VNet for any data-plane work, nightly drift checks that alert someone, and variables so the same code can build dev and prod.',
+      "Looking back, the controls caught real mistakes, not only the ones I set up to test them. The scanner blocked six misconfigurations in code I had written. The branch ruleset rejected a commit I pushed at main by accident, because I had made the branch from origin/main. And reading a plan before approving it turned up two changes I hadn't made, which turned out to be a diff that came back on every plan.",
+      "It isn't production-ready, and I can say where. Each checksum comes from the same place as its download, so it catches a corrupted file but not someone who controls the release. Signature verification would close that, with cosign for Trivy and GPG for HashiCorp. The provider lock file trusts its first download. Trivy's rules update on every run, which is how new findings appeared without any code change. With a team I would also want a second reviewer on PRs, a self-hosted agent inside the VNet for any data-plane work, nightly drift checks that alert someone, and variables so the same code can build dev and prod.",
       'What I would do differently: read every -/+ in a plan before approving, because the storage account replace showed its delete-then-create in advance. Read the full log rather than the last error, because the real auth failure was further up. And branch from an up-to-date local main instead of origin/main.',
-      'Every control I trust here is one I triggered on purpose: a PR to prove Apply skips, a portal tag to prove drift detection goes red, a push to main to prove the ruleset holds. A control I haven\'t seen fail is one I am only assuming works.',
+      "Every control I trust here is one I triggered on purpose: a PR to prove Apply skips, a portal tag to prove drift detection goes red, a push to main to prove the ruleset holds. A control I haven't seen fail is one I am only assuming works.",
     ],
-    tools: ['Terraform', 'Azure DevOps', 'Trivy', 'Log Analytics', 'Private Link', 'YAML'],
+    tools: [
+      'Terraform',
+      'Azure DevOps',
+      'Trivy',
+      'Log Analytics',
+      'Private Link',
+      'YAML',
+    ],
     tags: [
       'Secure Azure Landing Zone',
       'retrospective',
@@ -127,7 +144,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'portfolio-site-entry-2-rulesets-signing-dependabot',
     date: '2026-10-01',
     category: 'Portfolio Site',
-    title: 'A required-checks rule with nothing in it, and signing my own commits',
+    title:
+      'A required-checks rule with nothing in it, and signing my own commits',
     workedOn: [
       'Found two layers protecting main, a ruleset and classic branch protection, and that the ruleset required status checks but listed none',
       'Removed an always-on bypass that let Dependabot push straight to main',
@@ -136,13 +154,18 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Split Dependabot so major updates get their own PRs, and auto-merge only explicit minor and patch updates once checks pass',
     ],
     body: [
-      'I checked the rules on main after adding CI, expecting them to enforce it. They didn\'t. There were two layers: a ruleset, and older classic branch protection on top of it. The ruleset had required status checks switched on with an empty list, so a PR with failing tests could still merge. The classic rule wanted one approval, which I can\'t give my own PR, and had the branch locked, so every merge so far had gone through the admin bypass. That bypass skips CI too. The ruleset also gave Dependabot an always-on bypass, which would have let it push to main with no PR at all.',
+      "I checked the rules on main after adding CI, expecting them to enforce it. They didn't. There were two layers: a ruleset, and older classic branch protection on top of it. The ruleset had required status checks switched on with an empty list, so a PR with failing tests could still merge. The classic rule wanted one approval, which I can't give my own PR, and had the branch locked, so every merge so far had gone through the admin bypass. That bypass skips CI too. The ruleset also gave Dependabot an always-on bypass, which would have let it push to main with no PR at all.",
       'I replaced both with one ruleset. A change to main now needs a PR, the "Lint, test, build, audit" and "Secret scan" checks passing, and signed commits. The checks are tied to GitHub Actions\' app ID, so a check with the same name from another app doesn\'t count. My admin bypass only works through a PR, and Dependabot has no bypass. I found out it worked when I tried to push straight to main and GitHub refused it.',
-      'Signed commits were already required by the old rule, but my own commits weren\'t signed. Merges only passed because GitHub signs the merge commits it creates. I set git to sign with my existing GitHub SSH key, uploaded it as a signing key, and GitHub now shows my commits as Verified.',
-      'Dependabot\'s first run put all 16 npm updates in one PR, including 7 major versions. TypeScript 7 is outside typescript-eslint\'s supported range, so npm ci failed and blocked everything else in the group. Majors now get their own PRs. A workflow turns on auto-merge for Dependabot PRs whose update type is explicitly minor or patch, so an empty or unknown type stays manual. It runs on pull_request rather than pull_request_target, so a PR\'s code never runs with write access. Then I sorted the majors by hand: react-router 8 merged after I checked its breaking changes, Vite 8 and plugin-react 6 went in together because one needs the other, and TypeScript 7 is ignored until typescript-eslint supports it.',
+      "Signed commits were already required by the old rule, but my own commits weren't signed. Merges only passed because GitHub signs the merge commits it creates. I set git to sign with my existing GitHub SSH key, uploaded it as a signing key, and GitHub now shows my commits as Verified.",
+      "Dependabot's first run put all 16 npm updates in one PR, including 7 major versions. TypeScript 7 is outside typescript-eslint's supported range, so npm ci failed and blocked everything else in the group. Majors now get their own PRs. A workflow turns on auto-merge for Dependabot PRs whose update type is explicitly minor or patch, so an empty or unknown type stays manual. It runs on pull_request rather than pull_request_target, so a PR's code never runs with write access. Then I sorted the majors by hand: react-router 8 merged after I checked its breaking changes, Vite 8 and plugin-react 6 went in together because one needs the other, and TypeScript 7 is ignored until typescript-eslint supports it.",
       'A rule that is switched on but empty looks the same as one that works. The only way I found out was by reading what it checked.',
     ],
-    tools: ['GitHub rulesets', 'GitHub Actions', 'Dependabot', 'SSH commit signing'],
+    tools: [
+      'GitHub rulesets',
+      'GitHub Actions',
+      'Dependabot',
+      'SSH commit signing',
+    ],
     tags: [
       'Portfolio Site',
       'branch protection',
@@ -189,21 +212,29 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'portfolio-site-entry-1-redesign-tests-and-ci',
     date: '2026-10-01',
     category: 'Portfolio Site',
-    title: 'Rebuilding the site, correcting my own copy, and adding tests and CI',
+    title:
+      'Rebuilding the site, correcting my own copy, and adding tests and CI',
     workedOn: [
       'Turned Lab Notes from 52 full entries on one page into a shelf of project notebooks, with a short list of entries inside each',
       'Renamed CyberDiary to Lab Notes and kept the /diary URLs, so links I had already shared still work',
       'Gave the OWASP page a status grid and a page per risk, and split each risk into what I have done and what is next',
-      'Added seven tests on Node 24\'s built-in runner and a GitHub Actions workflow with a gitleaks scan',
+      "Added seven tests on Node 24's built-in runner and a GitHub Actions workflow with a gitleaks scan",
     ],
     body: [
       'The Lab Notes page rendered all 52 entries in full, one after another. A recruiter landing on it saw a wall of text with a row of filters. It is now a shelf with one notebook per project, a short list of entries inside each, and a Start here box with the latest milestone from each project. I renamed it from CyberDiary to Lab Notes and kept the /diary URLs, so links I have already shared still work.',
       'The OWASP page got the same treatment: a grid of the ten risks with their status, and a page for each one. I split every risk into what I have done and what is next, and cut 16 tools from the lists because nothing in these notes shows me using them.',
       'The About page had a bigger problem than its length and needed some cleaning up.  At Datacom I build local council environments with .NET tooling, export their configuration as JSON, and watch the pipeline that builds the cloud environment from it. The pipelines with security gates are in my own projects. I rewrote the About page, the Home page and my CV to say that.',
-      'Then I added tests and CI. The tests run on Node 24\'s built-in runner, so they need no new packages. They check what TypeScript can\'t see: entry IDs are unique, entries stay newest first, every screenshot and script path resolves, every OWASP link points at a real entry, and every nav page has a route and a flag in the CTF map. To prove they work, I added a nav page with no flag and moved an entry out of date order, and both tests failed. A GitHub Actions workflow now runs lint, the tests, a Linux build and npm audit on every PR, plus a gitleaks scan, with each Action pinned to a commit SHA and Dependabot keeping the pins current. It has not run yet; the first push will tell me whether it works.',
-      'Most of today was just cutting down long reads, tweaking designs and making sure it was user friendly.'
+      "Then I added tests and CI. The tests run on Node 24's built-in runner, so they need no new packages. They check what TypeScript can't see: entry IDs are unique, entries stay newest first, every screenshot and script path resolves, every OWASP link points at a real entry, and every nav page has a route and a flag in the CTF map. To prove they work, I added a nav page with no flag and moved an entry out of date order, and both tests failed. A GitHub Actions workflow now runs lint, the tests, a Linux build and npm audit on every PR, plus a gitleaks scan, with each Action pinned to a commit SHA and Dependabot keeping the pins current. It has not run yet; the first push will tell me whether it works.",
+      'Most of today was just cutting down long reads, tweaking designs and making sure it was user friendly.',
     ],
-    tools: ['React', 'TypeScript', 'Node.js test runner', 'GitHub Actions', 'gitleaks', 'Dependabot'],
+    tools: [
+      'React',
+      'TypeScript',
+      'Node.js test runner',
+      'GitHub Actions',
+      'gitleaks',
+      'Dependabot',
+    ],
     tags: [
       'Portfolio Site',
       'redesign',
@@ -225,7 +256,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Caught two typos in the schedule: a cron with four fields instead of five, and includes instead of include, neither of which would have failed the PR, since the PR runs the main pipeline, not this file',
       'Confirmed cron runs in UTC, so "Monday 3am" in Brisbane is Sunday, day 0',
       'Proved it works by tagging the resource group drifttest in the Portal: the pipeline went red with "Drift detected" and a plan to remove the tag, then green again once the tag was deleted',
-      'Checked the service connection\'s permissions after registering the new pipeline and confirmed only the two pipelines are listed',
+      "Checked the service connection's permissions after registering the new pipeline and confirmed only the two pipelines are listed",
     ],
     body: [
       'I added a second pipeline that only plans. It runs terraform plan -detailed-exitcode, which exits 0 when Azure matches the code, 1 on an error and 2 when something has drifted. Any non-zero exit fails the run, so drift shows up as red. It lives in its own file with trigger: none and pr: none, so it never runs Apply and never waits at the approval gate. always: true matters because ADO skips a scheduled run when there are no new commits, and drift happens in Azure, not in git.',
@@ -252,15 +283,15 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     category: 'Secure Azure Landing Zone',
     title: 'The Key Vault endpoint, and a plan that finally matched',
     workedOn: [
-      'Added the second private endpoint, for the Key Vault: the same pattern as blob with three different values, the vault\'s ID, the sub-resource vault, and the vault\'s DNS zone',
+      "Added the second private endpoint, for the Key Vault: the same pattern as blob with three different values, the vault's ID, the sub-resource vault, and the vault's DNS zone",
       'Read the plan line by line rather than trusting the green check, since a wrong sub-resource name or the blob zone pasted into the zone group would both pass validate without complaint',
       'Got exactly 1 to add, 0 to change, 0 to destroy, and the diagnostic settings refreshed with no diff, confirming the metric fix held on a new PR',
       'Checked right after merging and saw only the blob endpoint, since main was still waiting on approval and nothing reaches Azure until Apply runs',
-      'After approving, confirmed both endpoints as Approved, with the vault\'s A record at 10.0.2.5, the next free address after blob\'s 10.0.2.4',
+      "After approving, confirmed both endpoints as Approved, with the vault's A record at 10.0.2.5, the next free address after blob's 10.0.2.4",
     ],
     body: [
-      'I added the second private endpoint, for the Key Vault. It is the same pattern as blob with three different values: the vault\'s ID, the sub-resource vault, and the vault\'s DNS zone. Two slips would have passed validate without complaint: a wrong sub-resource name, or the blob zone pasted into the zone group. So I read the plan line by line instead of trusting the green check. It said exactly 1 to add, 0 to change, 0 to destroy. The diagnostic settings refreshed with no diff, so the metric fix held on a new PR.',
-      'My first check after merging showed only the blob endpoint. The merge had worked, but the main run was still waiting for my approval, and nothing reaches Azure until the Apply runs. After approving, both endpoints showed Approved. The vault\'s A record came up at 10.0.2.5, the next free address after blob\'s 10.0.2.4, since Azure reserves the first four in every subnet.',
+      "I added the second private endpoint, for the Key Vault. It is the same pattern as blob with three different values: the vault's ID, the sub-resource vault, and the vault's DNS zone. Two slips would have passed validate without complaint: a wrong sub-resource name, or the blob zone pasted into the zone group. So I read the plan line by line instead of trusting the green check. It said exactly 1 to add, 0 to change, 0 to destroy. The diagnostic settings refreshed with no diff, so the metric fix held on a new PR.",
+      "My first check after merging showed only the blob endpoint. The merge had worked, but the main run was still waiting for my approval, and nothing reaches Azure until the Apply runs. After approving, both endpoints showed Approved. The vault's A record came up at 10.0.2.5, the next free address after blob's 10.0.2.4, since Azure reserves the first four in every subnet.",
       'From my laptop, nslookup for the vault goes through privatelink.vaultcore.azure.net and ends at a public address, the same as blob. That is what should happen outside the VNet. Inside it, both names now resolve to private IPs.',
       'A merged PR only changes code. Check that the change has reached Azure before checking whether it works.',
     ],
@@ -278,7 +309,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-09-29',
     category: 'Secure Azure Landing Zone',
     milestone: true,
-    title: 'Fixing a diff that kept coming back, and a push that did not get through',
+    title:
+      'Fixing a diff that kept coming back, and a push that did not get through',
     workedOn: [
       'Fixed the recurring diagnostic settings diff by declaring the disabled metric categories in code: AllMetrics on the vault, Capacity and Transaction on blob storage, all with enabled = false',
       'Expected the next plan to show 2 changes putting back what the last apply had removed. It said No changes instead, since Azure had never actually removed them, it just kept reporting categories whatever code sent',
@@ -305,16 +337,17 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-16-approve-known-diff-verify-endpoint',
     date: '2026-09-29',
     category: 'Secure Azure Landing Zone',
-    title: 'Approving a plan I knew was not clean, and checking the endpoint worked',
+    title:
+      'Approving a plan I knew was not clean, and checking the endpoint worked',
     workedOn: [
       'Merged the blob private endpoint with the diagnostic settings diff still in it, approving 7 to add, 2 to change, 0 to destroy on purpose, since the fix for the 2 was already planned for its own PR',
       'Checked the result after apply instead of trusting the green pipeline: the endpoint connection shows Approved, with an A record for the storage account at 10.0.2.4, the first usable address in the subnet',
-      'Confirmed from my laptop that nslookup resolves through the privatelink name to the storage account\'s public IP, which the firewall still blocks, since my laptop is not in the VNet',
+      "Confirmed from my laptop that nslookup resolves through the privatelink name to the storage account's public IP, which the firewall still blocks, since my laptop is not in the VNet",
     ],
     body: [
       'I merged the blob private endpoint with the diagnostic settings diff still in it. At the approval gate, the plan matched the PR: 7 to add, 2 to change, 0 to destroy. The only ~ lines removed metric entries that were already switched off, and nothing touched the storage account or the Key Vault. I approved on purpose, knowing what the 2 changes were and that the fix would follow in its own PR.',
       'After the apply, I checked the result instead of trusting the green pipeline. The endpoint connection is Approved. The private DNS zone has an A record for the storage account at 10.0.2.4, the first usable address in the subnet, since Azure reserves the first four. Azure wrote that record itself, through the zone group.',
-      'From my laptop, nslookup goes through the privatelink name and ends at the storage account\'s public IP, which the firewall still blocks. That is expected, because my laptop is not in the VNet. From inside it, the same lookup would stop at 10.0.2.4.',
+      "From my laptop, nslookup goes through the privatelink name and ends at the storage account's public IP, which the firewall still blocks. That is expected, because my laptop is not in the VNet. From inside it, the same lookup would stop at 10.0.2.4.",
       'Approving a plan that is not clean is fine if you can explain every line of it. Approving without reading it is not.',
     ],
     screenshots: ['SecureAzureLandingZone/SALZ20.webp'],
@@ -330,28 +363,34 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'ctf-map-entry-1-game-mode-and-hidden-flag',
     date: '2026-09-26',
     category: 'Portfolio Site',
-    title: 'A game mode for this site, with a real flag hidden in it (Just for fun)',
+    title:
+      'A game mode for this site, with a real flag hidden in it (Just for fun)',
     workedOn: [
       'Added an optional 3D capture-the-flag map at /play: each page of the site is a flag, and you drive to one and press Enter to open it',
       'Kept the normal site as the default and put all the 3D code in its own chunk, so the main bundle only grew by about 1 KB',
       'Found the reflective floor showed nothing because the shader multiplies the reflection by the floor colour, and mine was almost black',
       'Self-hosted the fonts instead of loading them from Google Fonts, and added a Content Security Policy to the build',
       'Hid a real flag on the map',
-      'Web browser only not available on phone'
+      'Web browser only not available on phone',
     ],
     body: [
       'I added a game mode to this site. The Play CTF Map button on the home page opens a 3D arena styled on the grid from Tron. You drive a small program called the Bit around it, and each page of the site is a flag. Get close to one, press Enter, and you land on that page. The normal site stays the default, since nobody should have to play a game to read my CV.',
       'I built it with help from Claude Code over one Saturday, one phase at a time, committing each phase before starting the next.',
       'It uses Three.js through React Three Fiber, which comes to about 300 KB gzipped. All of it sits in its own chunk that only downloads when someone opens the map. The main bundle grew by about 1 KB.',
       'The reflective floor showed nothing at first. Reading the shader explained it: the reflection is multiplied by the floor colour, and my floor was almost black, so the result was almost black too. Raising the reflection strength from 3 to 50 fixed it.',
-      'Two decisions came from this being a security portfolio. The fonts are bundled with the site instead of loaded from Google Fonts, so opening the map does not send a visitor\'s IP address to Google. The build also adds a Content Security Policy now. GitHub Pages cannot send response headers, so the policy goes in a meta tag, with the one inline script allowed by its hash. Browsers ignore frame-ancestors in a meta tag, so there is still no clickjacking protection on this host.',
+      "Two decisions came from this being a security portfolio. The fonts are bundled with the site instead of loaded from Google Fonts, so opening the map does not send a visitor's IP address to Google. The build also adds a Content Security Policy now. GitHub Pages cannot send response headers, so the policy goes in a meta tag, with the one inline script allowed by its hash. Browsers ignore frame-ancestors in a meta tag, so there is still no clickjacking protection on this host.",
       'While I was in there, moving the Tailwind build plugin into devDependencies and running npm audit fix took the audit to 0 findings.',
       'There is also a real flag hidden on the map, in the usual flag{...} format. The boot screen tells you where to start looking. The string is base64 encoded in the bundle, so searching the source for flag{ finds nothing, but decoding it counts as a solve too.',
       'A static site cannot keep a secret. Anyone can read the bundle, so the flag is a game string and nothing real goes near it.',
     ],
     screenshots: ['CTFMap/CTFMap1.webp'],
     tools: ['React Three Fiber', 'Three.js', 'Vite', 'Claude Code'],
-    tags: ['CTF Map', 'Three.js', 'Content Security Policy', 'self-hosted fonts'],
+    tags: [
+      'CTF Map',
+      'Three.js',
+      'Content Security Policy',
+      'self-hosted fonts',
+    ],
   },
   {
     id: 'secure-azure-landing-zone-entry-15-private-endpoint-plan-drift',
@@ -387,12 +426,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     workedOn: [
       'Added two private DNS zones, privatelink.blob.core.windows.net and privatelink.vaultcore.azure.net, and linked each one to the VNet',
       'Learned the zone names are fixed by Azure for each service, and the redirect only works with the exact one',
-      'Found the PR plan said 6 to add when this step only wrote 4 resources: step 1\'s subnet is committed on the branch but not merged, and Apply only runs on main, so every PR plan counts everything Azure does not have yet',
+      "Found the PR plan said 6 to add when this step only wrote 4 resources: step 1's subnet is committed on the branch but not merged, and Apply only runs on main, so every PR plan counts everything Azure does not have yet",
     ],
     body: [
       'The second step of the private endpoints work was DNS. I added two private DNS zones and linked each one to the VNet. I could not pick the names, since Azure fixes a zone name for each service.',
       'The redirect works like this. Public DNS already answers salzstcg314215.blob.core.windows.net with a CNAME to the same name under privatelink. Any VNet linked to my zone can answer that second name with a private IP. A zone that is not linked to the VNet does nothing, which makes the link the easiest piece to leave out.',
-      'The PR plan said 6 to add, but this step only wrote 4 resources. Step 1\'s subnet is committed on the branch but has not been merged, and Apply only runs on main. So every PR plan counts everything on the branch that Azure does not have yet. The 2 extra resources came from step 1.',
+      "The PR plan said 6 to add, but this step only wrote 4 resources. Step 1's subnet is committed on the branch but has not been merged, and Apply only runs on main. So every PR plan counts everything on the branch that Azure does not have yet. The 2 extra resources came from step 1.",
       'A plan compares your code with what is actually deployed, not with your last commit. Before calling a count wrong, check where the counting starts.',
     ],
     screenshots: ['SecureAzureLandingZone/SALZ18.webp'],
@@ -408,7 +447,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-13-private-endpoint-subnet',
     date: '2026-09-26',
     category: 'Secure Azure Landing Zone',
-    title: 'A subnet for private endpoints, and an NSG that does not do much yet',
+    title:
+      'A subnet for private endpoints, and an NSG that does not do much yet',
     workedOn: [
       'Started the private endpoints work with the network they will sit in: a new subnet, salz-pe-subnet on 10.0.2.0/24, with the existing NSG associated',
       'Kept the endpoints out of the workload subnet, so access to them can be managed on its own later',
@@ -418,7 +458,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       'I started the private endpoints work with the network they will sit in: a new subnet, salz-pe-subnet on 10.0.2.0/24, with the existing NSG associated. The endpoints could have gone in the workload subnet. A separate subnet keeps them apart from workloads, so access to them can be managed on its own later.',
       'The NSG association looks like a security control but mostly is not one yet. On a new subnet, private endpoint network policies are off by default, and while they are off, NSG rules do not apply to endpoint traffic. The association is there so the subnet matches the other one, not because it filters anything.',
-      'Before merging I checked the PR\'s plan: 2 to add, 0 to change, 0 to destroy. After the storage account replace earlier in the project, I read the counts before approving, not after.',
+      "Before merging I checked the PR's plan: 2 to add, 0 to change, 0 to destroy. After the storage account replace earlier in the project, I read the counts before approving, not after.",
       'A control being attached does not mean it is enforced. Check what actually applies it before counting it as protection.',
     ],
     screenshots: ['SecureAzureLandingZone/SALZ17.webp'],
@@ -442,7 +482,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Restored the suppression without the 31 Dec expiry, with a reason naming the resource that provides the logs',
     ],
     body: [
-      'The logging was meant to fix the AZU-0057 finding I had accepted with a 31 Dec expiry. To check, I removed the suppression on a PR commit. An ignored finding does not appear in Trivy\'s counts, so that was the only honest test.',
+      "The logging was meant to fix the AZU-0057 finding I had accepted with a 31 Dec expiry. To check, I removed the suppression on a PR commit. An ignored finding does not appear in Trivy's counts, so that was the only honest test.",
       'Trivy still failed. The rule only looks for the legacy Storage Analytics setting inside the storage account block, and the new logging lives in a separate diagnostic setting.',
       'I restored the suppression without the expiry, with a reason that names the resource providing the logs. The expiry had meant "fail me if I forget to fix this". With logging in place, the gap is in the rule, and an expiry would fail a working pipeline.',
       'A passing or failing check tells you what the rule looks for, not whether you are secure. When they disagree, test it, then write down which one is right and why.',
@@ -465,13 +505,13 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     workedOn: [
       'Found the pipeline downloaded the Terraform binary without a checksum, even though the binary is what checks the provider lock-file hashes',
       'Found the install copied into three stages and already drifted: Validate used a version variable, Plan and Apply hardcoded the version in the URL',
-      'Moved it into one ADO step template, templates/install-terraform.yml, which downloads Terraform 1.9.8 with HashiCorp\'s SHA256SUMS file and verifies it under set -euo pipefail',
+      "Moved it into one ADO step template, templates/install-terraform.yml, which downloads Terraform 1.9.8 with HashiCorp's SHA256SUMS file and verifies it under set -euo pipefail",
       'Restructured Plan and Apply, since their install ran inside the AzureCLI@2 script: cd ../terraform became cd terraform',
       'Caught a missing template line in the Plan stage on my first attempt',
     ],
     body: [
-      'The Terraform binary checks the provider\'s lock-file hashes, and the pipeline was downloading it without a checksum. The tool at the bottom of the verification chain was the one piece nobody checked. The install was also copied into three stages and had already drifted.',
-      'I moved it into one step template that verifies the download against HashiCorp\'s SHA256SUMS file. Each stage now pulls it in with a single - template: line. Plan and Apply needed a small restructure, because their install ran inside the AzureCLI@2 script.',
+      "The Terraform binary checks the provider's lock-file hashes, and the pipeline was downloading it without a checksum. The tool at the bottom of the verification chain was the one piece nobody checked. The install was also copied into three stages and had already drifted.",
+      "I moved it into one step template that verifies the download against HashiCorp's SHA256SUMS file. Each stage now pulls it in with a single - template: line. Plan and Apply needed a small restructure, because their install ran inside the AzureCLI@2 script.",
       'My first attempt missed the template line in the Plan stage. If the hosted image ships its own Terraform, Plan would have run green on an unverified, different version, the exact drift the template exists to prevent.',
       'When you deduplicate code, check every place that used the old copy. A missing include can fail silently, just like a wrong condition.',
     ],
@@ -497,14 +537,14 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     workedOn: [
       'Added a pr: trigger so pull requests into main run Validate, Trivy, and Plan',
       "Added ne(variables['Build.Reason'], 'PullRequest') as a condition on the Apply stage, so a PR shows what would change without deploying it",
-      'Turned off fork builds in ADO, since the repo is public and a stranger\'s PR would otherwise run their version of my pipeline YAML with my Azure credentials',
+      "Turned off fork builds in ADO, since the repo is public and a stranger's PR would otherwise run their version of my pipeline YAML with my Azure credentials",
       'Added a GitHub ruleset on main: require a PR, require the Azure Pipelines check, block force pushes, and allow no bypass, including for me as admin',
       'Tested each control by triggering the case it should block: a direct push to main was rejected, and Apply showed as skipped on the PR',
     ],
     body: [
       'Until today, anyone with push access could commit straight to main and deploy, me included. Any control I had added (the lock file, readonly init, the Trivy checksum, the #trivy:ignore comments) could be removed with a single unreviewed commit.',
-      'The fix has four parts: a pr: trigger, a condition that skips Apply on PRs, fork builds turned off, and a ruleset on main with no bypass. Fork builds mattered most because the repo is public, and a stranger\'s PR would run their pipeline YAML with my Azure credentials.',
-      "The condition line took three attempts. The first had a typo in condition, a missing bracket, and Build Reason with a space instead of a dot. The first two would have failed loudly. The space would have failed silently: the variable lookup returns an empty string, the condition is always true, and Apply would have run on every PR while the YAML looked correct.",
+      "The fix has four parts: a pr: trigger, a condition that skips Apply on PRs, fork builds turned off, and a ruleset on main with no bypass. Fork builds mattered most because the repo is public, and a stranger's PR would run their pipeline YAML with my Azure credentials.",
+      'The condition line took three attempts. The first had a typo in condition, a missing bracket, and Build Reason with a space instead of a dot. The first two would have failed loudly. The space would have failed silently: the variable lookup returns an empty string, the condition is always true, and Apply would have run on every PR while the YAML looked correct.',
       'A control that fails silently is worse than no control, because you stop looking. I test each one by triggering the case it is meant to block.',
     ],
     tools: ['Azure DevOps', 'GitHub', 'Terraform', 'YAML'],
@@ -523,12 +563,12 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     title: 'Pinning the azurerm provider with the lock file',
     workedOn: [
       'Found that main.tf asks for azurerm ~> 3.0, a version range, and .terraform.lock.hcl was in .gitignore, so the pipeline resolved the range fresh on every run and trusted whatever the registry returned',
-      'Removed the lock file from .gitignore and ran terraform providers lock -platform=linux_amd64 -platform=darwin_arm64, so it holds checksums for both my Mac and the pipeline\'s Linux agent',
+      "Removed the lock file from .gitignore and ran terraform providers lock -platform=linux_amd64 -platform=darwin_arm64, so it holds checksums for both my Mac and the pipeline's Linux agent",
       'Added -lockfile=readonly to all three terraform init calls, so init fails on a mismatch instead of rewriting the lock file',
     ],
     body: [
-      'main.tf asks for azurerm ~> 3.0, which is a range. With the lock file in .gitignore, the pipeline resolved that range fresh on every run and trusted whatever the registry returned. That matters for azurerm, since the provider runs with the pipeline\'s Azure credentials.',
-      'I un-ignored the lock file and generated checksums for both platforms, my Mac and the pipeline\'s Linux agent. With -lockfile=readonly on every init, a mismatch fails the run, and a provider upgrade only happens when I run terraform init -upgrade locally and commit the result.',
+      "main.tf asks for azurerm ~> 3.0, which is a range. With the lock file in .gitignore, the pipeline resolved that range fresh on every run and trusted whatever the registry returned. That matters for azurerm, since the provider runs with the pipeline's Azure credentials.",
+      "I un-ignored the lock file and generated checksums for both platforms, my Mac and the pipeline's Linux agent. With -lockfile=readonly on every init, a mismatch fails the run, and a provider upgrade only happens when I run terraform init -upgrade locally and commit the result.",
       'The lock file does for the provider what my SHA-256 check does for Trivy, and Terraform ships it for free. Ignoring it in .gitignore threw that protection away.',
     ],
     tools: ['Terraform', 'Azure DevOps'],
@@ -611,7 +651,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     category: 'Secure Azure Landing Zone',
     title: 'Writing the actual Terraform: main.tf, resource by resource',
     workedOn: [
-      'Wrote the landing zone\'s real infrastructure by hand, validating after each addition: resource group, VNet + subnet, NSG (deny-by-default, no explicit rules, relying on Azure\'s implicit deny-all), NSG-subnet association, storage account, Key Vault',
+      "Wrote the landing zone's real infrastructure by hand, validating after each addition: resource group, VNet + subnet, NSG (deny-by-default, no explicit rules, relying on Azure's implicit deny-all), NSG-subnet association, storage account, Key Vault",
       'Learned the implicit dependency graph: writing azurerm_resource_group.main.name instead of a literal string tells Terraform the creation and destruction order, with no depends_on needed',
       'Learned data sources vs resources: data "azurerm_client_config" "current" {} reads who Terraform is authenticated as (used for tenant_id on the Key Vault) without creating anything',
       'Set security defaults myself instead of relying on the provider: TLS 1.2 minimum, HTTPS-only, and no public network access on the storage account; RBAC authorization and purge protection on Key Vault',
@@ -694,17 +734,18 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-09-23',
     category: 'Secure Azure Landing Zone',
     milestone: true,
-    title: 'Azure DevOps pipeline: Apply stage, deployment jobs and manual approval',
+    title:
+      'Azure DevOps pipeline: Apply stage, deployment jobs and manual approval',
     workedOn: [
       'Built the final stage using a deployment: job targeting the production ADO Environment, with an approval check attached, rather than a bare job:',
       'The deployment: job makes ADO pause and wait for a human to approve before any real infrastructure changes, so the pipeline enforces segregation of duties on every run',
       "Hit two bugs from the same root misunderstanding: deployment jobs don't behave like regular job:s",
       "First: deployment jobs don't auto-checkout the source repo the way regular jobs do, so terraform apply had no .tf files or backend config until an explicit - checkout: self step was added",
-      "Second: the downloaded plan artifact lands under $(Pipeline.Workspace)/<artifact-name>/, separate from the checked-out source, so apply had to run from the terraform/ source directory while pointing at the plan file by its full workspace path",
+      'Second: the downloaded plan artifact lands under $(Pipeline.Workspace)/<artifact-name>/, separate from the checked-out source, so apply had to run from the terraform/ source directory while pointing at the plan file by its full workspace path',
       'Pipeline is now end-to-end: Validate -> Security Scan -> Plan (published as artifact) -> manual approval gate -> Apply, applying the exact approved plan rather than re-planning',
     ],
     body: [
-      "Built the final stage with a deployment: job targeting the production ADO Environment, with an approval check attached, instead of a bare job:. That makes ADO pause the pipeline and wait for a human to approve before any real infrastructure changes, so the pipeline enforces segregation of duties on every run.",
+      'Built the final stage with a deployment: job targeting the production ADO Environment, with an approval check attached, instead of a bare job:. That makes ADO pause the pipeline and wait for a human to approve before any real infrastructure changes, so the pipeline enforces segregation of duties on every run.',
       "I hit two bugs from the same misunderstanding: deployment jobs behave differently from regular job:s. First, deployment jobs don't auto-checkout the source repo the way regular jobs do. Without a - checkout: self step, terraform apply had no .tf files or backend config to work with.",
       'Second, the downloaded plan artifact lands under $(Pipeline.Workspace)/<artifact-name>/, separate from the checked-out source. I had to run apply from the terraform/ source directory and point it at the plan file by its full workspace path.',
       "I had treated deployment: and job: as a naming difference. They come with different defaults, and I only found out when files I expected weren't there.",
@@ -728,7 +769,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-09-23',
     category: 'Secure Azure Landing Zone',
     milestone: true,
-    title: 'Azure DevOps pipeline: Plan stage, bootstrap and OIDC auth debugging',
+    title:
+      'Azure DevOps pipeline: Plan stage, bootstrap and OIDC auth debugging',
     workedOn: [
       'Built the Plan stage, the biggest stage yet and the first to touch real Azure',
       'Bootstrapped state infra: a standalone rg-tfstate resource group, storage account, and blob container to hold Terraform state, kept separate from the landing zone resources and created by hand with az cli instead of Terraform',
@@ -773,17 +815,23 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     title: 'Small feature, first backend: a visitor map with a rate limit',
     workedOn: [
       'Added an anonymous, country-level visitor counter - a Cloudflare Worker plus a KV namespace, called from the portfolio on page load. First real backend this site has had',
-      "Fixed a CORS bug (Worker only allowed the production origin, so local dev was locked out) and a map-library bug (its color scale collapses to one flat color when only one country has data yet)",
+      'Fixed a CORS bug (Worker only allowed the production origin, so local dev was locked out) and a map-library bug (its color scale collapses to one flat color when only one country has data yet)',
       'Pulled it out of the main nav in favour of a small corner badge on the homepage that links through to the full map - a whole tab felt like too much for a visitor counter',
       'Security-reviewed the finished feature and found one real gap: POST /visit had no rate limiting, so it could be curled directly and the counter inflated regardless of CORS',
       "Closed it with Cloudflare's native Rate Limiting binding (10 req/60s per IP) instead of hand-rolling one, and proved it works: 14 requests in a row, 429s from the 11th on",
     ],
     body: [
       "This is a small feature, and also the site's first actual backend; everything else is static. A Cloudflare Worker plus KV holds the counters, called from the frontend and separate from the GitHub Pages deploy.",
-      "I hit two real bugs. CORS locked out local dev until I made the Worker reflect the request origin against an allowlist. The map library paints every country the same colour when only one has data, because its min/max scale collapses to one value; I wrote my own styleFunction instead of using the default.",
+      'I hit two real bugs. CORS locked out local dev until I made the Worker reflect the request origin against an allowlist. The map library paints every country the same colour when only one has data, because its min/max scale collapses to one value; I wrote my own styleFunction instead of using the default.',
       "I security-reviewed it even though it's small, and the review found the one real gap: no rate limit on the write endpoint. CORS is a browser-only restriction, so a direct curl loop skips it. I fixed it with Cloudflare's own binding, then checked that it throttles.",
     ],
-    tools: ['Cloudflare Workers', 'Cloudflare KV', 'React', 'TypeScript', 'Wrangler'],
+    tools: [
+      'Cloudflare Workers',
+      'Cloudflare KV',
+      'React',
+      'TypeScript',
+      'Wrangler',
+    ],
     tags: [
       'Visitor Map',
       'Cloudflare Workers',
@@ -808,7 +856,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-09-19',
     category: 'AppSec Homelab',
     milestone: true,
-    title: 'Getting Azure Pipelines fully working: LAN reachability and a self-hosted agent',
+    title:
+      'Getting Azure Pipelines fully working: LAN reachability and a self-hosted agent',
     workedOn: [
       'Fixed the SAST stage: switched Semgrep from a job-level container to a plain docker run (matching gitleaks and Trivy), then dropped SEMGREP_APP_TOKEN, which forces "logged in" mode and conflicts with passing explicit --config rulesets',
       'Cleared 66 of 72 Semgrep findings as false positives: it was scanning committed ZAP HTML reports for "plaintext http links" inside their own reference text, fixed with a .semgrepignore for dast/',
@@ -816,7 +865,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Added Dependabot update grouping so weekly runs produce one PR per ecosystem instead of a dozen',
       'Found the real blocker on the deploy stage: Azure hosted agents run on the public internet and cannot reach a private LAN address, full stop',
       'Fixed it by installing a self-hosted Azure Pipelines agent on the mini PC itself, so the deploy job runs from inside the LAN with plain docker compose and zap-baseline.py, no SSH/SCP or secure-file key management needed',
-      'Chased three bugs that came with it: a stale manually-deployed container claiming the compose project\'s container names, ZAP unable to reach localhost:8080 because a container\'s localhost is its own network namespace (fixed with --network host), and the backend crash-looping on SQLite Error 14 because an earlier hardening change (non-root container user) broke write access to the database directory',
+      "Chased three bugs that came with it: a stale manually-deployed container claiming the compose project's container names, ZAP unable to reach localhost:8080 because a container's localhost is its own network namespace (fixed with --network host), and the backend crash-looping on SQLite Error 14 because an earlier hardening change (non-root container user) broke write access to the database directory",
       'Ran a second-pass security review once everything was green: confirmed the self-hosted agent has root-equivalent access to the mini PC (expected for any self-hosted runner, not a flaw, but worth being precise about), confirmed the old SSH deploy key is fully revoked, and flagged checking whether the public repo requires approval before a fork PR gets free compute',
     ],
     body: [
@@ -875,7 +924,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       "It was not a copy-paste job. Azure Pipelines and GitHub Actions share the same underlying ideas - jobs, stages, dependencies - but the syntax barely overlaps. GitHub's jobs became Azure's stages containing jobs; secrets.X became a Library variable group referenced as $(X); the SSH deploy key became a secure file downloaded at runtime; the required-reviewer gate had to be rebuilt as an Environment approval check. Porting all eight jobs meant understanding what each step actually did, not translating it line by line.",
       'The first run surfaced two failures. One was a real YAML bug: Azure Pipelines wants a container declared under resources.containers rather than referenced inline, so the Semgrep job could not find its image. Straightforward once I understood the schema difference.',
       'The second was more interesting. The dependency-scan stage caught a high-severity vulnerability in a transitive package, SQLitePCLRaw.lib.e_sqlite3, pulled in via Microsoft.EntityFrameworkCore.Sqlite. That led me to notice something Dependabot should have caught already: a branch existed with the exact fix, Microsoft.EntityFrameworkCore.Sqlite-9.0.20, but no PR had ever been opened for it. The repo had 12 such orphaned branches across NuGet, npm, and GitHub Actions.',
-      "The repo's Actions permissions API showed why: default_workflow_permissions was set to read, with PR creation disabled. Dependabot uses the same repo-level permission gate as GitHub Actions to open PRs, so it had been creating update branches every week and stopping there. I flipped \"Allow GitHub Actions to create and approve pull requests\" in Settings, deleted the 12 stale branches so Dependabot rebuilds them with real PRs on its next run, and fixed the EF Core vulnerability directly.",
+      'The repo\'s Actions permissions API showed why: default_workflow_permissions was set to read, with PR creation disabled. Dependabot uses the same repo-level permission gate as GitHub Actions to open PRs, so it had been creating update branches every week and stopping there. I flipped "Allow GitHub Actions to create and approve pull requests" in Settings, deleted the 12 stale branches so Dependabot rebuilds them with real PRs on its next run, and fixed the EF Core vulnerability directly.',
       'Dependabot had been running for weeks without a single update reaching review. The pipeline caught the vulnerability it introduced; the permissions setting is what let 12 fixes sit unopened.',
     ],
     screenshots: ['Homelab/HomeLabAzurePipelines1.webp'],
@@ -903,7 +952,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
     body: [
       'Added a SecurityScan stage, dependsOn: Validate, so it only runs once validation passes.',
-      "Chose tfsec over Checkov. tfsec is a single lightweight binary - the same download-a-release-and-run pattern as the Terraform install in stage 1 - and purpose-built for Azure IaC. Checkov is heavier, general-purpose, multi-cloud and compliance-focused, more than this pipeline needs right now.",
+      'Chose tfsec over Checkov. tfsec is a single lightweight binary - the same download-a-release-and-run pattern as the Terraform install in stage 1 - and purpose-built for Azure IaC. Checkov is heavier, general-purpose, multi-cloud and compliance-focused, more than this pipeline needs right now.',
       'Hit one bug before the stage ran clean: a missing line break collapsed bash and tfsec terraform/ into a single garbled command, bashtfsec. Same root cause as the earlier curl wrapping issue - pasted or edited YAML script blocks are plain shell text, and a lost newline merges two commands into one broken one.',
       'main.tf still has no real resource blocks, so tfsec found nothing to flag. The stage proves the mechanism works; it will not catch anything real until actual azurerm_* resources exist.',
       "Shortcut noted for later: install uses curl | bash from tfsec's install script, with no version pin or checksum. Fine for a personal, learning pipeline. A real production setup should pin an exact tfsec release and verify a checksum instead of trusting a mutable script at run time.",
@@ -939,7 +988,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       'Added the last two steps in the Validate stage: terraform init -backend=false and terraform validate.',
       "-backend=false is a deliberate choice. The remote state backend isn't configured yet - backend.tf is still a TODO - and validate-time init only needs providers resolved, not a working backend or a state lock.",
-      'The pipeline ran clean end to end. main.tf is still just TODO comments with no real resource blocks, so validate passes on an empty config with nothing to check. The mechanism works; it isn\'t checking anything meaningful yet. That changes once real azurerm_* resources go in.',
+      "The pipeline ran clean end to end. main.tf is still just TODO comments with no real resource blocks, so validate passes on an empty config with nothing to check. The mechanism works; it isn't checking anything meaningful yet. That changes once real azurerm_* resources go in.",
       'Validate stage is complete: install Terraform → fmt -check → init -backend=false → validate, all gated on a clean agent workspace after fixing the directory collision bug from the previous entry.',
       'Next: Stage 2, the security scan, with tfsec or Checkov.',
     ],
@@ -960,7 +1009,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-azure-landing-zone-entry-2-fmt-check-directory-collision',
     date: '2026-09-18',
     category: 'Secure Azure Landing Zone',
-    title: 'Azure DevOps pipeline: terraform fmt -check deletes its own source folder',
+    title:
+      'Azure DevOps pipeline: terraform fmt -check deletes its own source folder',
     workedOn: [
       'Added a terraform fmt -check -diff step, scoped to workingDirectory: terraform',
       'It failed with Not found workingDirectory: /home/vsts/work/1/s/terraform. First checked remotes, branches, and service connections - all fine',
@@ -1007,7 +1057,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'For installing Terraform on the agent, chose the plain-script approach - curl the release, unzip it - over the marketplace TerraformInstaller task, so it is visible what actually happens on the agent.',
       'That surfaced three bugs. First, the pipeline hung: unzip was waiting on an interactive overwrite prompt left over from a re-run, and a hosted agent has no stdin to answer it. Fixed with unzip -o.',
       'Second, the next run failed differently: cannot delete old terraform: Is a directory. A previous failed run had left a stray terraform directory in the workspace, and unzip -o can overwrite a file, not a directory. Fixed by adding rm -rf terraform terraform.zip to the top of the script, so a hosted agent reused across retries always starts from a clean slate rather than an assumed one.',
-      "Third, a smaller one: the curl command, pasted into the YAML script: | block, picked up a stray line break and split into two broken shell commands. Inside a script: | block, every line break is a command boundary unless continued with a trailing \\.",
+      'Third, a smaller one: the curl command, pasted into the YAML script: | block, picked up a stray line break and split into two broken shell commands. Inside a script: | block, every line break is a command boundary unless continued with a trailing \\.',
       'With all three fixed, terraform -version prints Terraform v1.9.8 on every run, regardless of the state a previous run left the workspace in. Next: terraform fmt -check and terraform init -backend=false.',
     ],
     screenshots: [
@@ -1034,7 +1084,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Authenticated through the Azure CLI rather than hardcoding credentials into the Terraform config',
       "Diagnosed a second toolchain issue after yesterday's Homebrew/Rosetta fix: a text editor auto-wrapping .tf files mid-line, breaking Terraform's HCL parser",
       'Confirmed the deployment in the Azure portal and the activity log: the storage account and resource group both created and visible',
-      "Next: document the before/after in the repo, then terraform destroy - this was a scoped exercise, not infrastructure I need running long-term",
+      'Next: document the before/after in the repo, then terraform destroy - this was a scoped exercise, not infrastructure I need running long-term',
     ],
     body: [
       'Until now, everything in my AppSec homelab was stood up manually: clone the repo, docker compose up -d --build, done. It works, but the setup only exists in my shell history. Nothing shows what is about to change before it happens, and there is no clean way to tear it down.',
@@ -1042,9 +1092,9 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Set up Terraform against a free-tier Azure subscription, authenticating through the Azure CLI instead of hardcoding credentials into the config. The build was two resources: a resource group and a storage account inside it, defined in .tf files.',
       'Yesterday\'s Apple-Silicon-vs-Intel-Homebrew issue was sorted, but a second bug turned up: a text editor auto-wrapping the .tf files mid-line, which broke Terraform\'s HCL parser (resource "azurerm_storage_account" and "main" { split across two lines). Infrastructure-as-code is still code, syntax errors included.',
       'With the config clean, terraform plan showed what it was about to create - the resource group, then the storage account with every default and computed attribute - before anything was committed. terraform apply stood both resources up in australiaeast in under two minutes.',
-      "The plan/apply split is the difference from Docker Compose, where a command just runs and you see what happens. Here, I got a diff of intended changes before Azure was touched, and a lockfile pinning the provider version so the build is reproducible on another machine.",
+      'The plan/apply split is the difference from Docker Compose, where a command just runs and you see what happens. Here, I got a diff of intended changes before Azure was touched, and a lockfile pinning the provider version so the build is reproducible on another machine.',
       'Confirmed it in the Azure portal and the activity log: stappsechomelab5791 under rg-appsec-homelab in Australia East, with the activity log listing every create and update operation Terraform ran to get there.',
-      "Next: document this before/after in the repo, then run terraform destroy. This was a scoped exercise for the portfolio, not infrastructure I need running long-term, so it comes down once it is captured.",
+      'Next: document this before/after in the repo, then run terraform destroy. This was a scoped exercise for the portfolio, not infrastructure I need running long-term, so it comes down once it is captured.',
     ],
     screenshots: [
       'Homelab/HomeLabTerraform1.webp',
@@ -1079,7 +1129,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Scaffolded the actual Terraform project: a providers.tf for the azurerm provider, ran terraform init, and fixed a real gitignore mistake before the first commit',
     ],
     body: [
-      "Picked Azure over the mini-PC/Docker option for the Terraform piece, since actual DevOps postings mean cloud infrastructure when they say Terraform, not local containers. Storage account is the target: small, free-tier friendly, and simple enough to understand every line rather than copy a template.",
+      'Picked Azure over the mini-PC/Docker option for the Terraform piece, since actual DevOps postings mean cloud infrastructure when they say Terraform, not local containers. Storage account is the target: small, free-tier friendly, and simple enough to understand every line rather than copy a template.',
       "Before any of the Terraform work, disabled the GitHub Actions workflow from the repo's Actions tab. No reason to keep the nightly cron and push-triggered scans running against a repo that's about to sit still for a phase that has nothing to do with the app itself.",
       'Installing Azure CLI turned into its own debugging exercise. brew install azure-cli failed compiling one of its dependencies with "C compiler cannot create executables" - looked like a broken toolchain at first, but manual clang test-compiles showed the compiler itself was fine. The real issue: Homebrew was installed at the old Intel-only location (/usr/local) and running via Rosetta on what is actually an Apple Silicon Mac, so its build scripts kept targeting x86_64 with no real x86_64 toolchain behind them. Rosetta itself turned out to be broken too - "Bad CPU type in executable" on Homebrew\'s own bundled Ruby, likely from a Command Line Tools reinstall - and fixing that with softwareupdate --install-rosetta got brew running again but left the original compile failure untouched, confirming the architecture mismatch was the real root cause, not a broken toolchain.',
       "Fixed it properly rather than patching around it: installed native arm64 Homebrew at /opt/homebrew, pointed the shell at it via .zprofile, and reinstalled azure-cli and terraform through that instead. Confirmed with file on the actual binaries that they're real arm64 executables, since terraform --version stubbornly still prints darwin_amd64 - that turned out to be a static build tag from HashiCorp's release process, not a reflection of what's actually running.",

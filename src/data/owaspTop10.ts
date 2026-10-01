@@ -62,7 +62,8 @@ export const owaspTop10: OwaspRisk[] = [
       },
       {
         label: 'Landing zone Terraform: secure defaults, tfsec findings',
-        entryId: 'secure-azure-landing-zone-entry-7-main-tf-resource-by-resource',
+        entryId:
+          'secure-azure-landing-zone-entry-7-main-tf-resource-by-resource',
       },
       {
         label: 'Fixing the tfsec findings, first deployment',
@@ -70,7 +71,8 @@ export const owaspTop10: OwaspRisk[] = [
       },
       {
         label: 'Semgrep: Dockerfile running as root',
-        entryId: 'appsec-homelab-entry-21-azure-pipelines-lan-self-hosted-agent',
+        entryId:
+          'appsec-homelab-entry-21-azure-pipelines-lan-self-hosted-agent',
       },
       {
         label: 'Trivy: storage account findings tfsec missed',
@@ -111,7 +113,8 @@ export const owaspTop10: OwaspRisk[] = [
       },
       {
         label: 'Dependabot gap and a transitive vulnerability',
-        entryId: 'appsec-homelab-entry-20-azure-pipelines-migration-dependabot-gap',
+        entryId:
+          'appsec-homelab-entry-20-azure-pipelines-migration-dependabot-gap',
       },
       {
         label: 'Swapping tfsec for a checksum-verified Trivy',
@@ -152,7 +155,8 @@ export const owaspTop10: OwaspRisk[] = [
       },
       {
         label: 'Landing zone: TLS and Key Vault settings',
-        entryId: 'secure-azure-landing-zone-entry-7-main-tf-resource-by-resource',
+        entryId:
+          'secure-azure-landing-zone-entry-7-main-tf-resource-by-resource',
       },
     ],
   },
@@ -269,7 +273,8 @@ export const owaspTop10: OwaspRisk[] = [
     relatedDiaryLinks: [
       {
         label: 'Landing zone: Apply stage and approval gate',
-        entryId: 'secure-azure-landing-zone-entry-6-apply-stage-deployment-jobs',
+        entryId:
+          'secure-azure-landing-zone-entry-6-apply-stage-deployment-jobs',
       },
       {
         label: 'Portfolio: branch rules and signed commits',

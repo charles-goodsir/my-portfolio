@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Canvas } from '@react-three/fiber'
-import { Grid, MeshReflectorMaterial, PerformanceMonitor } from '@react-three/drei'
+import {
+  Grid,
+  MeshReflectorMaterial,
+  PerformanceMonitor,
+} from '@react-three/drei'
 import {
   Bloom,
   ChromaticAberration,
@@ -34,7 +38,15 @@ import { flags, loadCaptured, saveCaptured, type MapFlag } from './flags'
 import Flag from './Flag'
 import { Player, Ripple, type RippleState } from './Player'
 import { Radar } from './Radar'
-import { blip, chime, fanfare, loadSoundOn, setSoundOn, startMusic, stopMusic } from './sound'
+import {
+  blip,
+  chime,
+  fanfare,
+  loadSoundOn,
+  setSoundOn,
+  startMusic,
+  stopMusic,
+} from './sound'
 import { NameSign, Stadium, Traffic, Walls } from './Scenery'
 import { reduceMotion } from './device'
 
@@ -56,7 +68,11 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
 
   // Start a ripple on the floor
   const rippleAt = (x: number, z: number, size: number, seconds: number) => {
-    Object.assign(ripple.current, { size, seconds, start: performance.now() / 1000 })
+    Object.assign(ripple.current, {
+      size,
+      seconds,
+      start: performance.now() / 1000,
+    })
     ripple.current.position.set(x, 0.02, z)
   }
 
@@ -69,7 +85,9 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
   // Clicking a distant flag: park STOP_SHORT from it, on the side the Bit is
   // coming from, so it never has to pass through the pole
   const approach = (flag: MapFlag) => {
-    const stop = new Vector3().subVectors(playerPosition.current, flag.position).setY(0)
+    const stop = new Vector3()
+      .subVectors(playerPosition.current, flag.position)
+      .setY(0)
     // Standing right on it: use the side facing the centre instead
     if (stop.lengthSq() < 0.01) stop.copy(flag.position).negate()
     stop.setLength(STOP_SHORT).add(flag.position)
@@ -108,7 +126,8 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
 
   // This capture is the one that completes the set (not a repeat visit to a
   // flag you already had): play the finale before leaving
-  const finale = captured !== null && allOwned && !savedRoutes.includes(captured.to)
+  const finale =
+    captured !== null && allOwned && !savedRoutes.includes(captured.to)
   const leaveSeconds = finale ? FINALE_SECONDS : CAPTURE_SECONDS
 
   // After a capture, pause so the effect plays out, then go
@@ -152,7 +171,10 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
     <div className="relative isolate h-screen w-screen bg-black">
       <Canvas
         dpr={dpr}
-        camera={{ position: (reduceMotion ? CAMERA_OFFSET : FLY_IN_START).toArray(), fov: 50 }}
+        camera={{
+          position: (reduceMotion ? CAMERA_OFFSET : FLY_IN_START).toArray(),
+          fov: 50,
+        }}
         onCreated={onReady} // WebGL is up: the boot screen can fade out
       >
         {/* First in the Canvas so its per-frame reset runs before any drawing */}
@@ -163,7 +185,9 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
             bottoms out, or keeps flip-flopping, turn reflections off for good */}
         <PerformanceMonitor
           onChange={({ factor }) => {
-            setDpr(Math.round((MIN_DPR + (MAX_DPR - MIN_DPR) * factor) * 10) / 10)
+            setDpr(
+              Math.round((MIN_DPR + (MAX_DPR - MIN_DPR) * factor) * 10) / 10,
+            )
             // < 0.05 not === 0: stepping down by 0.1 leaves float crumbs like 2.7e-17
             if (factor < 0.05) setLowQuality(true)
           }}
@@ -297,7 +321,9 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
         Sound: {soundOn ? 'on' : 'off'}
       </button>
 
-      <p className={`absolute right-4 top-4 px-3 py-1 text-sm ${HUD_PANEL} ${HUD_GLOW}`}>
+      <p
+        className={`absolute right-4 top-4 px-3 py-1 text-sm ${HUD_PANEL} ${HUD_GLOW}`}
+      >
         {ownedCount}/{flags.length} captured
         {allOwned && ' · grid secured'}
       </p>
@@ -311,7 +337,9 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
 
       <Radar player={playerPosition} owned={owned} />
 
-      <p className={`absolute bottom-4 right-4 px-3 py-2 text-xs text-[#94a3b8] ${HUD_PANEL}`}>
+      <p
+        className={`absolute bottom-4 right-4 px-3 py-2 text-xs text-[#94a3b8] ${HUD_PANEL}`}
+      >
         WASD / arrows or click to move · Enter to go in · Esc to exit
       </p>
 
@@ -324,7 +352,10 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
         <ul className="space-y-1">
           {flags.map((flag) => (
             <li key={flag.to}>
-              <Link to={flag.to} className="text-[#94a3b8] hover:text-[#2dd4bf] hover:underline">
+              <Link
+                to={flag.to}
+                className="text-[#94a3b8] hover:text-[#2dd4bf] hover:underline"
+              >
                 {flag.label}
               </Link>
             </li>
@@ -341,14 +372,17 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
           <>
             <span className="block text-4xl">GRID SECURED</span>
             <span className="mt-3 block text-base">
-              {flags.length}/{flags.length} flags. One process is still unaccounted for.
+              {flags.length}/{flags.length} flags. One process is still
+              unaccounted for.
             </span>
           </>
         ) : (
           captured && `Flag captured: ${captured.label}`
         )}
         {!captured && nearby && (
-          <span className="sr-only">{nearby.label} in range. Press Enter to go in.</span>
+          <span className="sr-only">
+            {nearby.label} in range. Press Enter to go in.
+          </span>
         )}
       </div>
 
@@ -363,7 +397,9 @@ function CtfMap({ booted, onReady }: { booted: boolean; onReady: () => void }) {
           style={{
             backgroundColor: GLOW_COLOUR,
             transitionDuration: `${CAPTURE_SECONDS * 500}ms`,
-            transitionDelay: captured ? `${(leaveSeconds - CAPTURE_SECONDS / 2) * 1000}ms` : '0ms',
+            transitionDelay: captured
+              ? `${(leaveSeconds - CAPTURE_SECONDS / 2) * 1000}ms`
+              : '0ms',
           }}
         />
       )}

@@ -36,9 +36,7 @@ function FinanceTracker() {
         {/* Project Header */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <h1 className="text-4xl font-bold text-ink">
-              Finance Tracker 2.0
-            </h1>
+            <h1 className="text-4xl font-bold text-ink">Finance Tracker 2.0</h1>
             <span className="inline-block bg-success/10 text-success px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
               Complete
             </span>
@@ -103,25 +101,24 @@ function FinanceTracker() {
           <div className="prose prose-lg max-w-none">
             <p className="text-ink-muted mb-4">
               Finance Tracker 2.0 is a native macOS app built with PyQt6.
-              Transactions live in a local SQLite cache so the UI stays fast
-              and works offline; an AWS backend (FastAPI on Lambda behind API
+              Transactions live in a local SQLite cache so the UI stays fast and
+              works offline; an AWS backend (FastAPI on Lambda behind API
               Gateway, managed with SAM) handles the durable copy, monthly
               snapshots, and the classification model.
             </p>
             <p className="text-ink-muted mb-4">
-              CSV imports go through an interactive review step before
-              anything is committed. Auto-classification runs on a rules
-              engine first and falls back to Gemini when the rules don't
-              match, and every correction I make gets stored and reused, so
-              the classifier gets better the more I use it instead of staying
-              static. EventBridge triggers a monthly Telegram reminder with a
-              summary of what changed.
+              CSV imports go through an interactive review step before anything
+              is committed. Auto-classification runs on a rules engine first and
+              falls back to Gemini when the rules don't match, and every
+              correction I make gets stored and reused, so the classifier gets
+              better the more I use it instead of staying static. EventBridge
+              triggers a monthly Telegram reminder with a summary of what
+              changed.
             </p>
             <p className="text-ink-muted">
               It's the project I built to actually understand serverless — SAM
-              templates, DynamoDB table design, Lambda cold starts — by using
-              it for something I run every month, not a tutorial I'd abandon
-              after.
+              templates, DynamoDB table design, Lambda cold starts — by using it
+              for something I run every month, not a tutorial I'd abandon after.
             </p>
           </div>
         </div>
@@ -161,9 +158,7 @@ function FinanceTracker() {
 
         {/* Key Features */}
         <div className="bg-card border border-line rounded-lg shadow-card p-8 mb-8">
-          <h2 className="text-2xl font-bold text-ink mb-6">
-            Key Features
-          </h2>
+          <h2 className="text-2xl font-bold text-ink mb-6">Key Features</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-lg font-semibold text-ink mb-3">
@@ -351,7 +346,12 @@ function FinanceTracker() {
                 data with intuitive navigation and real-time updates.
               </p>
               <div className="bg-sunken rounded-lg overflow-hidden max-w-2xl">
-                <ScreenshotFigure src={Main_Screen} alt="Finance Tracker dashboard showing transaction overview and navigation" width={1400} height={924} />
+                <ScreenshotFigure
+                  src={Main_Screen}
+                  alt="Finance Tracker dashboard showing transaction overview and navigation"
+                  width={1400}
+                  height={924}
+                />
               </div>
             </div>
 
@@ -364,7 +364,12 @@ function FinanceTracker() {
                 import capabilities.
               </p>
               <div className="bg-sunken rounded-lg overflow-hidden max-w-2xl">
-                <ScreenshotFigure src={Transactions} alt="Transaction management interface with form inputs and categorization" width={1400} height={956} />
+                <ScreenshotFigure
+                  src={Transactions}
+                  alt="Transaction management interface with form inputs and categorization"
+                  width={1400}
+                  height={956}
+                />
               </div>
             </div>
 
@@ -376,10 +381,20 @@ function FinanceTracker() {
                 Manage your accounts with the accounts feature.
               </p>
               <div className="bg-sunken rounded-lg overflow-hidden max-w-2xl">
-                <ScreenshotFigure src={Accounts_1} alt="Accounts Management Interface allowing adding and editing account balances" width={1400} height={942} />
+                <ScreenshotFigure
+                  src={Accounts_1}
+                  alt="Accounts Management Interface allowing adding and editing account balances"
+                  width={1400}
+                  height={942}
+                />
               </div>
               <div className="bg-sunken rounded-lg overflow-hidden max-w-2xl">
-                <ScreenshotFigure src={Accounts_2} alt="Second Accounts Screenshot" width={1400} height={949} />
+                <ScreenshotFigure
+                  src={Accounts_2}
+                  alt="Second Accounts Screenshot"
+                  width={1400}
+                  height={949}
+                />
               </div>
             </div>
 
@@ -392,7 +407,12 @@ function FinanceTracker() {
                 smooth data migration.
               </p>
               <div className="bg-sunken rounded-lg overflow-hidden max-w-2xl">
-                <ScreenshotFigure src={CSV_Import} alt="CSV import/export interface for bulk data management" width={1400} height={943} />
+                <ScreenshotFigure
+                  src={CSV_Import}
+                  alt="CSV import/export interface for bulk data management"
+                  width={1400}
+                  height={943}
+                />
               </div>
             </div>
 
@@ -405,7 +425,12 @@ function FinanceTracker() {
               </p>
             </div>
             <div className="bg-sunken rounded-lg overflow-hidden max-w-2xl">
-              <ScreenshotFigure src={Goals} alt="Goals management interface showing you your financial goals" width={1400} height={942} />
+              <ScreenshotFigure
+                src={Goals}
+                alt="Goals management interface showing you your financial goals"
+                width={1400}
+                height={942}
+              />
             </div>
 
             <div>
@@ -417,7 +442,12 @@ function FinanceTracker() {
                 insights feature.
               </p>
               <div className="bg-sunken rounded-lg overflow-hidden max-w-2xl">
-                <ScreenshotFigure src={Smart_Insights} alt="Smart insights showing you your financial health" width={1400} height={930} />
+                <ScreenshotFigure
+                  src={Smart_Insights}
+                  alt="Smart insights showing you your financial health"
+                  width={1400}
+                  height={930}
+                />
               </div>
             </div>
           </div>
