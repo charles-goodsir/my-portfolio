@@ -78,6 +78,10 @@ export const owaspTop10: OwaspRisk[] = [
         label: 'Trivy: storage account findings tfsec missed',
         entryId: 'secure-azure-landing-zone-entry-9-tfsec-to-trivy',
       },
+      {
+        label: 'Expense claims: Semgrep and Trivy findings on the first CI run',
+        entryId: 'secure-expense-claims-entry-2-ci-first-findings',
+      },
     ],
   },
   {
@@ -127,6 +131,14 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Portfolio: splitting Dependabot majors from auto-merge',
         entryId: 'portfolio-site-entry-2-rulesets-signing-dependabot',
+      },
+      {
+        label: 'Expense claims: NuGet audit and checksum-verified Trivy',
+        entryId: 'secure-expense-claims-entry-2-ci-first-findings',
+      },
+      {
+        label: "Expense claims: an auto-merge that didn't wait for CI",
+        entryId: 'secure-expense-claims-entry-3-auto-merge-required-checks',
       },
     ],
   },
@@ -220,6 +232,10 @@ export const owaspTop10: OwaspRisk[] = [
         label: 'Visitor map: privacy boundary and risk assessment',
         entryId: 'visitor-map-entry-1-build-and-rate-limit',
       },
+      {
+        label: 'Expense claims: STRIDE threat model before any code',
+        entryId: 'secure-expense-claims-entry-1-threat-model-scaffold',
+      },
     ],
   },
   {
@@ -279,6 +295,14 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Portfolio: branch rules and signed commits',
         entryId: 'portfolio-site-entry-2-rulesets-signing-dependabot',
+      },
+      {
+        label: 'Expense claims: linting the workflows themselves',
+        entryId: 'secure-expense-claims-entry-4-actionlint',
+      },
+      {
+        label: 'Expense claims: a required check blocks a fake secret',
+        entryId: 'secure-expense-claims-entry-5-gitleaks-proof-phase-0',
       },
     ],
   },
