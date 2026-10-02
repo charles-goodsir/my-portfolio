@@ -40,6 +40,23 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-4-actionlint',
+    date: '2026-10-02',
+    category: 'Secure Expense Claims',
+    title: 'Linting the workflows themselves',
+    workedOn: [
+      'Added actionlint to CI and made it a required check',
+      'Proved it catches a broken workflow before relying on it',
+    ],
+    body: [
+      "Prettier formats my YAML on save, but it only checks that the file is valid YAML, not that it's a valid workflow. A job with a misspelled key is still valid YAML, so GitHub would only complain when it tried to run it. I added actionlint as a sixth CI job. It checks workflow keys, expressions and if: conditions, and runs shellcheck over every run: block. I install it the same way as Trivy: download the release and its checksum file and check the hash before using it.",
+      'Before trusting it, I made a copy of ci.yml with runs-on changed to run-on in every job and ran actionlint on it. It reported 12 errors, two for each of the six jobs, and exited with 1. The real workflows came back clean. Once it had run on its own PR, I added Workflow lint to the required checks on main, so there are now six.',
+      'Every file type needs its own check. A file can be well formatted and still be wrong for the tool that reads it.',
+    ],
+    tools: ['actionlint', 'shellcheck', 'GitHub Actions', 'GitHub rulesets'],
+    tags: ['Secure Expense Claims', 'CI/CD pipeline', 'branch protection'],
+  },
+  {
     id: 'secure-expense-claims-entry-3-auto-merge-required-checks',
     date: '2026-10-02',
     category: 'Secure Expense Claims',
