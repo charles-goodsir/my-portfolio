@@ -40,6 +40,40 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-6-postgres-health-checks',
+    date: '2026-10-02',
+    category: 'Secure Expense Claims',
+    title:
+      'Postgres locally, and a health check that failed for the right reason',
+    workedOn: [
+      'Added Postgres 18 in Docker Compose and connected the API with EF Core',
+      'Split health checks into liveness and readiness',
+    ],
+    body: [
+      "Phase 1 started with the database. Postgres 18 runs in Docker Compose, the newest version Azure's Flexible Server supports, so local and Azure will match. The port is published on 127.0.0.1 only. A plain 5432:5432 would expose it to my whole network, and I found out on the homelab that Docker's published ports skip the host firewall. The password lives in a gitignored .env file, and Compose refuses to start without it. The API's connection string is in .NET user-secrets, outside the repo. In Azure there will be no password at all, because the app will sign in with a managed identity.",
+      "I split the health endpoint in two. /health only says the process is running, and /health/ready also opens a database connection. In Azure, the platform restarts containers that fail liveness and stops sending traffic to ones that fail readiness, and a database outage shouldn't cause restarts. It also keeps CI simple, because the existing test only calls /health and never needs a database.",
+      'The first readiness check returned 503 while the database was running and healthy. The Postgres log showed password authentication failing at the same second as my request. I had pasted the connection string command with the placeholder text still in it, so the user-secret said "<your .env password>". After fixing it, readiness returned 200, and stopping the database turned it back to 503 while liveness stayed at 200.',
+      "An error I wasn't expecting still told me the check worked, because it failed on the exact thing it was there to check.",
+    ],
+    tools: [
+      'PostgreSQL',
+      'Docker Compose',
+      'EF Core',
+      'ASP.NET Core',
+      '.NET user-secrets',
+    ],
+    tags: [
+      'Secure Expense Claims',
+      'database',
+      'health checks',
+      'secrets management',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC7.webp',
+      'SecureExpenseClaims/SEC8.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-5-gitleaks-proof-phase-0',
     date: '2026-10-02',
     category: 'Secure Expense Claims',
