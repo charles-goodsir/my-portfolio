@@ -40,6 +40,34 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-5-gitleaks-proof-phase-0',
+    date: '2026-10-02',
+    category: 'Secure Expense Claims',
+    milestone: true,
+    title: 'Trying to merge a fake secret',
+    workedOn: [
+      'Opened a PR with a fake API key to prove the secret scan blocks it',
+      'Finished Phase 0: threat model, CI and required checks',
+    ],
+    body: [
+      "The last test for Phase 0 was to try to merge a secret. I committed a config.txt with a made-up api_key value on a test branch. I picked a generic key rather than an AWS-shaped one, because gitleaks skips AWS keys ending in EXAMPLE, and GitHub's own push protection might have blocked an AWS key before CI saw it, which would have tested a different control. Before pushing, I ran gitleaks on the same commits locally, so I knew CI would see it.",
+      "On the PR, the secret scan failed with one finding, rule generic-api-key in config.txt, with the value redacted in the log. The other five checks passed, and the ruleset blocked the merge. I closed the PR without merging and deleted the branch. The fake value is still in the closed PR's history, which is why it had to be something that was never real.",
+      "That finishes Phase 0. There's a STRIDE threat model with 24 threats written before any code, and every PR to main has to pass six checks. Each check has been seen failing on something real or something I planted, so none of them is assumed to work.",
+      "A check I haven't seen fail could be broken without my knowing.",
+    ],
+    tools: ['gitleaks', 'GitHub Actions', 'GitHub rulesets'],
+    tags: [
+      'Secure Expense Claims',
+      'secret scanning',
+      'branch protection',
+      'CI/CD pipeline',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC5.webp',
+      'SecureExpenseClaims/SEC6.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-4-actionlint',
     date: '2026-10-02',
     category: 'Secure Expense Claims',
