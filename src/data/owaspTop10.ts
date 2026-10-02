@@ -46,6 +46,7 @@ export const owaspTop10: OwaspRisk[] = [
       'tfsec caught a real misconfiguration in my own Terraform: a Key Vault with no network ACL (CRITICAL). I fixed it with network_acls default_action = "Deny" instead of suppressing the finding, and the pipeline would not deploy until it passed',
       'Semgrep flagged the homelab Dockerfile running as root, and I switched the container to a non-root user',
       'Switching scanners to Trivy found four storage account misconfigurations tfsec had passed. I fixed two (a network_rules deny default, infrastructure encryption) and accepted two with written #trivy:ignore reasons (GRS replication on an empty account, and queue-only Storage Analytics logging)',
+      "The first CI run on the expense claims app failed on three findings. Semgrep flagged the API Dockerfile for having no USER line, and Trivy found HIGH CVEs in both base images. I fixed the pcre2 one with an apk upgrade and accepted the OpenSSL one, which Microsoft hadn't rebuilt yet, with a written reason and an expiry date so the build goes red again if it isn't fixed",
     ],
     next: [
       'Information disclosure / directory listing labs, and a config audit of the mini PC itself against CIS Benchmarks',
@@ -102,10 +103,12 @@ export const owaspTop10: OwaspRisk[] = [
       'Added a Dependabot cooldown period (a Semgrep finding) and update grouping, so weekly runs open one PR per ecosystem',
       "Closed a shortcut I'd flagged: the landing zone pipeline installed tfsec by piping an unpinned script into bash. Replaced it with Trivy pinned to v0.74.0 and verified against the release's SHA-256 checksum, with set -euo pipefail so a failed check actually stops the install",
       'Gave this portfolio the same supply chain checks: a CI workflow with npm audit and a gitleaks scan, every Action pinned to a full commit SHA, and Dependabot keeping the pins and packages current',
-      "Split Dependabot's npm updates so each major version gets its own PR, after one grouped PR of 16 updates failed npm ci because TypeScript 7 broke typescript-eslint's peer range. Only explicit minor and patch updates auto-merge, and only once CI passes",
+      "Split Dependabot's npm updates so major versions are kept out of the auto-merged PR, after one grouped PR of 16 updates failed npm ci because TypeScript 7 broke typescript-eslint's peer range. Only explicit minor and patch updates auto-merge, and only once CI passes. Majors now come as one grouped PR that I review, after @eslint/js 10 failed on its own because it needed eslint 10 to land with it",
+      'In the expense claims app, made NuGet fail the restore on high and critical advisories instead of using dotnet list package --vulnerable, which exits 0 even when it finds something. Tested it by adding System.Text.Json 8.0.4, and the restore failed with NU1903',
+      "Watched Dependabot auto-merge a patch update one second after the secret scan passed, while four other checks were still running. Auto-merge waits for required checks, and the ruleset didn't require any yet. All five passed, but nothing would have stopped a failure",
     ],
     next: ['Generate an SBOM for the app'],
-    tools: ['Dependabot', 'Trivy', 'gitleaks'],
+    tools: ['Dependabot', 'Trivy', 'gitleaks', 'NuGet audit'],
     relatedDiaryLinks: [
       {
         label: 'AppSec Homelab',
@@ -218,9 +221,10 @@ export const owaspTop10: OwaspRisk[] = [
     done: [
       'Wrote a lightweight risk assessment of the whole homelab (mini PC, app, pipeline, repo) mapped to NIST CSF 2.0, listing the real gaps - no patch cadence, no network segmentation, no recovery process - instead of padding them out',
       'For the visitor map, set the privacy boundary before writing any code: country-level aggregates only, no IP ever stored. Then wrote a risk assessment of the finished feature, which led to adding a rate limit',
+      'Wrote a STRIDE threat model for the expense claims app before any code: six assets, five trust boundaries and 24 threats, each with the control that addresses it and the phase it lands in. Some of it shaped the data model, like stopping anyone approving their own claim and writing the audit row in the same transaction as the status change',
     ],
     next: [
-      "A STRIDE threat model written before a build, and reading OWASP's ASVS design-level requirements",
+      "Prove each threat model control in the expense claims app as it's built, and read OWASP's ASVS design-level requirements",
     ],
     tools: ['NIST CSF 2.0'],
     relatedDiaryLinks: [
@@ -281,11 +285,20 @@ export const owaspTop10: OwaspRisk[] = [
       'Every homelab GitHub Action is pinned to a full commit SHA, so a moved tag cannot swap in different code (more under A03)',
       "Fixed this portfolio's branch rules: required checks had been switched on with an empty list, and Dependabot had a bypass that could push straight to main. One ruleset now requires CI, the secret scan and signed commits on every change to main, and my admin bypass only works through a PR",
       'Set up SSH commit signing with my GitHub key, so GitHub marks my commits Verified and main rejects unsigned ones',
+      'Made six CI checks required on the expense claims repo, each tied to the GitHub Actions app so a status with the same name from somewhere else does not count',
+      'Added actionlint so the workflow files are checked too, since a misspelled key is still valid YAML. Ran it on a copy of ci.yml with runs-on changed to run-on and it reported 12 errors before I relied on it',
+      'Proved the secret scan blocks a merge by opening a PR with a made-up API key. gitleaks failed the required check and the ruleset blocked the merge',
     ],
     next: [
       'The PortSwigger Insecure Deserialization path, and artifact signing with Sigstore/cosign',
     ],
-    tools: ['Azure DevOps approvals', 'GitHub rulesets', 'SSH commit signing'],
+    tools: [
+      'Azure DevOps approvals',
+      'GitHub rulesets',
+      'SSH commit signing',
+      'actionlint',
+      'gitleaks',
+    ],
     relatedDiaryLinks: [
       {
         label: 'Landing zone: Apply stage and approval gate',
