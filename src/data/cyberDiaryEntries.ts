@@ -40,6 +40,86 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-3-auto-merge-required-checks',
+    date: '2026-10-02',
+    category: 'Secure Expense Claims',
+    title: "An auto-merge that didn't wait for CI",
+    workedOn: [
+      'Added Dependabot with auto-merge for minor and patch updates',
+      'Made the CI checks required on main and sorted the major updates by hand',
+    ],
+    body: [
+      'I added Dependabot for NuGet, npm and GitHub Actions, with a workflow that turns on auto-merge for minor and patch updates and leaves major ones for me. I knew that until the ruleset on main required status checks, "merge once checks pass" would mean merge straight away. The first Dependabot PR showed it. A patch update to the xunit runner merged one second after the secret scan finished, while the other four checks were still running. They all passed afterwards, so nothing bad got in, but a failing check wouldn\'t have stopped it.',
+      "I added the five CI jobs to the ruleset as required checks, tied to the GitHub Actions app so a status with the same name from somewhere else doesn't count. Branches also have to be up to date with main before they merge. Later I committed a .gitignore change straight to my local main and tried to push it, and GitHub rejected it. I moved the commit to a branch and opened a PR.",
+      "Five major updates were left for me. I merged the test SDK, coverlet and the xunit runner one at a time, letting Dependabot rebase the rest in between. TypeScript 7 passed CI because this project uses oxlint rather than typescript-eslint. I closed the @types/node 26 update, because the types should match Node 24, which is what the project runs, and added an ignore rule so it doesn't come back.",
+      'An automation setting depends on the rules around it. Auto-merge was set up correctly and still merged before CI finished, because the ruleset gave it nothing to wait for.',
+    ],
+    tools: ['Dependabot', 'GitHub Actions', 'GitHub rulesets'],
+    tags: [
+      'Secure Expense Claims',
+      'Dependabot',
+      'branch protection',
+      'supply chain',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC3.webp',
+      'SecureExpenseClaims/SEC4.webp',
+    ],
+  },
+  {
+    id: 'secure-expense-claims-entry-2-ci-first-findings',
+    date: '2026-10-02',
+    category: 'Secure Expense Claims',
+    title: 'CI on every PR, and what it found on the first run',
+    workedOn: [
+      'Added CI: build and test, lint and npm audit, gitleaks, Semgrep and Trivy on both images',
+      'Fixed two image findings and accepted a third with an expiry date',
+    ],
+    body: [
+      "Every PR now runs five checks: the API build and tests, the frontend lint, build and npm audit, gitleaks, Semgrep, and Trivy on both container images. I install Trivy by downloading the binary and its checksum file and checking the hash before running it. I stopped using the trivy-action wrapper after finding that my homelab pins it to a commit that doesn't exist in the action's repository. The plan said to run dotnet list package --vulnerable, but that command exits 0 even when it finds something. NuGet already audits on every restore, so I made high and critical advisories into errors. When I added System.Text.Json 8.0.4 as a test, the restore failed with NU1903.",
+      "The first run failed on three findings. Semgrep flagged the API Dockerfile for having no USER line. The chiseled .NET image already runs as user 1654, but Semgrep can't see what the base image sets, so I added USER $APP_UID to make it explicit. Trivy found a HIGH pcre2 CVE in the nginx image, which an apk upgrade in the Dockerfile fixed. It also found a HIGH OpenSSL CVE in the .NET image. Ubuntu has released the fix, but Microsoft hasn't rebuilt the chiseled image yet, and that image has no package manager to upgrade it with. I accepted that one with a written reason and an expiry date of 16 October, so the build goes red again if the image still hasn't been rebuilt.",
+      'The mistakes along the way were mine and mostly about where files go. I put the workflow in github/ without the dot, then put dependabot.yml inside the workflows folder. Neither would have run, and nothing would have told me. I named the ignore file .yml while the workflow pointed at .yaml. I also left out the final newline three times, which is why I set up Prettier to format on save.',
+      "A misplaced config file doesn't fail. It just never runs, so the only way to know a check works is to see it fail on something real.",
+    ],
+    codeSnippets: [
+      {
+        label: 'Directory.Build.props: NuGet audit fails the restore',
+        code: `<NuGetAuditMode>all</NuGetAuditMode>
+<NuGetAuditLevel>high</NuGetAuditLevel>
+<WarningsAsErrors>$(WarningsAsErrors);NU1903;NU1904</WarningsAsErrors>`,
+      },
+      {
+        label: '.trivyignore.yaml: an accepted finding that expires',
+        code: `vulnerabilities:
+  - id: CVE-2026-84782
+    statement: >-
+      OpenSSL in the aspnet:10.0-noble-chiseled base image. Ubuntu has the fix
+      (3.0.13-0ubuntu3.16) but Microsoft hasn't rebuilt the image yet, and
+      chiseled images have no package manager to upgrade it. Recheck when this
+      expires; drop it once the rebuilt image scans clean.
+    expired_at: 2026-10-16`,
+      },
+    ],
+    tools: [
+      'GitHub Actions',
+      'Trivy',
+      'Semgrep',
+      'gitleaks',
+      'NuGet audit',
+      'Prettier',
+    ],
+    tags: [
+      'Secure Expense Claims',
+      'CI/CD pipeline',
+      'container security',
+      'supply chain',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC1.webp',
+      'SecureExpenseClaims/SEC2.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-1-threat-model-scaffold',
     date: '2026-10-01',
     category: 'Secure Expense Claims',
