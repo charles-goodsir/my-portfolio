@@ -6,11 +6,13 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
-    # Minor and patch updates share one PR. Each major update gets its own PR,
-    # so one breaking upgrade can't block the rest.
+    # Minor and patch updates share one PR and auto-merge. Major updates share
+    # a second PR that stays manual; one breaking upgrade blocks that PR until fixed.
     groups:
       npm-minor-and-patch:
         update-types: [minor, patch]
+      npm-major:
+        update-types: [major]
   - package-ecosystem: github-actions
     directory: /
     schedule:
