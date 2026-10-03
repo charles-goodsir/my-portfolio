@@ -40,6 +40,31 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'portfolio-site-entry-4-live-site-check',
+    date: '2026-10-03',
+    category: 'Portfolio Site',
+    title: 'Checking the live site after every deploy',
+    workedOn: [
+      'Checked which security headers GitHub Pages actually sends, and found none',
+      'Wrote a script that checks the HTTP to HTTPS redirect and the CSP meta tag on the live site',
+      'Added it as a CI job that runs after each deploy',
+    ],
+    body: [
+      "I planned to check the site's security headers after each deploy, so I looked at what GitHub Pages sends first. There was no HSTS, no X-Content-Type-Options and no frame-ancestors, and Pages doesn't let you set any of them. So the check covers what I do control: http:// has to return a 301 to https://, and the HTML has to contain the CSP meta tag my build adds. The script requests the page with the commit SHA in the query string so the CDN's 10-minute cache can't hand back the previous build.",
+      'Before relying on it I made it fail. Against charlesgoodsir.com it printed two oks, and against example.com, which serves plain HTTP, it failed with a 200 where it expected a 301. It runs in CI after the deploy job, so it is skipped on PRs the same way the deploy is.',
+      "While editing I pasted a line of the script into the end of ci.yml by mistake. actionlint caught it before I committed. GitHub would have rejected the workflow, and CI wouldn't have run at all.",
+      "A check is only useful for what it can see. The headers Pages can't send are written down as a known gap rather than left out.",
+    ],
+    tools: ['GitHub Actions', 'curl', 'Bash', 'actionlint', 'ShellCheck'],
+    tags: [
+      'Portfolio Site',
+      'CI/CD pipeline',
+      'Content Security Policy',
+      'HTTPS',
+    ],
+    screenshots: ['PortfolioSite/PS3.webp'],
+  },
+  {
     id: 'portfolio-site-entry-3-deploy-on-merge-audit-gate',
     date: '2026-10-03',
     category: 'Portfolio Site',
