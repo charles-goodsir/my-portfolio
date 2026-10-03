@@ -53,7 +53,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       'Until now the site went live when I ran npm run deploy from my laptop. CI checked every PR, but nothing stopped me deploying a build that had never passed it. I added a deploy job to the same workflow. On a push to main the check job uploads the dist folder it already built, and the deploy job only runs once both the checks and the secret scan pass. Only that job gets permission to write to Pages, so the jobs that run PR code never can. The github-pages environment also only accepts deploys from main, so GitHub enforces the rule as well as my YAML. Before that I added a Prettier check to CI. It flagged a trailing comma in my tracked VS Code settings, so I fixed that in the same commit.',
       "The PR went red, but not because of anything I'd changed. npm audit failed on a new high-severity advisory in braces, a denial of service through deeply nested patterns. I traced it with npm ls: gh-pages, then globby, fast-glob and micromatch, then braces. The suggested fix was npm audit fix --force, which would have downgraded gh-pages to an older version, a breaking change to a tool this PR was replacing anyway.",
-      'So I removed gh-pages and its deploy scripts, and the audit came back with 0 vulnerabilities. There is no manual deploy left. If the workflow breaks, I fix the workflow. I kept the old gh-pages branch, so I can point Pages back at it if the new deploy fails.',
+      'So I removed gh-pages and its deploy scripts, and the audit came back with 0 vulnerabilities. There is no manual deploy left. If the workflow breaks, I fix the workflow. I kept the old gh-pages branch, so I can point Pages back at it if the new deploy fails. After the merge, the run on main went green: checks, secret scan, then the deploy, and the new build was live. Then I removed gh-pages from the branches the github-pages environment accepts, so main is the only branch that can deploy.',
       'The quickest way to fix a vulnerable dependency can be to remove it. Check whether you still need it before forcing an upgrade.',
     ],
     tools: ['GitHub Actions', 'GitHub Pages', 'npm audit', 'Prettier'],
@@ -63,7 +63,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'supply chain',
       'continuous deployment',
     ],
-    screenshots: ['PortfolioSite/PS1.webp'],
+    screenshots: ['PortfolioSite/PS1.webp', 'PortfolioSite/PS2.webp'],
   },
   {
     id: 'secure-expense-claims-entry-6-postgres-health-checks',
