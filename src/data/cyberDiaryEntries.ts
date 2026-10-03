@@ -40,6 +40,32 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'portfolio-site-entry-3-deploy-on-merge-audit-gate',
+    date: '2026-10-03',
+    category: 'Portfolio Site',
+    title: 'Deploying on merge, and an audit gate that went red on its own',
+    workedOn: [
+      'Added a Prettier check to CI, and fixed the one tracked file it flagged',
+      'Replaced the manual npm run deploy with a GitHub Pages deploy job that only runs on main, after every check passes',
+      'Hit a new high-severity advisory in braces, pulled in only by gh-pages',
+      'Removed gh-pages instead of running npm audit fix --force',
+    ],
+    body: [
+      'Until now the site went live when I ran npm run deploy from my laptop. CI checked every PR, but nothing stopped me deploying a build that had never passed it. I added a deploy job to the same workflow. On a push to main the check job uploads the dist folder it already built, and the deploy job only runs once both the checks and the secret scan pass. Only that job gets permission to write to Pages, so the jobs that run PR code never can. The github-pages environment also only accepts deploys from main, so GitHub enforces the rule as well as my YAML. Before that I added a Prettier check to CI. It flagged a trailing comma in my tracked VS Code settings, so I fixed that in the same commit.',
+      "The PR went red, but not because of anything I'd changed. npm audit failed on a new high-severity advisory in braces, a denial of service through deeply nested patterns. I traced it with npm ls: gh-pages, then globby, fast-glob and micromatch, then braces. The suggested fix was npm audit fix --force, which would have downgraded gh-pages to an older version, a breaking change to a tool this PR was replacing anyway.",
+      'So I removed gh-pages and its deploy scripts, and the audit came back with 0 vulnerabilities. There is no manual deploy left. If the workflow breaks, I fix the workflow. I kept the old gh-pages branch, so I can point Pages back at it if the new deploy fails.',
+      'The quickest way to fix a vulnerable dependency can be to remove it. Check whether you still need it before forcing an upgrade.',
+    ],
+    tools: ['GitHub Actions', 'GitHub Pages', 'npm audit', 'Prettier'],
+    tags: [
+      'Portfolio Site',
+      'CI/CD pipeline',
+      'supply chain',
+      'continuous deployment',
+    ],
+    screenshots: ['PortfolioSite/PS1.webp'],
+  },
+  {
     id: 'secure-expense-claims-entry-6-postgres-health-checks',
     date: '2026-10-02',
     category: 'Secure Expense Claims',
