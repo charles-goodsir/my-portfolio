@@ -41,14 +41,15 @@ The plan and decisions behind it are in `plans/03-ctf-map.md`.
 ## Security
 
 - **Content Security Policy**: GitHub Pages can't send response headers, so a build-only plugin in `vite.config.ts` adds the policy as a `<meta>` tag in the built `index.html`. The one inline script (the GitHub Pages redirect shim) is allowed by its SHA-256 hash, recalculated on every build. The only external host allowed is the visitor map's Worker. `frame-ancestors` isn't available in a meta tag, so there's no clickjacking protection on this host
+- **Response headers**: GitHub Pages sends no HSTS, `X-Content-Type-Options` or `frame-ancestors` and doesn't let you add them. Fixing that needs a proxy in front of Pages (e.g. Cloudflare), which this site doesn't have. After each deploy, CI runs `scripts/check-live-site.sh` to confirm what Pages does allow: HTTP redirects to HTTPS, and the live HTML carries the CSP meta tag
 - **No third-party requests from the page**: fonts are self-hosted through `@fontsource` rather than loaded from Google Fonts
-- **Dependencies**: `npm audit` is clean. Build tooling lives in `devDependencies`
+- **Dependencies**: `npm audit --audit-level=high` runs in CI and blocks the merge and the deploy. Every Action is pinned to a full commit SHA, and Dependabot keeps packages and pins current. Build tooling lives in `devDependencies`
 
 Adding any new external script, font or API means adding it to the policy in `vite.config.ts`, or the browser will block it.
 
 ## Tech Stack
 
-- React 19, React Router 7
+- React 19, React Router 8
 - TypeScript
 - Tailwind CSS v4
 - Vite
@@ -78,11 +79,9 @@ To check the production build locally, including the Content Security Policy (wh
 npm run preview
 ```
 
-To deploy to GitHub Pages:
+## Deployment
 
-```bash
-npm run deploy
-```
+There's no manual deploy. `.github/workflows/ci.yml` runs lint, Prettier, tests, the build and `npm audit` on every PR and push to `main`, alongside a gitleaks secret scan. On a push to `main`, once both pass, a deploy job publishes the built `dist/` to GitHub Pages. PRs run the checks but never deploy, and the `github-pages` environment only accepts deploys from `main`. Only the deploy job has write access to Pages.
 
 ## Connect
 

@@ -40,6 +40,31 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'portfolio-site-entry-4-live-site-check',
+    date: '2026-10-03',
+    category: 'Portfolio Site',
+    title: 'Checking the live site after every deploy',
+    workedOn: [
+      'Checked which security headers GitHub Pages actually sends, and found none',
+      'Wrote a script that checks the HTTP to HTTPS redirect and the CSP meta tag on the live site',
+      'Added it as a CI job that runs after each deploy',
+    ],
+    body: [
+      "I planned to check the site's security headers after each deploy, so I looked at what GitHub Pages sends first. There was no HSTS, no X-Content-Type-Options and no frame-ancestors, and Pages doesn't let you set any of them. So the check covers what I do control: http:// has to return a 301 to https://, and the HTML has to contain the CSP meta tag my build adds. The script requests the page with the commit SHA in the query string so the CDN's 10-minute cache can't hand back the previous build.",
+      'Before relying on it I made it fail. Against charlesgoodsir.com it printed two oks, and against example.com, which serves plain HTTP, it failed with a 200 where it expected a 301. It runs in CI after the deploy job, so it is skipped on PRs the same way the deploy is.',
+      "While editing I pasted a line of the script into the end of ci.yml by mistake. actionlint caught it before I committed. GitHub would have rejected the workflow, and CI wouldn't have run at all.",
+      "A check is only useful for what it can see. The headers Pages can't send are written down as a known gap rather than left out.",
+    ],
+    tools: ['GitHub Actions', 'curl', 'Bash', 'actionlint', 'ShellCheck'],
+    tags: [
+      'Portfolio Site',
+      'CI/CD pipeline',
+      'Content Security Policy',
+      'HTTPS',
+    ],
+    screenshots: ['PortfolioSite/PS3.webp'],
+  },
+  {
     id: 'portfolio-site-entry-3-deploy-on-merge-audit-gate',
     date: '2026-10-03',
     category: 'Portfolio Site',
@@ -53,7 +78,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       'Until now the site went live when I ran npm run deploy from my laptop. CI checked every PR, but nothing stopped me deploying a build that had never passed it. I added a deploy job to the same workflow. On a push to main the check job uploads the dist folder it already built, and the deploy job only runs once both the checks and the secret scan pass. Only that job gets permission to write to Pages, so the jobs that run PR code never can. The github-pages environment also only accepts deploys from main, so GitHub enforces the rule as well as my YAML. Before that I added a Prettier check to CI. It flagged a trailing comma in my tracked VS Code settings, so I fixed that in the same commit.',
       "The PR went red, but not because of anything I'd changed. npm audit failed on a new high-severity advisory in braces, a denial of service through deeply nested patterns. I traced it with npm ls: gh-pages, then globby, fast-glob and micromatch, then braces. The suggested fix was npm audit fix --force, which would have downgraded gh-pages to an older version, a breaking change to a tool this PR was replacing anyway.",
-      'So I removed gh-pages and its deploy scripts, and the audit came back with 0 vulnerabilities. There is no manual deploy left. If the workflow breaks, I fix the workflow. I kept the old gh-pages branch, so I can point Pages back at it if the new deploy fails.',
+      'So I removed gh-pages and its deploy scripts, and the audit came back with 0 vulnerabilities. There is no manual deploy left. If the workflow breaks, I fix the workflow. I kept the old gh-pages branch, so I can point Pages back at it if the new deploy fails. After the merge, the run on main went green: checks, secret scan, then the deploy, and the new build was live. Then I removed gh-pages from the branches the github-pages environment accepts, so main is the only branch that can deploy.',
       'The quickest way to fix a vulnerable dependency can be to remove it. Check whether you still need it before forcing an upgrade.',
     ],
     tools: ['GitHub Actions', 'GitHub Pages', 'npm audit', 'Prettier'],
@@ -63,7 +88,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'supply chain',
       'continuous deployment',
     ],
-    screenshots: ['PortfolioSite/PS1.webp'],
+    screenshots: ['PortfolioSite/PS1.webp', 'PortfolioSite/PS2.webp'],
   },
   {
     id: 'secure-expense-claims-entry-6-postgres-health-checks',
