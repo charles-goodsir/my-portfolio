@@ -40,6 +40,34 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-8-postgres-integration-tests',
+    date: '2026-10-06',
+    category: 'Secure Expense Claims',
+    title: 'Testing against the real database',
+    workedOn: [
+      'Added integration tests that run against a throwaway Postgres 18 container',
+      'Added a CI check that fails if the model changes without a migration',
+    ],
+    body: [
+      "The database rules from the last step only counted if something tested them, so I added integration tests that run against real Postgres. Testcontainers starts a Postgres 18 container for the test run, the API points at it instead of my local database, and the real migrations are applied before any test runs. An in-memory database would have been quicker, but it ignores check constraints and has no xmin column, so it can't test the two rules I most wanted to prove.",
+      "One test inserts a claim with an amount of -5 and expects the database to refuse it. The other simulates two people loading the same claim: the first saves a change, and the second save has to fail with a concurrency error instead of overwriting it. Both pass on my Mac and in CI, where GitHub's runners have Docker.",
+      'I also added dotnet ef migrations has-pending-model-changes to the API job. It compares the C# model with the last migration and fails if they differ, so a model change can\'t merge without its migration. Before relying on it, I added a property without a migration and ran it: exit code 1 and "Changes have been made to the model since the last migration". On the real model it exits 0.',
+      'A test double that skips the rules you care about can only prove the code around them.',
+    ],
+    tools: [
+      'Testcontainers',
+      'xUnit',
+      'EF Core',
+      'PostgreSQL',
+      'GitHub Actions',
+    ],
+    tags: ['Secure Expense Claims', 'testing', 'database', 'CI/CD pipeline'],
+    screenshots: [
+      'SecureExpenseClaims/SEC11.webp',
+      'SecureExpenseClaims/SEC10.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-7-data-model',
     date: '2026-10-05',
     category: 'Secure Expense Claims',
