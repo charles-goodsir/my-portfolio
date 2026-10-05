@@ -40,6 +40,25 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-7-data-model',
+    date: '2026-10-05',
+    category: 'Secure Expense Claims',
+    title: 'Putting the money rules in the database',
+    workedOn: [
+      'Designed the users, claims and audit tables and generated the first EF Core migration',
+      'Tested the amount constraint and the concurrency column against Postgres',
+    ],
+    body: [
+      "I added the first three tables: users with their manager and bank details, claims, and an append-only audit log. Roles aren't in the database, because they'll come from Entra ID. Amounts are numeric(12,2), because a floating-point type can't represent money exactly. Statuses are stored as text, so the audit log reads \"Approved\" rather than 2. IDs are version 7 GUIDs, which can't be guessed but still sort by creation time, so the indexes stay compact.",
+      "Two rules live in the database itself rather than only in the API. A check constraint rejects any claim with an amount of zero or less, and when I inserted -5 by hand, Postgres refused it. Each claim also carries a version number from Postgres's xmin system column, so if a manager approves a claim while the employee is editing it, the second save fails instead of overwriting the first. The generated migration listed xmin as a column to create, which Postgres would reject. I applied it to see, and Npgsql skipped it as it should.",
+      'Most of my mistakes were typing. Autocomplete turned uint into AvxVnniInt16, a CPU vector type, and added the using line for it. That compiled, so only reading the diff caught it. I also misspelled two property names, which the build did catch.',
+      'A rule the database enforces still holds when a bug or a hand-written query skips the application.',
+    ],
+    tools: ['EF Core', 'PostgreSQL', '.NET 10'],
+    tags: ['Secure Expense Claims', 'database', 'data integrity'],
+    screenshots: ['SecureExpenseClaims/SEC9.webp'],
+  },
+  {
     id: 'portfolio-site-entry-4-live-site-check',
     date: '2026-10-03',
     category: 'Portfolio Site',
