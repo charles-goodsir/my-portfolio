@@ -256,6 +256,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Exploited a password-reset flaw where the reset token was not bound to the account it was issued for, replaying it in Repeater against a different username',
       'Defeated an account lockout by spoofing X-Forwarded-For so each login attempt looked like a new IP',
       'On the pipeline side, the landing zone authenticates to Azure with workload identity federation (OIDC): a short-lived federated token per run instead of a stored client secret',
+      'Added a Development-only sign-in to the expense claims API that trusts user and role headers, so I can test roles before Entra ID is set up. Every other environment gets JWT bearer authentication that rejects everything with a 401. A test runs the app as Production with an admin header and expects a 401, and I checked it catches the mistake by registering the stub everywhere: that test failed',
     ],
     next: [
       "JWT-specific labs, and reviewing the homelab app's own auth flow against OWASP's Authentication Cheat Sheet",
@@ -269,6 +270,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Landing zone: OIDC pipeline auth',
         entryId: 'secure-azure-landing-zone-entry-5-plan-stage-oidc-auth',
+      },
+      {
+        label: 'Expense claims: a sign-in that must never reach production',
+        entryId: 'secure-expense-claims-entry-9-dev-sign-in',
       },
     ],
   },

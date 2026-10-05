@@ -40,6 +40,28 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-9-dev-sign-in',
+    date: '2026-10-06',
+    category: 'Secure Expense Claims',
+    title: 'A sign-in that must never reach production',
+    workedOn: [
+      'Added a Development-only sign-in for testing roles locally',
+      'Added a test proving it is ignored in Production',
+    ],
+    body: [
+      "Until Entra ID arrives, I need to act as an employee, a manager or finance locally. I added a stub sign-in that trusts two request headers, one for a user ID and one for roles. It's also the most dangerous code in the project: if it ever ran in Azure, anyone could become an admin with one header. My threat model lists it as S2.",
+      'The stub is only registered when the environment is Development. Every other environment registers JWT bearer authentication with nothing configured yet, so it rejects every request with a 401 until Entra ID is set up. With no scheme at all, the authorization check would throw an exception and return a 500 instead.',
+      'A test runs the app as Production and sends an admin header, and expects a 401. To make sure the test could catch the mistake, I changed the condition to true so the stub was registered everywhere. That test failed and the other five passed. I also lost the Development-only OpenAPI endpoint while editing Program.cs, which no test covered, and only noticed by reading the diff.',
+      'A shortcut for testing needs its own test proving it is switched off where it matters.',
+    ],
+    tools: ['ASP.NET Core', 'xUnit'],
+    tags: ['Secure Expense Claims', 'authentication', 'testing'],
+    screenshots: [
+      'SecureExpenseClaims/SEC13.webp',
+      'SecureExpenseClaims/SEC12.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-8-postgres-integration-tests',
     date: '2026-10-06',
     category: 'Secure Expense Claims',
