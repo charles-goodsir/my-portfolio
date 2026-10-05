@@ -288,6 +288,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Made six CI checks required on the expense claims repo, each tied to the GitHub Actions app so a status with the same name from somewhere else does not count',
       'Added actionlint so the workflow files are checked too, since a misspelled key is still valid YAML. Ran it on a copy of ci.yml with runs-on changed to run-on and it reported 12 errors before I relied on it',
       'Proved the secret scan blocks a merge by opening a PR with a made-up API key. gitleaks failed the required check and the ruleset blocked the merge',
+      "Put the expense claims app's money rules in Postgres as well as the API: a check constraint rejects zero or negative amounts, and an xmin concurrency token stops one save overwriting another. Both are proved by integration tests against a real Postgres container, since an in-memory database ignores both",
     ],
     next: [
       'The PortSwigger Insecure Deserialization path, and artifact signing with Sigstore/cosign',
@@ -316,6 +317,14 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: a required check blocks a fake secret',
         entryId: 'secure-expense-claims-entry-5-gitleaks-proof-phase-0',
+      },
+      {
+        label: 'Expense claims: putting the money rules in the database',
+        entryId: 'secure-expense-claims-entry-7-data-model',
+      },
+      {
+        label: 'Expense claims: testing against the real database',
+        entryId: 'secure-expense-claims-entry-8-postgres-integration-tests',
       },
     ],
   },
