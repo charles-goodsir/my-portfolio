@@ -40,6 +40,31 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-11-approval-workflow',
+    date: '2026-10-06',
+    category: 'Secure Expense Claims',
+    title: 'Approvals that can only come from the right manager',
+    workedOn: [
+      'Added submit, approve, reject and pay, with an audit row for every change',
+      'Tested the manager, self-approval and finance rules, allowed and denied',
+    ],
+    body: [
+      "Claims can now move through the whole workflow: an employee submits, their manager approves or rejects, and finance pays. Each rule sits in the query that loads the claim. A manager only finds claims from their own direct reports, which is a join to the Users table, and never their own. Finance only finds approved or paid claims, and never their own. If the claim isn't one you can act on, it isn't loaded, and you get a 404.",
+      'Separation of duties needed its own check. "Is this my direct report?" and "is this my own claim?" are different questions, and the second only matters when someone is recorded as their own manager. I wrote a test with exactly that data. When I removed the "not my own claim" condition to see if the test caught it, it failed. Removing the manager relationship failed the cross-team and approvals-list tests the same way.',
+      'Every status change writes an audit row with who did it, taken from the signed-in identity, and the old and new status. The row and the status change go in the same SaveChanges call, which EF runs as one database transaction, so an approval can\'t exist without its record. A test that runs submit, approve and pay checks the audit trail reads Submit, Approve, Pay. My own mistakes were typing again: the synchronous query method where I needed the async one, a misnamed parameter, and "Submitted" instead of "Submit", which would have broken those audit tests.',
+      'Separation of duties needs a test with data that should never exist, because that is exactly the case the rule is for.',
+    ],
+    tools: ['ASP.NET Core', 'EF Core', 'xUnit', 'Testcontainers'],
+    tags: [
+      'Secure Expense Claims',
+      'access control',
+      'separation of duties',
+      'audit logging',
+      'testing',
+    ],
+    screenshots: ['SecureExpenseClaims/SEC17.webp'],
+  },
+  {
     id: 'secure-expense-claims-entry-10-employee-claims',
     date: '2026-10-06',
     category: 'Secure Expense Claims',
@@ -62,7 +87,11 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'mass assignment',
       'testing',
     ],
-    screenshots: ['SecureExpenseClaims/SEC14.webp'],
+    screenshots: [
+      'SecureExpenseClaims/SEC15.webp',
+      'SecureExpenseClaims/SEC16.webp',
+      'SecureExpenseClaims/SEC14.webp',
+    ],
   },
   {
     id: 'secure-expense-claims-entry-9-dev-sign-in',
