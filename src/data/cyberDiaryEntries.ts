@@ -40,6 +40,31 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-10-employee-claims',
+    date: '2026-10-06',
+    category: 'Secure Expense Claims',
+    title: 'Claims only their owner can see',
+    workedOn: [
+      'Added endpoints for employees to create, list, read and edit their own claims',
+      'Tested every ownership and validation rule, allowed and denied',
+    ],
+    body: [
+      "This is the first step with real features: an employee can create a claim, list their own claims, read one, and edit it while it's still a draft. The ownership check sits inside the database query, which only returns a claim if its ID and owner both match. Someone else's claim returns 404, the same as a claim that doesn't exist, so changing the ID in the URL reveals nothing.",
+      'Requests use their own small types with only the fields a caller may set, never the database entity, so a caller can\'t set status or owner by adding them to the JSON. Unknown fields are rejected with a 400 rather than ignored, so a request with "status":"Approved" fails visibly. .NET 10\'s built-in validation checks the amount range before my code runs, and the database constraint from earlier is still behind it.',
+      "There are 12 new tests, one for each allowed and denied case: reading and editing another person's claim, listing, mass assignment, editing a submitted claim, out-of-range amounts, the wrong role, an unknown user and no sign-in. I checked they could fail by removing the owner check from the query, which failed the two cross-user tests, and by allowing unknown JSON fields, which failed the mass-assignment test.",
+      "An authorization rule written into the query that fetches the data can't be skipped by forgetting a separate check afterwards.",
+    ],
+    tools: ['ASP.NET Core', 'EF Core', 'xUnit', 'Testcontainers'],
+    tags: [
+      'Secure Expense Claims',
+      'access control',
+      'IDOR',
+      'mass assignment',
+      'testing',
+    ],
+    screenshots: ['SecureExpenseClaims/SEC14.webp'],
+  },
+  {
     id: 'secure-expense-claims-entry-9-dev-sign-in',
     date: '2026-10-06',
     category: 'Secure Expense Claims',

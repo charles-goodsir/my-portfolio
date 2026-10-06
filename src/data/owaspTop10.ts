@@ -17,18 +17,26 @@ export const owaspTop10: OwaspRisk[] = [
   {
     rank: 'A01:2025',
     title: 'Broken Access Control',
-    progress: 'Planned',
+    progress: 'In progress',
     summary:
       'The application fails to properly enforce what an authenticated user is allowed to do or see, letting them act outside their intended permissions.',
     whyItMatters:
       'Consistently the #1 risk by occurrence. Covers IDOR, privilege escalation, and forced browsing - and now absorbs SSRF, since coercing a server into an unauthorised request is fundamentally an access control failure.',
-    done: [],
+    done: [
+      'In the expense claims API, put the ownership check inside the query that loads the claim, so another user\'s claim returns 404, the same as one that doesn\'t exist. Requests use their own types, and unknown JSON fields are rejected with a 400, so "status":"Approved" can\'t be slipped in. 12 tests cover each allowed and denied case, and removing the owner check fails the cross-user tests',
+    ],
     next: [
       "PortSwigger's Access Control and Server-Side Request Forgery learning paths",
       'Practice IDOR by tampering with object IDs directly in the PortSwigger labs via Burp Repeater',
       "Test the homelab app's two seeded accounts (administrator and wiener) against each other to see whether one can act as the other",
     ],
-    tools: [],
+    tools: ['ASP.NET Core', 'xUnit'],
+    relatedDiaryLinks: [
+      {
+        label: 'Expense claims: claims only their owner can see',
+        entryId: 'secure-expense-claims-entry-10-employee-claims',
+      },
+    ],
   },
   {
     rank: 'A02:2025',
