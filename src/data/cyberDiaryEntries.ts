@@ -40,6 +40,40 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-12-receipt-uploads',
+    date: '2026-10-07',
+    category: 'Secure Expense Claims',
+    title: 'Receipt uploads checked by content, not by name',
+    workedOn: [
+      'Added receipt uploads to Blob Storage, with Azurite running locally and in tests',
+      'Checked file types by their first bytes, capped uploads at 5 MB and served downloads only to people who can see the claim',
+    ],
+    body: [
+      "Receipts are the first part of the app where users send files, so they get their own checks. The API reads the first bytes of each upload and only accepts PDF, PNG or JPEG signatures. The uploader chooses both the file name and the Content-Type header, so the API ignores them. When I sent a text file named fake.pdf as application/pdf, it came back as a 415. The server stores each file under a name it generates from the receipt's ID, and downloads come back as attachments with a name the server chooses, so an uploaded file is never shown inside the app.",
+      'Who can download a receipt follows the same rules as the claim: the owner, their manager, and finance once the claim is approved. Everyone else gets a 404. I reused the manager and finance queries from the approval workflow rather than writing the rules again. I capped uploads at 5 MB in two places. The real web server stops reading the request past the limit, which I checked with a 6 MB upload that came back as a 413. The test server ignores that limit, so the code checks the file size as well.',
+      'Azurite, the local Blob Storage emulator, rejected the SDK because the SDK uses a newer storage API version than Azurite knows about, so Azurite runs with --skipApiVersionCheck. The old health and sign-in tests started failing once the app needed Blob Storage at startup, so every test now starts Postgres and Azurite. My own mistakes were a misspelled method name and a connection string I nested inside the Logging section. All 42 tests passed with that mistake, because the test setup provides its own connection string, and the app only crashed when I ran it myself.',
+      "Passing tests only say something about the configuration they use, and local settings files weren't part of it.",
+    ],
+    tools: [
+      'ASP.NET Core',
+      'Azure Blob Storage',
+      'Azurite',
+      'Testcontainers',
+      'xUnit',
+    ],
+    tags: [
+      'Secure Expense Claims',
+      'file upload security',
+      'access control',
+      'testing',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC19.webp',
+      'SecureExpenseClaims/SEC20.webp',
+      'SecureExpenseClaims/SEC18.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-11-approval-workflow',
     date: '2026-10-06',
     category: 'Secure Expense Claims',
@@ -49,10 +83,10 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Tested the manager, self-approval and finance rules, allowed and denied',
     ],
     body: [
-      "Claims can now move through the whole workflow: an employee submits, their manager approves or rejects, and finance pays. Each rule sits in the query that loads the claim. A manager only finds claims from their own direct reports, which is a join to the Users table, and never their own. Finance only finds approved or paid claims, and never their own. If the claim isn't one you can act on, it isn't loaded, and you get a 404.",
-      'Separation of duties needed its own check. "Is this my direct report?" and "is this my own claim?" are different questions, and the second only matters when someone is recorded as their own manager. I wrote a test with exactly that data. When I removed the "not my own claim" condition to see if the test caught it, it failed. Removing the manager relationship failed the cross-team and approvals-list tests the same way.',
+      "Claims can now move through the whole workflow: an employee submits, their manager approves or rejects, and finance pays. Each rule sits in the query that loads the claim. A manager only finds claims from their own direct reports, which is a join to the Users table, and never their own. Finance only finds approved or paid claims, and never their own. If you can't act on a claim, the query doesn't load it and you get a 404.",
+      'Separation of duties needed its own check. "Is this my direct report?" and "is this my own claim?" are different questions, and the second only matters when someone is recorded as their own manager. I wrote a test with that data, then removed the "not my own claim" condition to check the test would catch it. It failed. Removing the manager relationship failed the cross-team and approvals-list tests the same way.',
       'Every status change writes an audit row with who did it, taken from the signed-in identity, and the old and new status. The row and the status change go in the same SaveChanges call, which EF runs as one database transaction, so an approval can\'t exist without its record. A test that runs submit, approve and pay checks the audit trail reads Submit, Approve, Pay. My own mistakes were typing again: the synchronous query method where I needed the async one, a misnamed parameter, and "Submitted" instead of "Submit", which would have broken those audit tests.',
-      'Separation of duties needs a test with data that should never exist, because that is exactly the case the rule is for.',
+      'Separation of duties needs a test with data that should never exist, because that data is the case the rule is for.',
     ],
     tools: ['ASP.NET Core', 'EF Core', 'xUnit', 'Testcontainers'],
     tags: [
@@ -74,10 +108,10 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Tested every ownership and validation rule, allowed and denied',
     ],
     body: [
-      "This is the first step with real features: an employee can create a claim, list their own claims, read one, and edit it while it's still a draft. The ownership check sits inside the database query, which only returns a claim if its ID and owner both match. Someone else's claim returns 404, the same as a claim that doesn't exist, so changing the ID in the URL reveals nothing.",
-      'Requests use their own small types with only the fields a caller may set, never the database entity, so a caller can\'t set status or owner by adding them to the JSON. Unknown fields are rejected with a 400 rather than ignored, so a request with "status":"Approved" fails visibly. .NET 10\'s built-in validation checks the amount range before my code runs, and the database constraint from earlier is still behind it.',
+      "The first real features are for employees: they can create a claim, list their own claims, read one, and edit it while it's still a draft. The ownership check sits inside the database query, which only returns a claim if its ID and owner both match. Someone else's claim returns 404, the same as a claim that doesn't exist, so changing the ID in the URL reveals nothing.",
+      'Requests use their own small types with only the fields a caller may set, never the database entity, so a caller can\'t set status or owner by adding them to the JSON. The API rejects unknown fields with a 400 instead of ignoring them, so a request with "status":"Approved" fails visibly. .NET 10\'s built-in validation checks the amount range before my code runs, and the database constraint from earlier is still behind it.',
       "There are 12 new tests, one for each allowed and denied case: reading and editing another person's claim, listing, mass assignment, editing a submitted claim, out-of-range amounts, the wrong role, an unknown user and no sign-in. I checked they could fail by removing the owner check from the query, which failed the two cross-user tests, and by allowing unknown JSON fields, which failed the mass-assignment test.",
-      "An authorization rule written into the query that fetches the data can't be skipped by forgetting a separate check afterwards.",
+      'If the authorization rule lives in the query that fetches the data, nobody can skip it by forgetting a separate check afterwards.',
     ],
     tools: ['ASP.NET Core', 'EF Core', 'xUnit', 'Testcontainers'],
     tags: [
@@ -104,9 +138,9 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
     body: [
       "Until Entra ID arrives, I need to act as an employee, a manager or finance locally. I added a stub sign-in that trusts two request headers, one for a user ID and one for roles. It's also the most dangerous code in the project: if it ever ran in Azure, anyone could become an admin with one header. My threat model lists it as S2.",
-      'The stub is only registered when the environment is Development. Every other environment registers JWT bearer authentication with nothing configured yet, so it rejects every request with a 401 until Entra ID is set up. With no scheme at all, the authorization check would throw an exception and return a 500 instead.',
-      'A test runs the app as Production and sends an admin header, and expects a 401. To make sure the test could catch the mistake, I changed the condition to true so the stub was registered everywhere. That test failed and the other five passed. I also lost the Development-only OpenAPI endpoint while editing Program.cs, which no test covered, and only noticed by reading the diff.',
-      'A shortcut for testing needs its own test proving it is switched off where it matters.',
+      'The app only registers the stub in Development. Every other environment registers JWT bearer authentication with nothing configured yet, so it rejects every request with a 401 until Entra ID is set up. With no scheme at all, the authorization check would throw an exception and return a 500 instead.',
+      'A test runs the app as Production and sends an admin header, and expects a 401. To make sure the test could catch the mistake, I changed the condition to true so the app registered the stub everywhere. That test failed and the other five passed. I also lost the Development-only OpenAPI endpoint while editing Program.cs, which no test covered, and only noticed by reading the diff.',
+      'A shortcut for testing needs its own test proving it is off in production.',
     ],
     tools: ['ASP.NET Core', 'xUnit'],
     tags: ['Secure Expense Claims', 'authentication', 'testing'],
@@ -125,7 +159,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'Added a CI check that fails if the model changes without a migration',
     ],
     body: [
-      "The database rules from the last step only counted if something tested them, so I added integration tests that run against real Postgres. Testcontainers starts a Postgres 18 container for the test run, the API points at it instead of my local database, and the real migrations are applied before any test runs. An in-memory database would have been quicker, but it ignores check constraints and has no xmin column, so it can't test the two rules I most wanted to prove.",
+      "The database rules from the last step only counted if something tested them, so I added integration tests that run against real Postgres. Testcontainers starts a Postgres 18 container for the test run, the API points at it instead of my local database, and the test setup applies the real migrations before any test runs. An in-memory database would have been quicker, but it ignores check constraints and has no xmin column, so it can't test the two rules I most wanted to prove.",
       "One test inserts a claim with an amount of -5 and expects the database to refuse it. The other simulates two people loading the same claim: the first saves a change, and the second save has to fail with a concurrency error instead of overwriting it. Both pass on my Mac and in CI, where GitHub's runners have Docker.",
       'I also added dotnet ef migrations has-pending-model-changes to the API job. It compares the C# model with the last migration and fails if they differ, so a model change can\'t merge without its migration. Before relying on it, I added a property without a migration and ran it: exit code 1 and "Changes have been made to the model since the last migration". On the real model it exits 0.',
       'A test double that skips the rules you care about can only prove the code around them.',
@@ -155,7 +189,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       "I added the first three tables: users with their manager and bank details, claims, and an append-only audit log. Roles aren't in the database, because they'll come from Entra ID. Amounts are numeric(12,2), because a floating-point type can't represent money exactly. Statuses are stored as text, so the audit log reads \"Approved\" rather than 2. IDs are version 7 GUIDs, which can't be guessed but still sort by creation time, so the indexes stay compact.",
       "Two rules live in the database itself rather than only in the API. A check constraint rejects any claim with an amount of zero or less, and when I inserted -5 by hand, Postgres refused it. Each claim also carries a version number from Postgres's xmin system column, so if a manager approves a claim while the employee is editing it, the second save fails instead of overwriting the first. The generated migration listed xmin as a column to create, which Postgres would reject. I applied it to see, and Npgsql skipped it as it should.",
-      'Most of my mistakes were typing. Autocomplete turned uint into AvxVnniInt16, a CPU vector type, and added the using line for it. That compiled, so only reading the diff caught it. I also misspelled two property names, which the build did catch.',
+      'Most of my mistakes were typing. Autocomplete turned uint into AvxVnniInt16, a CPU vector type, and added the using line for it. That compiled, so I only caught it by reading the diff. I also misspelled two property names, which the build did catch.',
       'A rule the database enforces still holds when a bug or a hand-written query skips the application.',
     ],
     tools: ['EF Core', 'PostgreSQL', '.NET 10'],
