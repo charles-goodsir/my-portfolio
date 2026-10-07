@@ -154,7 +154,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       "Receipts are the first part of the app where users send files, so they get their own checks. The API reads the first bytes of each upload and only accepts PDF, PNG or JPEG signatures. The uploader chooses both the file name and the Content-Type header, so the API ignores them. When I sent a text file named fake.pdf as application/pdf, it came back as a 415. The server stores each file under a name it generates from the receipt's ID, and downloads come back as attachments with a name the server chooses, so an uploaded file is never shown inside the app.",
       'Who can download a receipt follows the same rules as the claim: the owner, their manager, and finance once the claim is approved. Everyone else gets a 404. I reused the manager and finance queries from the approval workflow rather than writing the rules again. I capped uploads at 5 MB in two places. The real web server stops reading the request past the limit, which I checked with a 6 MB upload that came back as a 413. The test server ignores that limit, so the code checks the file size as well.',
-      'Azurite, the local Blob Storage emulator, rejected the SDK because the SDK uses a newer storage API version than Azurite knows about, so Azurite runs with --skipApiVersionCheck. The old health and sign-in tests started failing once the app needed Blob Storage at startup, so every test now starts Postgres and Azurite. My own mistakes were a misspelled method name and a connection string I nested inside the Logging section. All 42 tests passed with that mistake, because the test setup provides its own connection string, and the app only crashed when I ran it myself.',
+      'My own mistake was a connection string I nested inside the Logging section. All 42 tests passed with it, because the test setup provides its own connection string, and the app only crashed when I ran it myself.',
       "Passing tests only say something about the configuration they use, and local settings files weren't part of it.",
     ],
     tools: [
@@ -188,7 +188,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       "Claims can now move through the whole workflow: an employee submits, their manager approves or rejects, and finance pays. Each rule sits in the query that loads the claim. A manager only finds claims from their own direct reports, which is a join to the Users table, and never their own. Finance only finds approved or paid claims, and never their own. If you can't act on a claim, the query doesn't load it and you get a 404.",
       'Separation of duties needed its own check. "Is this my direct report?" and "is this my own claim?" are different questions, and the second only matters when someone is recorded as their own manager. I wrote a test with that data, then removed the "not my own claim" condition to check the test would catch it. It failed. Removing the manager relationship failed the cross-team and approvals-list tests the same way.',
-      'Every status change writes an audit row with who did it, taken from the signed-in identity, and the old and new status. The row and the status change go in the same SaveChanges call, which EF runs as one database transaction, so an approval can\'t exist without its record. A test that runs submit, approve and pay checks the audit trail reads Submit, Approve, Pay. My own mistakes were typing again: the synchronous query method where I needed the async one, a misnamed parameter, and "Submitted" instead of "Submit", which would have broken those audit tests.',
+      "Every status change writes an audit row with who did it, taken from the signed-in identity, and the old and new status. The row and the status change go in the same SaveChanges call, which EF runs as one database transaction, so an approval can't exist without its record. A test that runs submit, approve and pay checks the audit trail reads Submit, Approve, Pay.",
       'Separation of duties needs a test with data that should never exist, because that data is the case the rule is for.',
     ],
     tools: ['ASP.NET Core', 'EF Core', 'xUnit', 'Testcontainers'],
@@ -292,7 +292,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       "I added the first three tables: users with their manager and bank details, claims, and an append-only audit log. Roles aren't in the database, because they'll come from Entra ID. Amounts are numeric(12,2), because a floating-point type can't represent money exactly. Statuses are stored as text, so the audit log reads \"Approved\" rather than 2. IDs are version 7 GUIDs, which can't be guessed but still sort by creation time, so the indexes stay compact.",
       "Two rules live in the database itself rather than only in the API. A check constraint rejects any claim with an amount of zero or less, and when I inserted -5 by hand, Postgres refused it. Each claim also carries a version number from Postgres's xmin system column, so if a manager approves a claim while the employee is editing it, the second save fails instead of overwriting the first. The generated migration listed xmin as a column to create, which Postgres would reject. I applied it to see, and Npgsql skipped it as it should.",
-      'Most of my mistakes were typing. Autocomplete turned uint into AvxVnniInt16, a CPU vector type, and added the using line for it. That compiled, so I only caught it by reading the diff. I also misspelled two property names, which the build did catch.',
+      'Autocomplete turned uint into AvxVnniInt16, a CPU vector type, and added the using line for it. That compiled, so I only caught it by reading the diff.',
       'A rule the database enforces still holds when a bug or a hand-written query skips the application.',
     ],
     tools: ['EF Core', 'PostgreSQL', '.NET 10'],
@@ -354,8 +354,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-expense-claims-entry-6-postgres-health-checks',
     date: '2026-10-02',
     category: 'Secure Expense Claims',
-    title:
-      'Postgres locally, and a health check that failed for the right reason',
+    title: 'A health check that failed for the right reason',
     workedOn: [
       'Added Postgres 18 in Docker Compose and connected the API with EF Core',
       'Split health checks into liveness and readiness',
@@ -513,20 +512,16 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-expense-claims-entry-1-threat-model-scaffold',
     date: '2026-10-01',
     category: 'Secure Expense Claims',
-    title:
-      'A threat model before any code, and a scaffold so CI has something real to check',
+    title: 'A threat model before any code',
     workedOn: [
-      'Started a new project that puts a real app on secure Azure infrastructure, then hardens, attacks and monitors it',
       'Wrote a STRIDE threat model before any app code: 6 assets, 5 trust boundaries and 24 threats, each with a planned control and the phase it lands in',
-      'Scaffolded a .NET 10 API with a health endpoint and one integration test, plus a React and TypeScript frontend',
-      'Wrote Dockerfiles that run as non-root users, and built and tested both images on the mini PC',
+      'Scaffolded a .NET 10 API and a React frontend, with Dockerfiles that run as non-root users',
     ],
     body: [
       "This project joins my two previous ones. The homelab was an app with a security pipeline, and the landing zone was locked-down Azure infrastructure. This one is an expense claims app on Azure: employees submit claims with receipts, managers approve them, and finance pays them. I picked it because money, approvals and file uploads give me real access-control rules to break later, which a CRUD demo wouldn't.",
       "Before any app code, I wrote a STRIDE threat model with 24 threats, each tied to a control and the phase that builds it. Two threats shape the design. A manager must not approve their own claim, which is a separation-of-duties rule I need to test on purpose. And a request for someone else's claim returns 404, so a 403 can't confirm the claim exists and IDs can't be enumerated.",
-      'The plan wanted CI to build, test and scan the API and frontend in the first phase, but there was no app yet. The homelab got around this with a test job that only printed a message. This time I scaffolded the templates first: a .NET 10 API with a /health endpoint, one integration test that starts the whole API in memory, and a Vite React app. NuGet lock files are committed and restored in locked mode, the same idea as the Terraform lock file in the landing zone. I chose Postgres for the database.',
-      "A few things didn't go to plan. My Mac only had the .NET 8 SDK, so I installed .NET 10, the current LTS. The Vite template now uses oxlint instead of ESLint. Docker Desktop wasn't running, so I built the images on the mini PC over SSH, which is how I found Docker getting around its firewall. The API image is Microsoft's chiseled Ubuntu image, with no shell, running as user 1654 at 181 MB. The frontend runs on unprivileged nginx as user 101. Both answered their health checks, and the mini PC builds amd64 images, the same architecture Azure Container Apps runs.",
-      'Next is CI, with Trivy failing on HIGH and CRITICAL findings from the first run, so the images have to start clean.',
+      "The plan wanted CI to build, test and scan the app in the first phase, but there was no app yet. The homelab got around this with a test job that only printed a message. This time I scaffolded the templates first: a .NET 10 API with a /health endpoint and one integration test, and a Vite React app. The API image is Microsoft's chiseled image with no shell, running as user 1654, and the frontend runs on unprivileged nginx. I built both on the mini PC, which is how I found Docker's published ports getting around its firewall.",
+      'A pipeline that checks a placeholder proves nothing, so give it real code to fail on from the first run.',
     ],
     tools: [
       '.NET 10',
