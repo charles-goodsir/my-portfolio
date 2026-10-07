@@ -62,65 +62,29 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-expense-claims-entry-17-payments-page',
     date: '2026-10-07',
     category: 'Secure Expense Claims',
-    title: 'A page that vanished with every check green',
+    title: 'Three pages, and a green build with one missing',
     workedOn: [
-      'Added the payments page for finance using a shared claim queue component',
-      'Showed the API refuses a payment the UI never offers',
+      'Built the frontend with a development sign-in picker and pages for claims, approvals and payments',
+      'Added Vitest to CI and showed the API refuses a payment the UI never offers',
     ],
     body: [
-      "Finance now has a page of approved claims waiting for payment. It was nearly identical to the approvals page, so instead of copying it I turned the approvals page into one shared queue component. Each page passes a title, the list endpoint and its actions, and each action posts to the matching claim route. I tested the whole path in the browser: Alice submitted a claim, Manny approved it, Fiona paid it, and Alice's list showed it as Paid.",
-      "When I typed it into the repo, the edit to the main app file deleted the My claims page entirely. Lint passed, the TypeScript build passed and the tests passed, because the page still compiled even though nothing used it. Comparing the file against the version I'd tested in the browser is what caught it. Nobody could have added a claim if it had merged.",
-      "I also tried to pay one of Alice's approved claims as Alice, with curl and her development headers. The UI never shows her a Pay button, and the API returned 403 because the finance role check runs before any code. That's 403 and not 404 on purpose: it's a role check, not a question of whether the claim exists.",
+      "The frontend now has a page for each role. A development-only picker signs me in as one of the four seeded users. Employees get My claims, managers get approvals and finance gets payments. The approvals and payments pages were nearly identical, so they share one queue component. None of the pages has rules of its own: the Vite dev server forwards /api to the .NET API, one function adds the sign-in headers, and the API decides what each person sees. I tested the whole path in the browser: Alice submitted a claim, Manny approved it, Fiona paid it, and Alice's list showed it as Paid.",
+      "Two problems got past me before review. The first version silenced two React lint warnings with a comment. They were pointing at a real race: if I switched user while the list was loading, the previous user's response could replace the new one. The page now ignores responses for a user who is no longer selected. Later, my edit to the main app file deleted the My claims page entirely. Lint, the TypeScript build and the Vitest tests all passed, because the page still compiled even though nothing used it. I only caught it by comparing the file with the version I'd tested in the browser.",
+      "Hiding a button isn't a control, so I tried paying one of Alice's approved claims as Alice, with curl and her development headers. The API returned 403, because the finance role check runs before any code. It's a 403 rather than a 404 because this is a role check, not a question of whether the claim exists. I also split the no-manager submit error from the not-a-draft one. Both were a bare 409, but only one needs an admin to fix it, so it now says so.",
       "A green build only proves what the checks look at. If nothing renders the page, nothing notices when it's gone.",
     ],
-    tools: ['React', 'TypeScript', 'curl'],
-    tags: ['Secure Expense Claims', 'frontend', 'access control'],
+    tools: ['React', 'TypeScript', 'Vite', 'Vitest', 'ASP.NET Core', 'curl'],
+    tags: [
+      'Secure Expense Claims',
+      'frontend',
+      'access control',
+      'testing',
+      'CI/CD pipeline',
+    ],
     screenshots: [
+      'SecureExpenseClaims/SEC28.webp',
       'SecureExpenseClaims/SEC30.webp',
       'SecureExpenseClaims/SEC31.webp',
-    ],
-  },
-  {
-    id: 'secure-expense-claims-entry-16-approvals-page',
-    date: '2026-10-07',
-    category: 'Secure Expense Claims',
-    title: 'Approvals, and a 409 that explains itself',
-    workedOn: [
-      'Added the approvals page for managers',
-      'Gave the no-manager submit error a message',
-    ],
-    body: [
-      "Managers now have a page of submitted claims from their direct reports, with Approve and Reject buttons. The page has no rules of its own. Which claims appear, and who can decide them, is still worked out by the API's query, so hiding the page from other roles is a convenience and not a control.",
-      "Submitting a claim with no manager used to return an empty 409 Conflict, the same response as submitting a claim that wasn't a draft. Those are different problems: one means the claim has moved on, the other is something an admin has to fix. I split the check so the no-manager case returns a problem detail telling the user to ask an admin. I extended the existing test to look for the message and checked it failed when the endpoint went back to a bare 409.",
-      "Two errors that need different fixes shouldn't share one response.",
-    ],
-    tools: ['ASP.NET Core', 'React', 'TypeScript', 'xUnit'],
-    tags: ['Secure Expense Claims', 'frontend', 'error handling'],
-    screenshots: [
-      'SecureExpenseClaims/SEC27.webp',
-      'SecureExpenseClaims/SEC28.webp',
-      'SecureExpenseClaims/SEC29.webp',
-    ],
-  },
-  {
-    id: 'secure-expense-claims-entry-15-frontend-my-claims',
-    date: '2026-10-07',
-    category: 'Secure Expense Claims',
-    title: 'The first page, and a lint warning that was right',
-    workedOn: [
-      'Built the frontend shell with a development sign-in picker and the My claims page',
-      'Added Vitest and made the frontend tests part of CI',
-    ],
-    body: [
-      "The frontend now has its first real page. A development-only picker lets me sign in as Alice, Manny, Fiona or Adam, the seeded users from the API, and My claims lists, adds, edits and submits claims. The Vite dev server forwards anything under /api to the .NET API, so the browser only ever calls its own origin and I didn't have to open up CORS. Every request goes through one function that adds the sign-in headers, which is where the Entra ID token will go in Phase 3.",
-      'I tested it in the browser against the real API. As Alice I added a claim, changed its amount and submitted it, and its edit buttons disappeared. As Manny, who has no manager, submitting showed 409: Conflict and the claim stayed a draft. The picker only changes which headers are sent. What each person can see is still decided by the API, which is why Manny only saw his own claims.',
-      "The first version silenced two React lint warnings with a comment. They were pointing at a real race: if I switched user while the list was loading, the previous user's response could arrive late and replace the new one. The page now ignores responses for a user who is no longer selected. Vitest covers the request function: the headers it sends, the /api prefix, turning error responses into errors with a status, and empty 204 responses. CI runs those tests on every PR.",
-      'Before silencing a warning, check what it is pointing at.',
-    ],
-    tools: ['React', 'TypeScript', 'Vite', 'Vitest'],
-    tags: ['Secure Expense Claims', 'frontend', 'testing', 'CI/CD pipeline'],
-    screenshots: [
-      'SecureExpenseClaims/SEC25.webp',
       'SecureExpenseClaims/SEC26.webp',
     ],
   },
@@ -190,7 +154,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       "Receipts are the first part of the app where users send files, so they get their own checks. The API reads the first bytes of each upload and only accepts PDF, PNG or JPEG signatures. The uploader chooses both the file name and the Content-Type header, so the API ignores them. When I sent a text file named fake.pdf as application/pdf, it came back as a 415. The server stores each file under a name it generates from the receipt's ID, and downloads come back as attachments with a name the server chooses, so an uploaded file is never shown inside the app.",
       'Who can download a receipt follows the same rules as the claim: the owner, their manager, and finance once the claim is approved. Everyone else gets a 404. I reused the manager and finance queries from the approval workflow rather than writing the rules again. I capped uploads at 5 MB in two places. The real web server stops reading the request past the limit, which I checked with a 6 MB upload that came back as a 413. The test server ignores that limit, so the code checks the file size as well.',
-      'Azurite, the local Blob Storage emulator, rejected the SDK because the SDK uses a newer storage API version than Azurite knows about, so Azurite runs with --skipApiVersionCheck. The old health and sign-in tests started failing once the app needed Blob Storage at startup, so every test now starts Postgres and Azurite. My own mistakes were a misspelled method name and a connection string I nested inside the Logging section. All 42 tests passed with that mistake, because the test setup provides its own connection string, and the app only crashed when I ran it myself.',
+      'My own mistake was a connection string I nested inside the Logging section. All 42 tests passed with it, because the test setup provides its own connection string, and the app only crashed when I ran it myself.',
       "Passing tests only say something about the configuration they use, and local settings files weren't part of it.",
     ],
     tools: [
@@ -224,7 +188,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       "Claims can now move through the whole workflow: an employee submits, their manager approves or rejects, and finance pays. Each rule sits in the query that loads the claim. A manager only finds claims from their own direct reports, which is a join to the Users table, and never their own. Finance only finds approved or paid claims, and never their own. If you can't act on a claim, the query doesn't load it and you get a 404.",
       'Separation of duties needed its own check. "Is this my direct report?" and "is this my own claim?" are different questions, and the second only matters when someone is recorded as their own manager. I wrote a test with that data, then removed the "not my own claim" condition to check the test would catch it. It failed. Removing the manager relationship failed the cross-team and approvals-list tests the same way.',
-      'Every status change writes an audit row with who did it, taken from the signed-in identity, and the old and new status. The row and the status change go in the same SaveChanges call, which EF runs as one database transaction, so an approval can\'t exist without its record. A test that runs submit, approve and pay checks the audit trail reads Submit, Approve, Pay. My own mistakes were typing again: the synchronous query method where I needed the async one, a misnamed parameter, and "Submitted" instead of "Submit", which would have broken those audit tests.',
+      "Every status change writes an audit row with who did it, taken from the signed-in identity, and the old and new status. The row and the status change go in the same SaveChanges call, which EF runs as one database transaction, so an approval can't exist without its record. A test that runs submit, approve and pay checks the audit trail reads Submit, Approve, Pay.",
       'Separation of duties needs a test with data that should never exist, because that data is the case the rule is for.',
     ],
     tools: ['ASP.NET Core', 'EF Core', 'xUnit', 'Testcontainers'],
@@ -328,7 +292,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       "I added the first three tables: users with their manager and bank details, claims, and an append-only audit log. Roles aren't in the database, because they'll come from Entra ID. Amounts are numeric(12,2), because a floating-point type can't represent money exactly. Statuses are stored as text, so the audit log reads \"Approved\" rather than 2. IDs are version 7 GUIDs, which can't be guessed but still sort by creation time, so the indexes stay compact.",
       "Two rules live in the database itself rather than only in the API. A check constraint rejects any claim with an amount of zero or less, and when I inserted -5 by hand, Postgres refused it. Each claim also carries a version number from Postgres's xmin system column, so if a manager approves a claim while the employee is editing it, the second save fails instead of overwriting the first. The generated migration listed xmin as a column to create, which Postgres would reject. I applied it to see, and Npgsql skipped it as it should.",
-      'Most of my mistakes were typing. Autocomplete turned uint into AvxVnniInt16, a CPU vector type, and added the using line for it. That compiled, so I only caught it by reading the diff. I also misspelled two property names, which the build did catch.',
+      'Autocomplete turned uint into AvxVnniInt16, a CPU vector type, and added the using line for it. That compiled, so I only caught it by reading the diff.',
       'A rule the database enforces still holds when a bug or a hand-written query skips the application.',
     ],
     tools: ['EF Core', 'PostgreSQL', '.NET 10'],
@@ -390,8 +354,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-expense-claims-entry-6-postgres-health-checks',
     date: '2026-10-02',
     category: 'Secure Expense Claims',
-    title:
-      'Postgres locally, and a health check that failed for the right reason',
+    title: 'A health check that failed for the right reason',
     workedOn: [
       'Added Postgres 18 in Docker Compose and connected the API with EF Core',
       'Split health checks into liveness and readiness',
@@ -549,20 +512,16 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     id: 'secure-expense-claims-entry-1-threat-model-scaffold',
     date: '2026-10-01',
     category: 'Secure Expense Claims',
-    title:
-      'A threat model before any code, and a scaffold so CI has something real to check',
+    title: 'A threat model before any code',
     workedOn: [
-      'Started a new project that puts a real app on secure Azure infrastructure, then hardens, attacks and monitors it',
       'Wrote a STRIDE threat model before any app code: 6 assets, 5 trust boundaries and 24 threats, each with a planned control and the phase it lands in',
-      'Scaffolded a .NET 10 API with a health endpoint and one integration test, plus a React and TypeScript frontend',
-      'Wrote Dockerfiles that run as non-root users, and built and tested both images on the mini PC',
+      'Scaffolded a .NET 10 API and a React frontend, with Dockerfiles that run as non-root users',
     ],
     body: [
       "This project joins my two previous ones. The homelab was an app with a security pipeline, and the landing zone was locked-down Azure infrastructure. This one is an expense claims app on Azure: employees submit claims with receipts, managers approve them, and finance pays them. I picked it because money, approvals and file uploads give me real access-control rules to break later, which a CRUD demo wouldn't.",
       "Before any app code, I wrote a STRIDE threat model with 24 threats, each tied to a control and the phase that builds it. Two threats shape the design. A manager must not approve their own claim, which is a separation-of-duties rule I need to test on purpose. And a request for someone else's claim returns 404, so a 403 can't confirm the claim exists and IDs can't be enumerated.",
-      'The plan wanted CI to build, test and scan the API and frontend in the first phase, but there was no app yet. The homelab got around this with a test job that only printed a message. This time I scaffolded the templates first: a .NET 10 API with a /health endpoint, one integration test that starts the whole API in memory, and a Vite React app. NuGet lock files are committed and restored in locked mode, the same idea as the Terraform lock file in the landing zone. I chose Postgres for the database.',
-      "A few things didn't go to plan. My Mac only had the .NET 8 SDK, so I installed .NET 10, the current LTS. The Vite template now uses oxlint instead of ESLint. Docker Desktop wasn't running, so I built the images on the mini PC over SSH, which is how I found Docker getting around its firewall. The API image is Microsoft's chiseled Ubuntu image, with no shell, running as user 1654 at 181 MB. The frontend runs on unprivileged nginx as user 101. Both answered their health checks, and the mini PC builds amd64 images, the same architecture Azure Container Apps runs.",
-      'Next is CI, with Trivy failing on HIGH and CRITICAL findings from the first run, so the images have to start clean.',
+      "The plan wanted CI to build, test and scan the app in the first phase, but there was no app yet. The homelab got around this with a test job that only printed a message. This time I scaffolded the templates first: a .NET 10 API with a /health endpoint and one integration test, and a Vite React app. The API image is Microsoft's chiseled image with no shell, running as user 1654, and the frontend runs on unprivileged nginx. I built both on the mini PC, which is how I found Docker's published ports getting around its firewall.",
+      'A pipeline that checks a placeholder proves nothing, so give it real code to fail on from the first run.',
     ],
     tools: [
       '.NET 10',
