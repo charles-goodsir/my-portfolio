@@ -56,7 +56,7 @@ function DiaryEntry() {
         to={`/diary?project=${encodeURIComponent(entry.category)}`}
         className="mt-6 inline-flex items-center text-primary hover:underline underline-offset-2 transition-colors duration-300"
       >
-        ← All {entry.category} entries
+        ← {entry.category}
       </Link>
     </section>
   )
