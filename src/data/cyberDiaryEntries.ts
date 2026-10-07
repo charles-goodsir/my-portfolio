@@ -40,6 +40,28 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-15-frontend-my-claims',
+    date: '2026-10-07',
+    category: 'Secure Expense Claims',
+    title: 'The first page, and a lint warning that was right',
+    workedOn: [
+      'Built the frontend shell with a development sign-in picker and the My claims page',
+      'Added Vitest and made the frontend tests part of CI',
+    ],
+    body: [
+      "The frontend now has its first real page. A development-only picker lets me sign in as Alice, Manny, Fiona or Adam, the seeded users from the API, and My claims lists, adds, edits and submits claims. The Vite dev server forwards anything under /api to the .NET API, so the browser only ever calls its own origin and I didn't have to open up CORS. Every request goes through one function that adds the sign-in headers, which is where the Entra ID token will go in Phase 3.",
+      'I tested it in the browser against the real API. As Alice I added a claim, changed its amount and submitted it, and its edit buttons disappeared. As Manny, who has no manager, submitting showed 409: Conflict and the claim stayed a draft. The picker only changes which headers are sent. What each person can see is still decided by the API, which is why Manny only saw his own claims.',
+      "The first version silenced two React lint warnings with a comment. They were pointing at a real race: if I switched user while the list was loading, the previous user's response could arrive late and replace the new one. The page now ignores responses for a user who is no longer selected. Vitest covers the request function: the headers it sends, the /api prefix, turning error responses into errors with a status, and empty 204 responses. CI runs those tests on every PR.",
+      'Before silencing a warning, check what it is pointing at.',
+    ],
+    tools: ['React', 'TypeScript', 'Vite', 'Vitest'],
+    tags: ['Secure Expense Claims', 'frontend', 'testing', 'CI/CD pipeline'],
+    screenshots: [
+      'SecureExpenseClaims/SEC25.webp',
+      'SecureExpenseClaims/SEC26.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-14-admin-and-seed',
     date: '2026-10-07',
     category: 'Secure Expense Claims',
