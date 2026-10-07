@@ -15,7 +15,7 @@ const securityProjects: Project[] = [
     id: 'secure-expense-claims',
     title: 'Secure Expense Claims',
     description:
-      'In progress. An expense claims app on Azure, built from a STRIDE threat model, then hardened, attacked and monitored. So far: the threat model and a .NET 10 API and React frontend in non-root containers',
+      'In progress. An expense claims app on Azure, built from a STRIDE threat model, then hardened, attacked and monitored. So far: the threat model, CI with six required checks, and the claims workflow with access control, audited approvals and checked receipt uploads',
     technologies: [
       '.NET 10',
       'React',

@@ -87,7 +87,9 @@ function PortfolioSite() {
             <p className="text-ink-muted mb-4">
               The Lab Notes and OWASP Top 10 sections are data-driven from typed
               content files. The URL records which Lab Notes project you're
-              viewing, so you can share a filtered view.
+              viewing, so you can share a filtered view. Each entry has its own
+              page, with links to the previous and next entry in the same
+              project.
             </p>
             <p className="text-ink-muted">
               The build adds a Content Security Policy. GitHub Pages cannot send

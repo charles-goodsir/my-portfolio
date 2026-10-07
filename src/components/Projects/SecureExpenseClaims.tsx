@@ -8,7 +8,10 @@ const technologies = [
   'Vite',
   'PostgreSQL',
   'Docker',
+  'EF Core',
   'xUnit',
+  'Testcontainers',
+  'GitHub Actions',
   'Azure',
   'STRIDE',
 ]
@@ -123,16 +126,38 @@ function SecureExpenseClaims() {
               threat
             </li>
             <li>
-              • .NET 10 API with a /health endpoint and an integration test that
-              starts the whole API in memory
+              • CI on every PR: tests, gitleaks, Semgrep, Trivy on both images,
+              NuGet and npm audit, and actionlint, all required on main. Each
+              check has been seen failing on a real or planted problem
             </li>
-            <li>• React and TypeScript frontend scaffolded with Vite</li>
-            <li>• NuGet lock files committed and restored in locked mode</li>
             <li>
-              • API image on Microsoft&apos;s chiseled Ubuntu base: no shell,
-              runs as user 1654
+              • Ownership checks inside the query that loads a claim, so another
+              user&apos;s claim returns 404 and unknown JSON fields are rejected
             </li>
-            <li>• Frontend on unprivileged nginx, running as user 101</li>
+            <li>
+              • Submit, approve, reject and pay, with separation of duties and
+              an audit row written in the same transaction as each change
+            </li>
+            <li>
+              • Receipt uploads checked by their first bytes, capped at 5 MB and
+              downloadable only by people who can see the claim
+            </li>
+            <li>
+              • Generic error responses with a trace ID, and a per-user rate
+              limit
+            </li>
+            <li>
+              • An Admin role that can change reporting lines but can&apos;t
+              approve or pay, with every change audited
+            </li>
+            <li>
+              • A React frontend for each role, with a development-only sign-in
+              that a test proves is off in Production
+            </li>
+            <li>
+              • Integration tests against real Postgres and Azurite in
+              containers
+            </li>
           </ul>
         </div>
 
@@ -140,8 +165,9 @@ function SecureExpenseClaims() {
         <div className="bg-card border border-line rounded-lg shadow-card p-8">
           <h2 className="text-2xl font-bold text-ink mb-6">Status</h2>
           <p className="text-ink-muted">
-            In progress. Next is CI, with Trivy failing on HIGH and CRITICAL
-            findings from the first run, so the images have to start clean.
+            In progress. Phase 0 (threat model, CI and required checks) is done,
+            and Phase 1, the app itself, is in progress. The development sign-in
+            is replaced by Entra ID in Phase 3.
           </p>
         </div>
       </div>
