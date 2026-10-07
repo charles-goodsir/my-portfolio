@@ -40,6 +40,33 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-13-errors-and-rate-limits',
+    date: '2026-10-07',
+    category: 'Secure Expense Claims',
+    title: 'Errors that say nothing useful to an attacker',
+    workedOn: [
+      'Replaced stack traces in error responses with a generic problem and a trace ID',
+      'Added a per-user rate limit of 100 requests a minute',
+    ],
+    body: [
+      "Before changing anything, I forced a real failure by pointing the API at a database port where nothing was listening. The response was plain text containing the Npgsql exception and its stack trace, which is .NET's developer exception page and on by default in Development. Now every error comes back as a problem-details response with a status, a generic title and a trace ID, in every environment, so what I test against is what production sends. The stack trace still goes to the server log, and the trace ID links the two.",
+      "The first version turned a 400 into a 500. In Development, ASP.NET reports a malformed request body by throwing an exception, and my handler caught that like any other error. The mass-assignment test from earlier failed, which is how I found it. The handler now keeps the original status for bad requests, so a client's mistake isn't reported as a server error.",
+      'Rate limiting gives each signed-in user their own budget of 100 requests a minute, and anonymous callers are counted by IP address. Health checks are exempt, because the platform calls them constantly. The test lowers the limit to 3: the fourth request gets a 429 while a second user still gets through. With the limiter removed the test failed, and with one shared budget for everyone the second user was blocked too, so the test caught both.',
+      "An error handler needs the same testing as any other control, because a handler that catches everything also catches errors that were never the server's fault.",
+    ],
+    tools: ['ASP.NET Core', 'xUnit', 'Testcontainers'],
+    tags: [
+      'Secure Expense Claims',
+      'error handling',
+      'rate limiting',
+      'testing',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC22.webp',
+      'SecureExpenseClaims/SEC21.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-12-receipt-uploads',
     date: '2026-10-07',
     category: 'Secure Expense Claims',
