@@ -16,7 +16,7 @@ function DiaryEntry() {
   const next = project[index - 1]
 
   return (
-    <section className="max-w-[45rem] mx-auto py-16 px-4">
+    <section className="max-w-180 mx-auto py-16 px-4">
       <Link
         to={`/diary?project=${encodeURIComponent(entry.category)}`}
         className="mb-8 inline-flex items-center text-primary hover:underline underline-offset-2 transition-colors duration-300"
