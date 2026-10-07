@@ -40,6 +40,69 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-18-receipt-uploads-frontend',
+    date: '2026-10-07',
+    category: 'Secure Expense Claims',
+    title: 'Receipts in the browser, and a header I nearly broke',
+    workedOn: [
+      'Added receipt upload and download to the claim tables',
+      'Added a render test that checks which sections each user sees',
+    ],
+    body: [
+      "Receipts can now be uploaded and downloaded from the claim tables. Uploads only show on drafts, matching the API, and managers and finance get download links in their queues. The non-obvious part was the request function. It added a JSON content type to every request, which would have replaced the multipart header the browser builds for a file upload, boundary and all, and the API couldn't have read the file. It now only sets JSON when the body is a string, and a test fails if that changes.",
+      "Downloads can't be plain links, because a link can't send the sign-in headers. The page fetches the file, wraps it in a temporary blob URL and saves it under the name the API chose, receipt-<id>.pdf, never the uploader's name. In the browser I uploaded a real PDF, then an HTML file renamed to .pdf, which showed 415 Unsupported Media Type on the row. Through the dev proxy, a 6 MB file came back 413. The accept attribute on the file picker only filters the dialog. The magic byte check in the API is what stops a disguised file.",
+      "I also added the render test I'd wanted since the payments page. It renders the app as each seeded user and checks which sections appear, and with the My claims line removed it failed for Alice, Manny and Fiona. Review still mattered: my edit dropped the line that passes a caller's own headers through the request function. Nothing passes headers yet, so every test passed, but the first Entra ID token in Phase 3 would have vanished without an error.",
+      'When a test suite passes, ask what it never exercises. A line nothing calls yet can be deleted without a single failure.',
+    ],
+    tools: ['React', 'TypeScript', 'Vitest', 'Testing Library', 'jsdom'],
+    tags: ['Secure Expense Claims', 'frontend', 'file upload', 'testing'],
+    screenshots: ['SecureExpenseClaims/SEC32.webp'],
+  },
+  {
+    id: 'secure-expense-claims-entry-17-payments-page',
+    date: '2026-10-07',
+    category: 'Secure Expense Claims',
+    title: 'A page that vanished with every check green',
+    workedOn: [
+      'Added the payments page for finance using a shared claim queue component',
+      'Showed the API refuses a payment the UI never offers',
+    ],
+    body: [
+      "Finance now has a page of approved claims waiting for payment. It was nearly identical to the approvals page, so instead of copying it I turned the approvals page into one shared queue component. Each page passes a title, the list endpoint and its actions, and each action posts to the matching claim route. I tested the whole path in the browser: Alice submitted a claim, Manny approved it, Fiona paid it, and Alice's list showed it as Paid.",
+      "When I typed it into the repo, the edit to the main app file deleted the My claims page entirely. Lint passed, the TypeScript build passed and the tests passed, because the page still compiled even though nothing used it. Comparing the file against the version I'd tested in the browser is what caught it. Nobody could have added a claim if it had merged.",
+      "I also tried to pay one of Alice's approved claims as Alice, with curl and her development headers. The UI never shows her a Pay button, and the API returned 403 because the finance role check runs before any code. That's 403 and not 404 on purpose: it's a role check, not a question of whether the claim exists.",
+      "A green build only proves what the checks look at. If nothing renders the page, nothing notices when it's gone.",
+    ],
+    tools: ['React', 'TypeScript', 'curl'],
+    tags: ['Secure Expense Claims', 'frontend', 'access control'],
+    screenshots: [
+      'SecureExpenseClaims/SEC30.webp',
+      'SecureExpenseClaims/SEC31.webp',
+    ],
+  },
+  {
+    id: 'secure-expense-claims-entry-16-approvals-page',
+    date: '2026-10-07',
+    category: 'Secure Expense Claims',
+    title: 'Approvals, and a 409 that explains itself',
+    workedOn: [
+      'Added the approvals page for managers',
+      'Gave the no-manager submit error a message',
+    ],
+    body: [
+      "Managers now have a page of submitted claims from their direct reports, with Approve and Reject buttons. The page has no rules of its own. Which claims appear, and who can decide them, is still worked out by the API's query, so hiding the page from other roles is a convenience and not a control.",
+      "Submitting a claim with no manager used to return an empty 409 Conflict, the same response as submitting a claim that wasn't a draft. Those are different problems: one means the claim has moved on, the other is something an admin has to fix. I split the check so the no-manager case returns a problem detail telling the user to ask an admin. I extended the existing test to look for the message and checked it failed when the endpoint went back to a bare 409.",
+      "Two errors that need different fixes shouldn't share one response.",
+    ],
+    tools: ['ASP.NET Core', 'React', 'TypeScript', 'xUnit'],
+    tags: ['Secure Expense Claims', 'frontend', 'error handling'],
+    screenshots: [
+      'SecureExpenseClaims/SEC27.webp',
+      'SecureExpenseClaims/SEC28.webp',
+      'SecureExpenseClaims/SEC29.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-15-frontend-my-claims',
     date: '2026-10-07',
     category: 'Secure Expense Claims',
