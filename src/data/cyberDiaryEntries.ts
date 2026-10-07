@@ -40,6 +40,33 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-14-admin-and-seed',
+    date: '2026-10-07',
+    category: 'Secure Expense Claims',
+    title: 'An admin who can move people but not money',
+    workedOn: [
+      'Added admin endpoints to list users, change reporting lines and read the audit log',
+      'Added four Development-only seed users, one per role',
+    ],
+    body: [
+      "Checking the plan against what I'd built, I found the Admin role had no API at all, and Phase 1 isn't done until every role works. An admin can list users, change someone's manager and read the audit log. The user list leaves out bank details, because admins manage people, not payments. The Admin role has no approve or pay permissions, and a test proves an admin calling approve gets a 403.",
+      "Changing a manager decides who can approve someone's money, so it writes its own audit row with who made the change and the old and new manager. A test changes an employee's manager, then checks the old manager now gets a 404 on that employee's claim while the new manager can approve it. When I stopped auditing the change, the test failed, and the same happened when I allowed someone to be their own manager.",
+      'In Development, the app now applies its migrations and adds four test users at startup: Alice, Manny, Fiona and Adam. The seed is code that only runs locally, not migration data, which would also have run in production. That broke the error-handling test, which points the database at a dead port on purpose, so the startup work can be switched off for that one test. My own mistake was writing "Set Manager" with a space while every other audit action is one word. The test caught it, and later detections will search for those names exactly.',
+      'Every way of changing who can approve money needs the same audit trail as approving it.',
+    ],
+    tools: ['ASP.NET Core', 'EF Core', 'xUnit'],
+    tags: [
+      'Secure Expense Claims',
+      'access control',
+      'separation of duties',
+      'audit logging',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC23.webp',
+      'SecureExpenseClaims/SEC24.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-13-errors-and-rate-limits',
     date: '2026-10-07',
     category: 'Secure Expense Claims',

@@ -26,6 +26,7 @@ export const owaspTop10: OwaspRisk[] = [
       'In the expense claims API, put the ownership check inside the query that loads the claim, so another user\'s claim returns 404, the same as one that doesn\'t exist. Requests use their own types, and unknown JSON fields are rejected with a 400, so "status":"Approved" can\'t be slipped in. 12 tests cover each allowed and denied case, and removing the owner check fails the cross-user tests',
       "Added the approval workflow with each rule in the query that loads the claim: a manager only finds their direct reports' claims, finance only finds approved ones, and nobody finds their own. I tested self-approval with data that should never exist, a user recorded as their own manager, and removing the check failed that test",
       'Receipt downloads follow the same rules as the claim, reusing the manager and finance queries rather than writing them again. Anyone else gets a 404',
+      "Gave the Admin role its own endpoints with no approve or pay permissions, so an admin calling approve gets a 403. Changing someone's manager is tested end to end: the old manager gets a 404 on the claim and the new one can approve it",
     ],
     next: [
       "PortSwigger's Access Control and Server-Side Request Forgery learning paths",
@@ -45,6 +46,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: receipt uploads checked by content',
         entryId: 'secure-expense-claims-entry-12-receipt-uploads',
+      },
+      {
+        label: 'Expense claims: an admin who can move people but not money',
+        entryId: 'secure-expense-claims-entry-14-admin-and-seed',
       },
     ],
   },
@@ -372,6 +377,7 @@ export const owaspTop10: OwaspRisk[] = [
     done: [
       'Both risk assessments so far (the homelab and the visitor map) list detection as a gap: nothing I have built alerts on unusual traffic yet',
       'The expense claims app writes an audit row for every status change, with who did it from the signed-in identity, in the same transaction as the change. That covers logging the actions that matter, but nothing alerts on them yet',
+      "Changing someone's manager writes its own audit row with the old and new manager, because it decides who can approve their money. Audit action names are kept to one word so later detections can search for them exactly",
     ],
     next: [
       "Read OWASP's Logging Cheat Sheet for what should and shouldn't be logged",
@@ -383,6 +389,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: approvals with an audit row for every change',
         entryId: 'secure-expense-claims-entry-11-approval-workflow',
+      },
+      {
+        label: 'Expense claims: audit rows for reporting-line changes',
+        entryId: 'secure-expense-claims-entry-14-admin-and-seed',
       },
     ],
   },
