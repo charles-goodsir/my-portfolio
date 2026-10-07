@@ -40,6 +40,35 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-19-compose-phase-1',
+    date: '2026-10-07',
+    category: 'Secure Expense Claims',
+    milestone: true,
+    title: 'The whole app in containers, and a limit that came first',
+    workedOn: [
+      'Ran the API and frontend in Docker Compose behind nginx',
+      'Walked every role through the workflow and tested the controls on the container path',
+    ],
+    body: [
+      "Phase 1 is finished. The API and frontend now run in Docker Compose next to Postgres and the blob emulator, with nginx serving the frontend and forwarding /api to the API. Only nginx publishes a port, and only on 127.0.0.1. The API has no published port at all, so from my Mac it doesn't answer, and the only way in is through nginx. In Azure, the Container Apps ingress will play the same role.",
+      "The non-obvious part was a limit I didn't set. nginx rejects request bodies over 1 MB by default, before they reach the API. The API's 5 MB receipt limit would never have applied, and a 2 MB receipt came back as nginx's own HTML 413 page, which the frontend can't read. I raised nginx's limit just above 5 MB so the API stays the control that decides, and checked that the 2 MB upload failed without that line and worked with it.",
+      "Then I tested the controls on the container path. Alice submitted a claim with a receipt, Manny downloaded it under a name the server chose and approved it, Fiona paid it, and Adam's audit log showed all three steps with names. An HTML file renamed to .pdf was still rejected with 415. Most importantly, the dev sign-in that trusts two headers only exists because Compose sets the environment to Development. I ran the same API image as Production and sent Adam's admin headers, and it returned 401. The same headers through Compose returned 200.",
+      'Every layer in front of a control can quietly replace it. A proxy, a gateway or a load balancer with its own default limit decides first, so test controls through the path real traffic takes.',
+    ],
+    tools: ['Docker Compose', 'nginx', 'ASP.NET Core', 'curl'],
+    tags: [
+      'Secure Expense Claims',
+      'containers',
+      'access control',
+      'file upload',
+      'Phase 1',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC34.webp',
+      'SecureExpenseClaims/SEC33.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-18-receipt-uploads-frontend',
     date: '2026-10-07',
     category: 'Secure Expense Claims',

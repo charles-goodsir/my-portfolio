@@ -155,6 +155,9 @@ function SecureExpenseClaims() {
               that a test proves is off in Production
             </li>
             <li>
+              • The whole app in Docker Compose, with nginx as the only way in
+            </li>
+            <li>
               • Integration tests against real Postgres and Azurite in
               containers
             </li>
@@ -165,9 +168,9 @@ function SecureExpenseClaims() {
         <div className="bg-card border border-line rounded-lg shadow-card p-8">
           <h2 className="text-2xl font-bold text-ink mb-6">Status</h2>
           <p className="text-ink-muted">
-            In progress. Phase 0 (threat model, CI and required checks) is done,
-            and Phase 1, the app itself, is in progress. The development sign-in
-            is replaced by Entra ID in Phase 3.
+            In progress. Phase 0 (threat model, CI and required checks) and
+            Phase 1 (the app, running in Docker Compose behind nginx) are done.
+            The development sign-in is replaced by Entra ID in Phase 3.
           </p>
         </div>
       </div>

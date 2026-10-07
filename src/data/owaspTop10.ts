@@ -290,6 +290,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Defeated an account lockout by spoofing X-Forwarded-For so each login attempt looked like a new IP',
       'On the pipeline side, the landing zone authenticates to Azure with workload identity federation (OIDC): a short-lived federated token per run instead of a stored client secret',
       'Added a Development-only sign-in to the expense claims API that trusts user and role headers, so I can test roles before Entra ID is set up. Every other environment gets JWT bearer authentication that rejects everything with a 401. A test runs the app as Production with an admin header and expects a 401, and I checked it catches the mistake by registering the stub everywhere: that test failed',
+      "Checked the same thing on the built container image, not just in tests: the API image run as Production returned 401 to an admin's dev headers, while the same headers through Docker Compose (Development) returned 200",
     ],
     next: [
       "JWT-specific labs, and reviewing the homelab app's own auth flow against OWASP's Authentication Cheat Sheet",
@@ -307,6 +308,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: a sign-in that must never reach production',
         entryId: 'secure-expense-claims-entry-9-dev-sign-in',
+      },
+      {
+        label: 'Expense claims: the dev sign-in off in the Production image',
+        entryId: 'secure-expense-claims-entry-19-compose-phase-1',
       },
     ],
   },
