@@ -315,7 +315,8 @@ export const owaspTop10: OwaspRisk[] = [
         entryId: 'secure-expense-claims-entry-19-compose-phase-1',
       },
       {
-        label: 'Expense claims: a pipeline identity that can only do what it was given',
+        label:
+          'Expense claims: a pipeline identity that can only do what it was given',
         entryId: 'secure-expense-claims-entry-20-pipeline-identity-azure',
       },
     ],

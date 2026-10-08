@@ -52,9 +52,15 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       "Phase 2 puts the app in Azure, so the pipeline needed a way in without stored secrets. GitHub Actions signs in with OIDC as one of two managed identities. The plan identity can read the resource group and read Terraform state, and only pull requests and main can use it. The deploy identity can change things, but Azure only issues it a token for a job running in a GitHub environment that waits for my approval. Both identities live in a separate resource group the pipeline has no rights over, so it can't change its own access.",
       "The first plan failed with AADSTS700213. My repo uses GitHub's immutable OIDC subjects, which include the numeric owner and repo IDs, and I had federated the name-only format. I kept the stricter format: if I delete or rename the repo, someone else can claim its name, but GitHub never reuses the ID. The second failure came from the read-only identity working as designed. With no state yet, terraform init tries to write an empty one, and the plan identity has no write access. I seeded the state once with a temporary role on my own account, removed it afterwards, and PR plans now run without taking a lock.",
       "Then I tested the boundary. The deploy identity's client ID is a plain variable in a public repo, so I pointed the PR plan job at it on purpose. Azure refused with AADSTS700213 because a pull request isn't the approved environment, and the PR couldn't merge. I also caught myself out: a PR merged with its Terraform plan still red, because I'd turned on auto-merge and the new checks weren't required yet. Both are required now.",
-      "Assume anyone can read your identifiers. Your access depends on what the other side checks before it issues a token, so test that by asking for more than you should get.",
+      'Assume anyone can read your identifiers. Your access depends on what the other side checks before it issues a token, so test that by asking for more than you should get.',
     ],
-    tools: ['GitHub Actions', 'Terraform', 'Azure', 'OIDC', 'Managed identities'],
+    tools: [
+      'GitHub Actions',
+      'Terraform',
+      'Azure',
+      'OIDC',
+      'Managed identities',
+    ],
     tags: [
       'Secure Expense Claims',
       'CI/CD pipeline',
