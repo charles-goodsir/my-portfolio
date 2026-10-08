@@ -40,6 +40,41 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-21-drift-and-cancelled-apply',
+    date: '2026-10-08',
+    category: 'Secure Expense Claims',
+    title: 'The plan was right, and I approved it anyway',
+    workedOn: [
+      'Added Postgres Flexible Server injected into the VNet with Entra-only auth, and receipts storage with keys disabled and a subnet firewall',
+      'Traced unexpected drift on the Postgres subnet to Azure, and recovered from a cancelled apply',
+    ],
+    body: [
+      'Postgres and receipt storage went into Azure today. The database sits in its own delegated subnet with no public address, and password login is switched off, so the only admin is a managed identity that will run migrations later. Storage has account keys disabled and a firewall that only admits traffic from the apps subnet. From my laptop, a request to the container came back 403 AuthorizationFailure, which is the firewall rejecting me before any auth is checked.',
+      "The storage PR plan showed 2 to change when I expected 1. The extra change was Terraform trying to remove a Microsoft.Storage service endpoint from the Postgres subnet, and I hadn't added it. The Azure activity log showed the Postgres service itself had written to the subnet a minute after creating the server. I declared the endpoint in code so plans stop fighting it.",
+      "Before that fix was in, though, I merged the first commit and approved its apply with the 2-to-change plan still in it. It removed the endpoint, and I cancelled it partway through creating the storage account. That left the account in Azure but not in Terraform state, and left the state lock held by a run that no longer existed, so the fix's apply failed on the lock. I broke the lease on the state blob, deleted the orphaned account and re-ran the apply.",
+      'An approval gate only checks what the approver actually reads, and once an apply has started, letting it finish and fixing forward usually does less damage than killing it.',
+    ],
+    tools: [
+      'Terraform',
+      'Azure',
+      'PostgreSQL',
+      'Azure Storage',
+      'GitHub Actions',
+    ],
+    tags: [
+      'Secure Expense Claims',
+      'CI/CD pipeline',
+      'drift',
+      'network isolation',
+      'incident',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC42.webp',
+      'SecureExpenseClaims/SEC40.webp',
+      'SecureExpenseClaims/SEC41.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-20-pipeline-identity-azure',
     date: '2026-10-08',
     category: 'Secure Expense Claims',
