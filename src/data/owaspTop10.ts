@@ -71,6 +71,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Switching scanners to Trivy found four storage account misconfigurations tfsec had passed. I fixed two (a network_rules deny default, infrastructure encryption) and accepted two with written #trivy:ignore reasons (GRS replication on an empty account, and queue-only Storage Analytics logging)',
       "The first CI run on the expense claims app failed on three findings. Semgrep flagged the API Dockerfile for having no USER line, and Trivy found HIGH CVEs in both base images. I fixed the pcre2 one with an apk upgrade and accepted the OpenSSL one, which Microsoft hadn't rebuilt yet, with a written reason and an expiry date so the build goes red again if it isn't fixed",
       'Put the expense claims database and receipt storage in Azure with no public path: Postgres in a delegated subnet with Entra-only auth, and storage with account keys disabled and a firewall that returned 403 to my laptop',
+      'Added a weekly drift check that plans the expense claims environment with the read-only identity and goes red on any difference. A tag I added in the portal turned it red with exit code 2, and removing the tag turned it green',
     ],
     next: [
       'Information disclosure / directory listing labs, and a config audit of the mini PC itself against CIS Benchmarks',
@@ -111,6 +112,10 @@ export const owaspTop10: OwaspRisk[] = [
         label:
           'Expense claims: private Postgres and storage, and a cancelled apply',
         entryId: 'secure-expense-claims-entry-21-drift-and-cancelled-apply',
+      },
+      {
+        label: 'Expense claims: a weekly drift check',
+        entryId: 'secure-expense-claims-entry-24-weekly-drift-check',
       },
     ],
   },

@@ -40,6 +40,34 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-24-weekly-drift-check',
+    date: '2026-10-08',
+    category: 'Secure Expense Claims',
+    title: 'A drift check for an environment that is usually not there',
+    milestone: true,
+    workedOn: [
+      'Added a weekly drift check that runs terraform plan -detailed-exitcode with the read-only pipeline identity',
+      'Proved it by tagging a storage account in the portal, then removing the tag',
+    ],
+    body: [
+      "The last step of Phase 2 is a scheduled GitHub Actions workflow that compares Azure with the Terraform code every Monday morning. It plans with the read-only identity and has no apply job and no approval gate, so it can report drift but never fix it. Terraform's -detailed-exitcode returns 0 when everything matches, 1 on an error and 2 on drift, and anything other than 0 turns the run red.",
+      "The twist is that I destroy this environment at the end of every session to keep the cost near zero. A naive check would wake up on Monday, find nothing deployed and go red, wanting to create everything. A check that's always red gets ignored. So the workflow first looks at Terraform state, and if it's empty, it reports the environment as torn down and passes. If someone deleted resources by hand, state would still list them and the plan would catch it.",
+      "To test it, I added a drifttest tag to the receipts storage account in the portal. Nothing happened at first, because changing something in Azure doesn't trigger a GitHub workflow. That's exactly why drift needs a schedule. When I ran the check by hand, it went red with exit code 2 and a plan to remove the tag. After I deleted the tag, the next run was green. Earlier in the phase, an ordinary PR plan caught real drift that I hadn't caused, when Azure added a service endpoint to the Postgres subnet.",
+      'Drift happens outside your repository, so nothing in your repository will notice it unless you go and ask on a schedule.',
+    ],
+    tools: ['GitHub Actions', 'Terraform', 'Azure'],
+    tags: [
+      'Secure Expense Claims',
+      'CI/CD pipeline',
+      'drift',
+      'infrastructure as code',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC49.webp',
+      'SecureExpenseClaims/SEC50.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-23-database-role-and-access-review',
     date: '2026-10-08',
     category: 'Secure Expense Claims',
