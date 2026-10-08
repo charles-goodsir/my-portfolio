@@ -40,6 +40,41 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-23-database-role-and-access-review',
+    date: '2026-10-08',
+    category: 'Secure Expense Claims',
+    title: 'Audit rows the app itself cannot delete',
+    workedOn: [
+      'Added a migration job that creates the API database role with DML-only grants and insert-only audit rows',
+      'Found and removed a leftover pipeline identity with Contributor on the whole subscription',
+    ],
+    body: [
+      "The API now reaches Postgres with its own managed identity, and that identity only has the rights a migration job grants it. The job runs the same image with a --migrate flag, signed in as a separate identity that is the server's Entra admin. It applies migrations, creates the API's role mapped to its object ID, and grants read and write on the app's tables. The audit table only gets SELECT and INSERT. Until now, the rule that audit records can't be edited held only because the API had no endpoint for it. Now the database refuses as well, which a test proves by trying UPDATE, DELETE and ALTER TABLE as that role.",
+      "The first job run failed with 42883: function does not exist. Azure installs its Entra role functions only in the postgres database, and the job was connected to the app's database. Switching databases on the open connection looked like the easy fix, but a quick local test showed Npgsql drops the token provider when it reconnects. So the job opens a second connection to postgres, signed in the same way. I wrote a test that puts a stand-in function in a separate database. With the old code, it fails with the same 42883.",
+      "The leftover service principal from my finished landing zone project, the one in the last entry's screenshot, had more access than that list showed. It still had Contributor on the whole subscription, plus Blob Data Contributor on the entire Terraform state account, which includes this project's state. Everything in this project is scoped to one resource group and one container, and an old identity nobody was watching could have bypassed all of it. I disabled its pipelines and removed both roles.",
+      'Least privilege has to be checked across everything that can reach a resource, including identities left over from finished work.',
+    ],
+    tools: [
+      'Azure Container Apps',
+      'PostgreSQL',
+      'Entra ID',
+      'Azure RBAC',
+      'Npgsql',
+      'xUnit',
+    ],
+    tags: [
+      'Secure Expense Claims',
+      'least privilege',
+      'audit integrity',
+      'access review',
+      'managed identity',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC48.webp',
+      'SecureExpenseClaims/SEC47.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-22-digest-deploy-dev-auth-off',
     date: '2026-10-08',
     category: 'Secure Expense Claims',
@@ -51,7 +86,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       "The API is running in Azure Container Apps now. CI pushes images to GHCR from the same job that scans them with Trivy, so what gets published is exactly what was scanned, and the push step only runs on main. On the PR run it showed as skipped. Terraform pins the image by its sha256 digest rather than a tag, because a tag can be moved to point at different content and a digest can't.",
       "The app's identity needed blob access on the receipts container, but the pipeline's deploy identity is a Contributor, and Contributors can't assign roles. Making it Owner would let it grant anything, including to itself. Instead I gave it Role Based Access Control Administrator with a condition that it can only assign or remove Storage Blob Data Contributor, and Terraform scopes that assignment to the one container.",
-      "Taking a screenshot of the resource group's role assignments turned up something I hadn't meant to leave there. The old landing zone pipeline's service principal still had Contributor on it. That project is finished, but anything that could still sign in as it could change these resources without going through the approval gate. The screenshot shows it because I took it first. I removed the assignment straight after.",
+      "Taking a screenshot of the resource group's role assignments turned up something I hadn't meant to leave there. The old landing zone pipeline's service principal still had Contributor on it. That project is finished, but anything that could still sign in as it could change these resources without going through the approval gate. The screenshot shows it because I took it first. I removed it straight after, and the next entry covers how far its access went.",
       "Locally the API accepts X-Dev-User and X-Dev-Roles headers so I can test each role without Entra. That stub must never run in Azure. With ASPNETCORE_ENVIRONMENT left unset, the container logs Hosting environment: Production, and a request with Admin dev headers got 401, the same as no headers at all. The readiness check returns 503, because the app's identity doesn't have a database role yet.",
       "Review caught two things that the build didn't. A YAML indentation slip nested the image job inside another job, which actionlint rejected. And while pasting the managed identity change, I accidentally deleted the block that registers authentication, health checks and problem details. It still compiled. I only found it by diffing against the version I'd tested.",
       "A green build only tells you the code that's there compiles. To catch a security control that has disappeared, you have to compare against what you meant to ship.",
