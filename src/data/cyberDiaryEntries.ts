@@ -40,6 +40,54 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-26-breaking-the-token-checks',
+    date: '2026-10-09',
+    category: 'Secure Expense Claims',
+    title: 'Breaking each token check to prove it works',
+    workedOn: [
+      'Switched the API to validate Entra access tokens outside Development',
+      'Added tests for wrong audience, wrong tenant, expiry, wrong key, edited roles, alg none and a missing oid',
+    ],
+    body: [
+      "The API now accepts only Entra access tokens outside Development. The non-obvious part was the user ID. By default ASP.NET maps the token's sub claim to the user's ID, but in Entra sub is different for every app a person signs in to. The stable value is oid, the user's object ID, so the API maps that instead and refuses any token that doesn't have one.",
+      "The tests sign tokens with a local RSA key standing in for Entra's, so they run without a network. There's one valid token and seven bad ones: another app's audience, another tenant's issuer, expired past the five-minute clock skew, signed by a different key, roles edited after signing, alg none with no signature, and no oid.",
+      "A test that passes doesn't prove much on its own, so each check got switched off in turn to see whether its test went red. Audience, issuer, lifetime and unsigned tokens all failed the right test. The first attempt at bypassing signature checks only broke the valid-token test, because it failed a different check, so it proved nothing. The version that really switched signatures off turned all three signature tests red.",
+      'Something did go wrong on my side. When I pasted in the new auth block, I replaced too much and deleted authorization, error handling and the rate limiter. The diff review caught it before commit, with all 61 tests failing.',
+      'A security test has only proven something once you have seen it fail with the control switched off.',
+    ],
+    tools: ['ASP.NET Core', 'xUnit', 'Microsoft Entra ID'],
+    tags: ['Secure Expense Claims', 'authentication', 'JWT', 'testing'],
+    screenshots: ['SecureExpenseClaims/SEC55.webp'],
+  },
+  {
+    id: 'secure-expense-claims-entry-25-roles-live-in-entra',
+    date: '2026-10-09',
+    category: 'Secure Expense Claims',
+    title: 'Putting the roles where the admin cannot reach them',
+    workedOn: [
+      'Registered the API and SPA in Entra ID with four app roles and a single scope',
+      'Created four test users and assigned their roles on the API enterprise app',
+    ],
+    body: [
+      'Phase 3 swaps the stub sign-in for Entra ID. I registered the API with four app roles (Employee, Manager, Finance, Admin) and one scope the web app asks for, plus a single-page app registration with no secret. The roles and scope live in a JSON file in the repo with fixed IDs, because role assignments point at the ID while tokens carry the name. If a rebuild generated new IDs, every assignment would quietly stop matching.',
+      "I did this by hand rather than in Terraform. Managing app registrations from the pipeline would mean giving the deploy identity a tenant-wide Graph permission, and the rule so far has been that the pipeline only touches its own resource group. I also switched on assignment required on the API, so a user in the tenant with no role assigned shouldn't get a token for it at all. I'll test that properly in the attack step instead of trusting the setting.",
+      'Roles are assigned in Entra, not in the app, which closes the threat where an Admin grants themselves Finance. I got to see that from the other side when I gave Adam the Employee role by mistake. The only way to fix it was in Entra, by removing the assignment and adding Admin. Nothing inside the app could have changed it.',
+      'If the people who use an app can also change their own permissions in it, the permissions are only a suggestion, so keep the grants somewhere the app cannot write.',
+    ],
+    tools: ['Microsoft Entra ID', 'Azure CLI', 'Microsoft Graph'],
+    tags: [
+      'Secure Expense Claims',
+      'identity',
+      'access control',
+      'least privilege',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC53.webp',
+      'SecureExpenseClaims/SEC54.webp',
+      'SecureExpenseClaims/SEC52.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-24-weekly-drift-check',
     date: '2026-10-08',
     category: 'Secure Expense Claims',
