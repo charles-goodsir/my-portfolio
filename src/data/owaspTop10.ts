@@ -298,6 +298,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Added a Development-only sign-in to the expense claims API that trusts user and role headers, so I can test roles before Entra ID is set up. Every other environment gets JWT bearer authentication that rejects everything with a 401. A test runs the app as Production with an admin header and expects a 401, and I checked it catches the mistake by registering the stub everywhere: that test failed',
       "Checked the same thing on the built container image, not just in tests: the API image run as Production returned 401 to an admin's dev headers, while the same headers through Docker Compose (Development) returned 200",
       "Gave the expense claims pipeline two OIDC identities with no secrets: a read-only plan identity for pull requests, and a deploy identity Azure only issues a token to inside an approval-gated GitHub environment. I pointed a PR job at the deploy identity's public client ID on purpose and Azure refused it",
+      'Checked the dev sign-in once more on the deployed API in Azure Container Apps: the container logged Hosting environment: Production, and a request with Admin dev headers got 401, the same as no headers',
     ],
     next: [
       "JWT-specific labs, and reviewing the homelab app's own auth flow against OWASP's Authentication Cheat Sheet",
@@ -325,6 +326,10 @@ export const owaspTop10: OwaspRisk[] = [
           'Expense claims: a pipeline identity that can only do what it was given',
         entryId: 'secure-expense-claims-entry-20-pipeline-identity-azure',
       },
+      {
+        label: 'Expense claims: the dev login headers do nothing in Azure',
+        entryId: 'secure-expense-claims-entry-22-digest-deploy-dev-auth-off',
+      },
     ],
   },
   {
@@ -344,6 +349,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Added actionlint so the workflow files are checked too, since a misspelled key is still valid YAML. Ran it on a copy of ci.yml with runs-on changed to run-on and it reported 12 errors before I relied on it',
       'Proved the secret scan blocks a merge by opening a PR with a made-up API key. gitleaks failed the required check and the ruleset blocked the merge',
       "Put the expense claims app's money rules in Postgres as well as the API: a check constraint rejects zero or negative amounts, and an xmin concurrency token stops one save overwriting another. Both are proved by integration tests against a real Postgres container, since an in-memory database ignores both",
+      "Expense claims images are pushed to GHCR by the same job that scans them with Trivy, only on main, and Terraform deploys the API pinned to the image's sha256 digest, so a moved tag cannot change what runs",
     ],
     next: [
       'The PortSwigger Insecure Deserialization path, and artifact signing with Sigstore/cosign',
@@ -380,6 +386,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: testing against the real database',
         entryId: 'secure-expense-claims-entry-8-postgres-integration-tests',
+      },
+      {
+        label: 'Expense claims: scanned images deployed by digest',
+        entryId: 'secure-expense-claims-entry-22-digest-deploy-dev-auth-off',
       },
     ],
   },
