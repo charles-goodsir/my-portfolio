@@ -51,6 +51,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       "The API is running in Azure Container Apps now. CI pushes images to GHCR from the same job that scans them with Trivy, so what gets published is exactly what was scanned, and the push step only runs on main. On the PR run it showed as skipped. Terraform pins the image by its sha256 digest rather than a tag, because a tag can be moved to point at different content and a digest can't.",
       "The app's identity needed blob access on the receipts container, but the pipeline's deploy identity is a Contributor, and Contributors can't assign roles. Making it Owner would let it grant anything, including to itself. Instead I gave it Role Based Access Control Administrator with a condition that it can only assign or remove Storage Blob Data Contributor, and Terraform scopes that assignment to the one container.",
+      "Taking a screenshot of the resource group's role assignments turned up something I hadn't meant to leave there. The old landing zone pipeline's service principal still had Contributor on it. That project is finished, but anything that could still sign in as it could change these resources without going through the approval gate. The screenshot shows it because I took it first. I removed the assignment straight after.",
       "Locally the API accepts X-Dev-User and X-Dev-Roles headers so I can test each role without Entra. That stub must never run in Azure. With ASPNETCORE_ENVIRONMENT left unset, the container logs Hosting environment: Production, and a request with Admin dev headers got 401, the same as no headers at all. The readiness check returns 503, because the app's identity doesn't have a database role yet.",
       "Review caught two things that the build didn't. A YAML indentation slip nested the image job inside another job, which actionlint rejected. And while pasting the managed identity change, I accidentally deleted the block that registers authentication, health checks and problem details. It still compiled. I only found it by diffing against the version I'd tested.",
       "A green build only tells you the code that's there compiles. To catch a security control that has disappeared, you have to compare against what you meant to ship.",
@@ -74,6 +75,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'SecureExpenseClaims/SEC44.webp',
       'SecureExpenseClaims/SEC43.webp',
       'SecureExpenseClaims/SEC45.webp',
+      'SecureExpenseClaims/SEC46.webp',
     ],
   },
   {
