@@ -13,6 +13,8 @@ const technologies = [
   'Testcontainers',
   'GitHub Actions',
   'Azure',
+  'Terraform',
+  'Entra ID',
   'STRIDE',
 ]
 
@@ -161,6 +163,28 @@ function SecureExpenseClaims() {
               • Integration tests against real Postgres and Azurite in
               containers
             </li>
+            <li>
+              • Terraform deploys from GitHub Actions with OIDC and no secrets:
+              a read-only identity plans on PRs, and a deploy identity only gets
+              a token inside an approval-gated environment
+            </li>
+            <li>
+              • The API in Azure Container Apps, pinned to the digest of an
+              image Trivy scanned, with Postgres and storage on private
+              networking and no keys or passwords
+            </li>
+            <li>
+              • A database role for the API that can only read and insert audit
+              rows, so the database refuses edits to the audit trail
+            </li>
+            <li>
+              • A weekly drift check that passes when the environment is torn
+              down and went red on a tag added in the portal
+            </li>
+            <li>
+              • App roles held in Entra ID, and seven bad-token tests that each
+              fail when their check is switched off
+            </li>
           </ul>
         </div>
 
@@ -168,9 +192,11 @@ function SecureExpenseClaims() {
         <div className="bg-card border border-line rounded-lg shadow-card p-8">
           <h2 className="text-2xl font-bold text-ink mb-6">Status</h2>
           <p className="text-ink-muted">
-            In progress. Phase 0 (threat model, CI and required checks) and
-            Phase 1 (the app, running in Docker Compose behind nginx) are done.
-            The development sign-in is replaced by Entra ID in Phase 3.
+            In progress. Phase 0 (threat model, CI and required checks), Phase 1
+            (the app in Docker Compose behind nginx) and Phase 2 (deployment to
+            Azure through Terraform) are done. Phase 3 is replacing the
+            development sign-in with Entra ID: the app roles and token checks
+            are in.
           </p>
         </div>
       </div>
