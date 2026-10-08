@@ -405,6 +405,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Both risk assessments so far (the homelab and the visitor map) list detection as a gap: nothing I have built alerts on unusual traffic yet',
       'The expense claims app writes an audit row for every status change, with who did it from the signed-in identity, in the same transaction as the change. That covers logging the actions that matter, but nothing alerts on them yet',
       "Changing someone's manager writes its own audit row with the old and new manager, because it decides who can approve their money. Audit action names are kept to one word so later detections can search for them exactly",
+      "The expense claims API's database role only has SELECT and INSERT on the audit table, so the database refuses edits even if the app tried. A test signs in as that role and checks UPDATE, DELETE and ALTER TABLE all fail",
     ],
     next: [
       "Read OWASP's Logging Cheat Sheet for what should and shouldn't be logged",
@@ -420,6 +421,11 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: audit rows for reporting-line changes',
         entryId: 'secure-expense-claims-entry-14-admin-and-seed',
+      },
+      {
+        label: 'Expense claims: audit rows the app itself cannot delete',
+        entryId:
+          'secure-expense-claims-entry-23-database-role-and-access-review',
       },
     ],
   },
