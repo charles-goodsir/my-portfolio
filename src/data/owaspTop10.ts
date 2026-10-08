@@ -27,6 +27,7 @@ export const owaspTop10: OwaspRisk[] = [
       "Added the approval workflow with each rule in the query that loads the claim: a manager only finds their direct reports' claims, finance only finds approved ones, and nobody finds their own. I tested self-approval with data that should never exist, a user recorded as their own manager, and removing the check failed that test",
       'Receipt downloads follow the same rules as the claim, reusing the manager and finance queries rather than writing them again. Anyone else gets a 404',
       "Gave the Admin role its own endpoints with no approve or pay permissions, so an admin calling approve gets a 403. Changing someone's manager is tested end to end: the old manager gets a 404 on the claim and the new one can approve it",
+      'Moved the expense claims roles into Entra ID as app roles assigned on the enterprise app, with assignment required, so nobody inside the app, Admin included, can change their own role',
     ],
     next: [
       "PortSwigger's Access Control and Server-Side Request Forgery learning paths",
@@ -50,6 +51,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: an admin who can move people but not money',
         entryId: 'secure-expense-claims-entry-14-admin-and-seed',
+      },
+      {
+        label: 'Expense claims: roles kept where the admin cannot reach them',
+        entryId: 'secure-expense-claims-entry-25-roles-live-in-entra',
       },
     ],
   },
@@ -304,6 +309,7 @@ export const owaspTop10: OwaspRisk[] = [
       "Checked the same thing on the built container image, not just in tests: the API image run as Production returned 401 to an admin's dev headers, while the same headers through Docker Compose (Development) returned 200",
       "Gave the expense claims pipeline two OIDC identities with no secrets: a read-only plan identity for pull requests, and a deploy identity Azure only issues a token to inside an approval-gated GitHub environment. I pointed a PR job at the deploy identity's public client ID on purpose and Azure refused it",
       'Checked the dev sign-in once more on the deployed API in Azure Container Apps: the container logged Hosting environment: Production, and a request with Admin dev headers got 401, the same as no headers',
+      'Switched the expense claims API to Entra access tokens, using oid rather than sub as the user ID. Tests reject seven bad tokens (wrong audience, wrong tenant, expired, wrong key, edited roles, alg none, no oid), and I switched each check off in turn to watch its test fail',
     ],
     next: [
       "JWT-specific labs, and reviewing the homelab app's own auth flow against OWASP's Authentication Cheat Sheet",
@@ -334,6 +340,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: the dev login headers do nothing in Azure',
         entryId: 'secure-expense-claims-entry-22-digest-deploy-dev-auth-off',
+      },
+      {
+        label: 'Expense claims: breaking each token check to prove it works',
+        entryId: 'secure-expense-claims-entry-26-breaking-the-token-checks',
       },
     ],
   },
