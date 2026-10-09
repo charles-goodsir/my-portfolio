@@ -82,6 +82,7 @@ export const owaspTop10: OwaspRisk[] = [
       "The first CI run on the expense claims app failed on three findings. Semgrep flagged the API Dockerfile for having no USER line, and Trivy found HIGH CVEs in both base images. I fixed the pcre2 one with an apk upgrade and accepted the OpenSSL one, which Microsoft hadn't rebuilt yet, with a written reason and an expiry date so the build goes red again if it isn't fixed",
       'Put the expense claims database and receipt storage in Azure with no public path: Postgres in a delegated subnet with Entra-only auth, and storage with account keys disabled and a firewall that returned 403 to my laptop',
       'Added a weekly drift check that plans the expense claims environment with the read-only identity and goes red on any difference. A tag I added in the portal turned it red with exit code 2, and removing the tag turned it green',
+      'Registered the expense claims sign-in URL as a single-page app, which uses PKCE and no secret, after the Web platform type broke sign-in with AADSTS9002326. I removed the Web entry so nobody can attach a client secret to it. Review also caught an environment variable name with one underscore instead of two that Terraform accepted as valid',
     ],
     next: [
       'Information disclosure / directory listing labs, and a config audit of the mini PC itself against CIS Benchmarks',
@@ -126,6 +127,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: a weekly drift check',
         entryId: 'secure-expense-claims-entry-24-weekly-drift-check',
+      },
+      {
+        label: 'Expense claims: real sign-in in Azure, and the platform type',
+        entryId: 'secure-expense-claims-entry-28-entra-sign-in-in-azure',
       },
     ],
   },
