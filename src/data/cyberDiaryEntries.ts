@@ -40,6 +40,31 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-27-assignment-required-wasnt',
+    date: '2026-10-09',
+    category: 'Secure Expense Claims',
+    title: 'The setting that said nobody else could get in',
+    workedOn: [
+      'Found that an unassigned tenant user could get a token for the API',
+      'Required assignment on the web app and made the API reject tokens with no roles',
+    ],
+    body: [
+      "When I set up Entra for the expense claims API, I turned on assignment required on the API's enterprise app and wrote in my notes that unassigned users wouldn't get a token for it. Only four test users had roles. The first time I ran the web app against real Entra, my browser was already signed in to the tenant as me, and the app said Signed in as Charles Goodsir. I had no role assignment at all.",
+      "Entra had issued my account an access token for the API, and the API had accepted it. Because the app creates a user's row on their first valid token, I also had a row in the Users table. My token carried no roles, so every real endpoint would have returned 403, but I could still reach the who-am-I endpoint and leave a record behind. The cause is where Entra checks assignment. It's enforced on the app you sign in to, which was the web app, and that still had it switched off. Setting it on the API didn't stop a different client app getting tokens for it.",
+      "I fixed it in two places so that one wrong setting can't reopen it. The web app now requires assignment, with only the four test users assigned. The API now refuses any token with no roles before it creates a user, and a test proves that by creating no row. To see both layers work with real tokens, I added myself back to the web app with no role and signed in. Entra let me through, and the API answered the who-am-I call with a 401. When I removed myself again, I got Microsoft's AADSTS50105 refusal page instead. Alice and Manny still submitted and approved a claim.",
+      'A security setting is only a claim until you try to get past it as someone it should stop, and the first person worth trying is yourself.',
+    ],
+    tools: ['Microsoft Entra ID', 'ASP.NET Core', 'MSAL'],
+    tags: ['Secure Expense Claims', 'identity', 'access control', 'finding'],
+    screenshots: [
+      'SecureExpenseClaims/SEC56.webp',
+      'SecureExpenseClaims/SEC57.webp',
+      'SecureExpenseClaims/SEC58.webp',
+      'SecureExpenseClaims/SEC60.webp',
+      'SecureExpenseClaims/SEC59.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-26-breaking-the-token-checks',
     date: '2026-10-09',
     category: 'Secure Expense Claims',

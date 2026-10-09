@@ -28,6 +28,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Receipt downloads follow the same rules as the claim, reusing the manager and finance queries rather than writing them again. Anyone else gets a 404',
       "Gave the Admin role its own endpoints with no approve or pay permissions, so an admin calling approve gets a 403. Changing someone's manager is tested end to end: the old manager gets a 404 on the claim and the new one can approve it",
       'Moved the expense claims roles into Entra ID as app roles assigned on the enterprise app, with assignment required, so nobody inside the app, Admin included, can change their own role',
+      "Found that my own unassigned account could still get a token for the expense claims API, because Entra checks assignment on the app you sign in to and the web app didn't require it. Fixed it twice: the web app now requires assignment, and the API rejects any token with no roles before it creates a user",
     ],
     next: [
       "PortSwigger's Access Control and Server-Side Request Forgery learning paths",
@@ -55,6 +56,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: roles kept where the admin cannot reach them',
         entryId: 'secure-expense-claims-entry-25-roles-live-in-entra',
+      },
+      {
+        label: 'Expense claims: the setting that said nobody else could get in',
+        entryId: 'secure-expense-claims-entry-27-assignment-required-wasnt',
       },
     ],
   },
