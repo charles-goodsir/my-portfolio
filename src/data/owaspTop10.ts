@@ -88,6 +88,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Put the expense claims database and receipt storage in Azure with no public path: Postgres in a delegated subnet with Entra-only auth, and storage with account keys disabled and a firewall that returned 403 to my laptop',
       'Added a weekly drift check that plans the expense claims environment with the read-only identity and goes red on any difference. A tag I added in the portal turned it red with exit code 2, and removing the tag turned it green',
       'Registered the expense claims sign-in URL as a single-page app, which uses PKCE and no secret, after the Web platform type broke sign-in with AADSTS9002326. I removed the Web entry so nobody can attach a client secret to it. Review also caught an environment variable name with one underscore instead of two that Terraform accepted as valid',
+      "On the mini PC, traced a timeout to a DOCKER-USER chain I'd written months earlier that drops forwarded container traffic except allowed ports. ufw status listed an 8080 rule that wasn't the one letting traffic through, so I read the loaded rules and added a RETURN line for the new port",
     ],
     next: [
       'Information disclosure / directory listing labs, and a config audit of the mini PC itself against CIS Benchmarks',
@@ -136,6 +137,11 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: real sign-in in Azure, and the platform type',
         entryId: 'secure-expense-claims-entry-28-entra-sign-in-in-azure',
+      },
+      {
+        label:
+          'Personal ops: the firewall rules actually loaded on the mini PC',
+        entryId: 'personal-ops-platform-entry-1-mcp-foundation-firewall',
       },
     ],
   },
@@ -325,6 +331,7 @@ export const owaspTop10: OwaspRisk[] = [
       "Gave the expense claims pipeline two OIDC identities with no secrets: a read-only plan identity for pull requests, and a deploy identity Azure only issues a token to inside an approval-gated GitHub environment. I pointed a PR job at the deploy identity's public client ID on purpose and Azure refused it",
       'Checked the dev sign-in once more on the deployed API in Azure Container Apps: the container logged Hosting environment: Production, and a request with Admin dev headers got 401, the same as no headers',
       'Switched the expense claims API to Entra access tokens, using oid rather than sub as the user ID. Tests reject seven bad tokens (wrong audience, wrong tenant, expired, wrong key, edited roles, alg none, no oid), and I switched each check off in turn to watch its test fail',
+      'Gave my self-hosted MCP server bearer token auth that accepts more than one token so I can rotate them, with hashed constant-time compares and a Host allowlist. No token, a wrong token, Basic auth and a spoofed Host got 401, 401, 401 and 403',
     ],
     next: [
       "JWT-specific labs, and reviewing the homelab app's own auth flow against OWASP's Authentication Cheat Sheet",
@@ -359,6 +366,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: breaking each token check to prove it works',
         entryId: 'secure-expense-claims-entry-26-breaking-the-token-checks',
+      },
+      {
+        label: 'Personal ops: bearer token auth on my own MCP server',
+        entryId: 'personal-ops-platform-entry-1-mcp-foundation-firewall',
       },
     ],
   },

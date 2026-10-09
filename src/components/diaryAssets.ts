@@ -17,6 +17,7 @@ const screenshotModules = import.meta.glob(
     '../assets/CTFMap/*.webp',
     '../assets/SecureExpenseClaims/*.webp',
     '../assets/PortfolioSite/*.webp',
+    '../assets/PersonalOps/*.webp',
   ],
   { eager: true, import: 'default' },
 ) as Record<string, string>
