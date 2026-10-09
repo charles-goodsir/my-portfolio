@@ -40,6 +40,41 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-28-entra-sign-in-in-azure',
+    date: '2026-10-09',
+    category: 'Secure Expense Claims',
+    title: 'Real sign-in in Azure, and the platform type that mattered',
+    workedOn: [
+      'Built the web app into the API image so both are served from one origin',
+      'Deployed with Entra token validation settings and walked every role in Azure',
+    ],
+    body: [
+      "To get Entra sign-in running in Azure, the API image now builds the React app and serves it from the same Container App, so the browser only talks to one origin and there are no CORS rules to get wrong. The Entra client and tenant IDs are baked into the JavaScript at build time. That made me accept something I'd been treating as private. The images are public on GHCR, so anyone can read those IDs from the bundle. They're identifiers, not credentials, and nothing in the app depends on them being hidden.",
+      "The first sign-in in Azure got through the Microsoft login page and then went blank, with AADSTS9002326 in the console. I'd added the Container App's URL to the app registration under the Web platform instead of Single-page application. Entra treats those differently. A Web app is expected to swap the sign-in code for a token on a server using a client secret, while a single-page app does it from the browser with PKCE and no secret. I moved the URL to the right platform and removed the Web entry, so there's no place for anyone to add a client secret to an app that should never have one.",
+      "Review caught two config mistakes before they reached Azure. One environment variable name had a single underscore where it needed two, so the API would have read a setting nobody uses, kept no Authority and rejected every token. The image digest also hadn't been bumped, which would have redeployed the old build. Terraform validate passed both, because to Terraform they're just strings. The secret scanner also flagged the API's client ID twice. I marked those single lines as reviewed with an inline allow comment instead of loosening the rule, and squashed the commits so no unmarked copy stayed in the PR's history.",
+      'With that fixed, the whole flow worked in Azure with real Entra users. Alice submitted a claim with a receipt, Manny approved it, Fiona paid it, and Adam set the reporting line through the audited admin page. My own unassigned account was refused by Entra before it reached the app.',
+      'Configuration fails silently in a way code rarely does, so read the values in a plan or a registration, not just whether they were accepted.',
+    ],
+    tools: [
+      'Microsoft Entra ID',
+      'Azure Container Apps',
+      'Terraform',
+      'Docker',
+      'Gitleaks',
+    ],
+    tags: [
+      'Secure Expense Claims',
+      'identity',
+      'OAuth',
+      'configuration',
+      'deployment',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC62.webp',
+      'SecureExpenseClaims/SEC61.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-27-assignment-required-wasnt',
     date: '2026-10-09',
     category: 'Secure Expense Claims',
