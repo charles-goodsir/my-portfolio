@@ -40,6 +40,35 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-29-twenty-eight-attacks',
+    date: '2026-10-09',
+    category: 'Secure Expense Claims',
+    title: 'Attacking my own access control with real tokens',
+    milestone: true,
+    workedOn: [
+      'Wrote a script that runs 28 access control attacks against the deployed app',
+      'Ran it in Azure with real Entra ID tokens for each test user',
+    ],
+    body: [
+      "To finish Phase 3 I attacked the app the way a signed-in user would. A script takes real Entra access tokens for Alice, Manny, Fiona and Adam, sets up its own claims, then tries 28 things each user shouldn't be able to do: read someone else's claim or receipt by ID, approve or pay without the role, approve a claim from someone who isn't your report, approve or pay your own claim, smuggle a status field into a new claim, pay the same claim twice, and send forged tokens. Every attack has its expected status written in the script before it runs, and the script fails if any of them gets through.",
+      "Before trusting a list of passes, I checked the script could fail. I ran it against a copy of the API with the ownership check removed from the claim read endpoint, and it reported the IDOR with a 200 where it expected 404. Then I ran it against Azure. All 28 were refused. Missing a role got 403, a claim outside your scope got 404, the same answer as an ID that doesn't exist, and the forged tokens got 401. That included a genuine Microsoft-signed token issued for Graph, Alice's token with every role added, and her token resent with alg none.",
+      'Getting the tokens into the script was harder than the attacks. Pasting did nothing, because a macOS terminal accepts at most 1024 characters on an input line and an access token is longer, so the script now reads the clipboard instead. Later a separate check looked as if signing out had revoked a token, until I found that copying the command had replaced the token on the clipboard. With that fixed, a token copied before sign-out still worked afterwards, which is how bearer tokens behave. I wrote it up as a known gap.',
+      "You can trust a test suite once you've watched it catch the thing it's for, and a security script is no different.",
+    ],
+    tools: ['Bash', 'curl', 'Microsoft Entra ID', 'Azure Container Apps'],
+    tags: [
+      'Secure Expense Claims',
+      'access control',
+      'IDOR',
+      'penetration testing',
+      'JWT',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC64.webp',
+      'SecureExpenseClaims/SEC65.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-28-entra-sign-in-in-azure',
     date: '2026-10-09',
     category: 'Secure Expense Claims',

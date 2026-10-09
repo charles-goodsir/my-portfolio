@@ -1,4 +1,43 @@
 import { Link } from 'react-router'
+import ScreenshotFigure from '../ui/ScreenshotFigure'
+import attacksImg from '../../assets/SecureExpenseClaims/SEC64.webp'
+import devHeadersImg from '../../assets/SecureExpenseClaims/SEC43.webp'
+import rolesImg from '../../assets/SecureExpenseClaims/SEC52.webp'
+import driftImg from '../../assets/SecureExpenseClaims/SEC49.webp'
+
+const images = [
+  {
+    src: attacksImg,
+    alt: 'Terminal output of the attack script listing 28 access control attacks, each marked PASS with the status code the app returned',
+    width: 1372,
+    height: 1142,
+    caption:
+      'The attack script against the deployed app with real Entra tokens. All 28 attacks were refused with the status code written down before the run.',
+  },
+  {
+    src: devHeadersImg,
+    alt: 'Terminal showing curl requests to the deployed API: 401 with no headers, 401 with Admin dev headers, and 503 from the readiness check',
+    width: 1224,
+    height: 794,
+    caption:
+      'The development sign-in switched off in Azure: Admin dev headers get the same 401 as no headers at all.',
+  },
+  {
+    src: rolesImg,
+    alt: 'Entra ID enterprise application page listing the test users and the app role assigned to each',
+    width: 2296,
+    height: 1250,
+    caption:
+      'Roles assigned in Entra ID, where nobody inside the app, Admin included, can change them.',
+  },
+  {
+    src: driftImg,
+    alt: 'Terraform plan output in GitHub Actions showing a drifttest tag to be removed and the job failing with exit code 2',
+    width: 2056,
+    height: 630,
+    caption: 'The weekly drift check going red on a tag I added in the portal.',
+  },
+]
 
 const technologies = [
   '.NET 10',
@@ -185,6 +224,15 @@ function SecureExpenseClaims() {
               • App roles held in Entra ID, and seven bad-token tests that each
               fail when their check is switched off
             </li>
+            <li>
+              • Entra sign-in working end to end in Azure, with the web app
+              served from the API&apos;s origin and registered as a single-page
+              app with no secret
+            </li>
+            <li>
+              • An attack script that tries 28 access control attacks with real
+              tokens. It caught a planted IDOR, and all 28 were refused in Azure
+            </li>
           </ul>
         </div>
 
@@ -193,11 +241,27 @@ function SecureExpenseClaims() {
           <h2 className="text-2xl font-bold text-ink mb-6">Status</h2>
           <p className="text-ink-muted">
             In progress. Phase 0 (threat model, CI and required checks), Phase 1
-            (the app in Docker Compose behind nginx) and Phase 2 (deployment to
-            Azure through Terraform) are done. Phase 3 is replacing the
-            development sign-in with Entra ID: the app roles and token checks
-            are in.
+            (the app in Docker Compose behind nginx), Phase 2 (deployment to
+            Azure through Terraform) and Phase 3 (Entra ID sign-in, proved by
+            attacking it) are done.
           </p>
+        </div>
+
+        {/* Screenshots */}
+        <div className="bg-card border border-line rounded-lg shadow-card p-8 mt-8">
+          <h2 className="text-2xl font-bold text-ink mb-6">Screenshots</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {images.map((image) => (
+              <ScreenshotFigure
+                key={image.src}
+                src={image.src}
+                alt={image.alt}
+                width={image.width}
+                height={image.height}
+                caption={image.caption}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -29,6 +29,7 @@ export const owaspTop10: OwaspRisk[] = [
       "Gave the Admin role its own endpoints with no approve or pay permissions, so an admin calling approve gets a 403. Changing someone's manager is tested end to end: the old manager gets a 404 on the claim and the new one can approve it",
       'Moved the expense claims roles into Entra ID as app roles assigned on the enterprise app, with assignment required, so nobody inside the app, Admin included, can change their own role',
       "Found that my own unassigned account could still get a token for the expense claims API, because Entra checks assignment on the app you sign in to and the web app didn't require it. Fixed it twice: the web app now requires assignment, and the API rejects any token with no roles before it creates a user",
+      'Attacked the deployed expense claims app with real Entra tokens for each user: 28 access control attacks, including IDOR on claims and receipts, self-approval, smuggled status fields, double payment and forged tokens. All 28 were refused, after I checked the script reported a planted IDOR',
     ],
     next: [
       "PortSwigger's Access Control and Server-Side Request Forgery learning paths",
@@ -60,6 +61,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: the setting that said nobody else could get in',
         entryId: 'secure-expense-claims-entry-27-assignment-required-wasnt',
+      },
+      {
+        label: 'Expense claims: 28 access control attacks with real tokens',
+        entryId: 'secure-expense-claims-entry-29-twenty-eight-attacks',
       },
     ],
   },
