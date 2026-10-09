@@ -72,6 +72,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     screenshots: [
       'SecureExpenseClaims/SEC62.webp',
       'SecureExpenseClaims/SEC61.webp',
+      'SecureExpenseClaims/SEC63.webp',
     ],
   },
   {
