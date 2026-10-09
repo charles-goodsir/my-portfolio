@@ -40,6 +40,38 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-1-mcp-foundation-firewall',
+    date: '2026-10-09',
+    category: 'Personal Ops Platform',
+    title: "An MCP server on my own hardware, and a firewall I'd forgotten",
+    workedOn: [
+      'Set up a TypeScript monorepo with Postgres, pgvector and an MCP server on the mini PC',
+      'Added bearer token auth with rotation and a Host allowlist, gitleaks, CI and a Docker Compose deployment',
+    ],
+    body: [
+      "I set up the foundation for a self-hosted platform on my home mini PC. It's a TypeScript monorepo with Postgres and pgvector, and an MCP server so Claude can call tools that run on my own hardware. Each step went through its own PR, and it ends with a gitleaks pre-commit hook, CI and a Docker Compose deployment. The detail that surprised me came early. When an MCP server talks over stdio, stdout is the protocol channel, so one log line printed to stdout would corrupt the connection. All logs have to go to stderr.",
+      'For the HTTP transport I used bearer token auth with more than one valid token at a time, so I can rotate one in before removing the old one. Tokens are hashed before a constant-time compare, and requests with a Host header that isn\'t on an allowlist are rejected. I tested it by sending no token, a wrong token, a Basic auth header and a spoofed Host header, and got 401, 401, 401 and 403. When I connected Claude Code, it failed with a 401. I had pasted my token without the word "Bearer" in front of it, so my own auth check rejected me, which at least showed it was working.',
+      "The deployment caught me out. The server was listening on the mini PC and answered locally, but connections from my laptop timed out. I was first told that ufw doesn't apply to Docker ports, then told to add a ufw allow rule. Both were wrong for my box. Months earlier I had added a custom DOCKER-USER chain that drops all forwarded container traffic except port 8080. ufw status showed an 8080 rule that wasn't what let 8080 through. I added a RETURN line for port 3000 and reloaded, and it worked.",
+      'I kept the repo private, which on GitHub Free means no branch protection. Every change still goes through a PR, but nothing enforces it until I make the repo public.',
+      'Read the firewall rules that are actually loaded before trusting a summary of them, including your own summary from months ago.',
+    ],
+    tools: [
+      'TypeScript',
+      'MCP',
+      'PostgreSQL',
+      'pgvector',
+      'Docker Compose',
+      'ufw',
+      'gitleaks',
+    ],
+    tags: ['Personal Ops Platform', 'authentication', 'firewall', 'homelab'],
+    screenshots: [
+      'PersonalOps/PO1.webp',
+      'PersonalOps/PO2.webp',
+      'PersonalOps/PO3.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-29-twenty-eight-attacks',
     date: '2026-10-09',
     category: 'Secure Expense Claims',
