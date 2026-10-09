@@ -70,6 +70,22 @@ test('every notebook has a hover description', () => {
     )
 })
 
+test('every notebook gets its own cover colour', () => {
+  const diary = read('src/components/CyberDiary.tsx')
+  const list = diary.match(/const covers = \[([^\]]*)\]/)?.[1] ?? ''
+  const covers = [...list.matchAll(/'(bg-[\w-]+)'/g)].map((m) => m[1])
+  assert.equal(
+    new Set(covers).size,
+    covers.length,
+    'a cover colour is listed twice',
+  )
+  const notebooks = new Set(cyberDiaryEntries.map((e) => e.category)).size
+  assert.ok(
+    notebooks <= covers.length,
+    `${notebooks} notebooks but only ${covers.length} cover colours, so colours would repeat`,
+  )
+})
+
 test('OWASP risks are A01 to A10 and link to real diary entries', () => {
   assert.deepEqual(
     owaspTop10.map((r) => r.rank.slice(0, 3)),
