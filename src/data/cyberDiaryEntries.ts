@@ -40,6 +40,34 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-2-local-knowledge-base',
+    date: '2026-10-10',
+    category: 'Personal Ops Platform',
+    title: 'A notes search that never leaves the mini PC',
+    workedOn: [
+      'Added a knowledge base with local Ollama embeddings so Claude can answer from my notes and cite the file',
+      "Moved the CI Postgres image to GitHub's registry by digest, and fixed file watching and chunk boundaries on the real host",
+    ],
+    body: [
+      'I built a knowledge base into my personal ops platform, so Claude can answer questions from my own notes and say which file the answer came from. The embeddings run locally with Ollama on the mini PC instead of a hosted API, because embedding means sending every note in full, the opposite of keeping data at home. The non-obvious detail is that the model, nomic-embed-text, expects a "search_document:" prefix on stored text and "search_query:" on questions. Leave them off and nothing fails, the results just get worse.',
+      "The first PR went red before my code even ran. GitHub's runners couldn't pull the Postgres image from Docker Hub, first hitting the anonymous rate limit and then timing out on its login server. A Docker Hub token didn't help, because the login endpoint was down from my laptop too. I copied the exact image, same digest, to GitHub's own registry, and CI now pulls it with the token every run already gets. Later, an end-to-end test caught a bug no unit test could: search failed because the MCP server's container had no address for Ollama and looked for it on itself. I also merged one PR before its own check had run, which GitHub Free won't stop you doing.",
+      "File watching behaved differently on my Mac than on the mini PC. On Docker Desktop, deleting a note never reached the container, so the index kept a file that no longer existed. On the mini PC's native Linux mount the same delete was picked up straight away. I kept a 15-minute rescan as a backstop and proved the behaviour on the machine it runs on. The first full index of 102 notes took about 25 minutes on the CPU, which is the price of keeping embeddings local.",
+      "Searching my real notes showed one more flaw: a chunk that started halfway through a word, because a long bullet list was being cut every 1500 characters. I changed the splitter to break at lines, then sentences, then words, and added a version number to each file's hash so the mini PC would re-index instead of skipping files whose content hadn't changed.",
+      'A test only proves the environment it ran in, so prove the rest on the real target.',
+    ],
+    tools: [
+      'Ollama',
+      'pgvector',
+      'PostgreSQL',
+      'MCP',
+      'Docker Compose',
+      'GitHub Actions',
+      'GHCR',
+    ],
+    tags: ['Personal Ops Platform', 'data privacy', 'supply chain', 'homelab'],
+    screenshots: ['PersonalOps/PO4.webp', 'PersonalOps/PO5.webp'],
+  },
+  {
     id: 'personal-ops-platform-entry-1-mcp-foundation-firewall',
     date: '2026-10-09',
     category: 'Personal Ops Platform',
