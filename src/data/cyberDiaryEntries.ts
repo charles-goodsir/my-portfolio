@@ -66,7 +66,11 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'GitHub Actions',
     ],
     tags: ['Personal Ops Platform', 'data privacy', 'supply chain', 'homelab'],
-    screenshots: ['PersonalOps/PO4.webp', 'PersonalOps/PO5.webp'],
+    screenshots: [
+      'PersonalOps/PO4.webp',
+      'PersonalOps/PO5.webp',
+      'PersonalOps/PO6.webp',
+    ],
   },
   {
     id: 'personal-ops-platform-entry-1-mcp-foundation-firewall',
