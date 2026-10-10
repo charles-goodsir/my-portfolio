@@ -40,6 +40,39 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-2-local-knowledge-base',
+    date: '2026-10-10',
+    category: 'Personal Ops Platform',
+    title: 'A knowledge base that stays on my own hardware',
+    milestone: true,
+    workedOn: [
+      'Added notes search to the MCP server, with embeddings from a local Ollama model on the mini PC',
+      "Moved the CI database image from Docker Hub to GitHub's registry, pinned by digest",
+      'Next: the finance agent',
+    ],
+    body: [
+      'I added a knowledge base to my personal ops platform so Claude can answer questions from my own notes and cite the file each answer came from. The control I cared about was keeping the notes at home. Embedding a note sends all of it to the model, so I run the embedding model locally with Ollama on the mini PC instead of calling a hosted API. Ollama publishes no port, the notes folder is mounted read-only, and the notes directory is in .gitignore and .dockerignore so a note can\'t end up in git or in an image. One detail surprised me: nomic-embed-text expects "search_document:" in front of stored text and "search_query:" in front of questions, and leaving them off makes the results worse without any error.',
+      "The first PR failed before any of my code ran. GitHub's runners couldn't pull the Postgres image from Docker Hub. Anonymous pulls hit the rate limit, then the login server timed out. A Docker Hub token didn't help, because the same login endpoint timed out from my laptop too. I copied the image to GitHub's own registry with docker buildx imagetools create, which keeps the digest identical, so the pin in CI still names the exact image I tested. CI pulls it with the token every run already gets, so there's no long-lived secret to manage. I also merged one PR before its own check finished, which GitHub Free doesn't block on a private repo.",
+      "Testing on the real target caught two problems. In the deployed stack, search failed because the MCP server's container had no address for Ollama and looked for it on itself, which no unit test could see. On my Mac, Docker Desktop never passed a file delete into the container, so the index kept a note I had removed. On the mini PC's native Linux mount the same delete showed up straight away, and a 15-minute rescan stays as a backstop. The first index of 102 notes took about 25 minutes on CPU, which is the cost of keeping embeddings local.",
+      "Searching my real notes turned up one more bug: a chunk that started halfway through a word. A long bullet list was being cut every 1500 characters. The splitter now breaks at lines, then sentences, then words, and a chunker version in each file's hash makes the mini PC re-index when the chunking changes.",
+      'A test proves the environment it ran in, so I prove the rest on the machine the service runs on.',
+    ],
+    tools: [
+      'TypeScript',
+      'MCP',
+      'Ollama',
+      'pgvector',
+      'Docker Compose',
+      'GitHub Actions',
+    ],
+    tags: ['Personal Ops Platform', 'data privacy', 'supply chain', 'homelab'],
+    screenshots: [
+      'PersonalOps/PO4.webp',
+      'PersonalOps/PO5.webp',
+      'PersonalOps/PO6.webp',
+    ],
+  },
+  {
     id: 'personal-ops-platform-entry-1-mcp-foundation-firewall',
     date: '2026-10-09',
     category: 'Personal Ops Platform',
