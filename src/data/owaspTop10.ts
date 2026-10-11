@@ -166,6 +166,7 @@ export const owaspTop10: OwaspRisk[] = [
       "Split Dependabot's npm updates so major versions are kept out of the auto-merged PR, after one grouped PR of 16 updates failed npm ci because TypeScript 7 broke typescript-eslint's peer range. Only explicit minor and patch updates auto-merge, and only once CI passes. Majors now come as one grouped PR that I review, after @eslint/js 10 failed on its own because it needed eslint 10 to land with it",
       'In the expense claims app, made NuGet fail the restore on high and critical advisories instead of using dotnet list package --vulnerable, which exits 0 even when it finds something. Tested it by adding System.Text.Json 8.0.4, and the restore failed with NU1903',
       "Watched Dependabot auto-merge a patch update one second after the secret scan passed, while four other checks were still running. Auto-merge waits for required checks, and the ruleset didn't require any yet. All five passed, but nothing would have stopped a failure",
+      "When Docker Hub rate-limited and then timed out my CI, I copied the Postgres image by its exact digest to GitHub's own registry, so CI pulls the same bytes with the token every run already has",
     ],
     next: ['Generate an SBOM for the app'],
     tools: ['Dependabot', 'Trivy', 'gitleaks', 'NuGet audit'],
@@ -202,6 +203,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: "Expense claims: an auto-merge that didn't wait for CI",
         entryId: 'secure-expense-claims-entry-3-auto-merge-required-checks',
+      },
+      {
+        label: "Personal ops: a CI image copied by digest to GitHub's registry",
+        entryId: 'personal-ops-platform-entry-2-local-knowledge-base',
       },
     ],
   },
