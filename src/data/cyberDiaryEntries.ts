@@ -40,7 +40,6 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
-<<<<<<< HEAD
     id: 'personal-ops-platform-entry-3-finance-agent-masking',
     date: '2026-10-12',
     category: 'Personal Ops Platform',
@@ -61,7 +60,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     ],
     screenshots: ['PersonalOps/PO7.webp', 'PersonalOps/PO8.webp', 'PersonalOps/PO9.webp'],
     tools: ['TypeScript', 'MCP', 'Akahu', 'Claude API', 'PostgreSQL', 'Telegram', 'Docker Compose'],
-=======
+  },
+  {
     id: 'personal-ops-platform-entry-2-local-knowledge-base',
     date: '2026-10-10',
     category: 'Personal Ops Platform',
@@ -93,7 +93,6 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'PersonalOps/PO5.webp',
       'PersonalOps/PO6.webp',
     ],
->>>>>>> origin/main
   },
   {
     id: 'personal-ops-platform-entry-1-mcp-foundation-firewall',
