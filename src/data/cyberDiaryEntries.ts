@@ -44,7 +44,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-10-12',
     category: 'Personal Ops Platform',
     milestone: true,
-    title: 'Bank data on my own hardware, and the card digits my mask let through',
+    title:
+      'Bank data on my own hardware, and the card digits my mask let through',
     workedOn: [
       'Synced Akahu transactions with no account numbers stored, and categorised them with my rules first and Claude Haiku second',
       'Masked descriptions before they leave the box, and sent only aggregates in a weekly Telegram summary',
@@ -54,12 +55,24 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       "Phase 3 gives Claude my bank transactions, so I treated every step as a question about what leaves the mini PC. Akahu supplies the data. The parser never reads account numbers or holder names, so the table has no column to store them. A keys-only look at real transactions showed another party's account number on 53% of rows, so the whole meta block is dropped. Claude Haiku categorises from masked descriptions and amounts, and my own rules always override it.",
       "Real data found what the tests missed. The first live run categorised 750 transactions, then failed on a category that wasn't in my list. The SDK's zod helper had turned my enum into a description, so the API was only hinted at the list. I wrote the JSON schema by hand with a real enum, the remaining 1,400 went through, and a test now checks the tool schemas carry the enum too. Later a Ticketmaster description ended in six asterisks and four digits. The bank had masked the card number, but my six-digit mask let the last four through. Anything after a run of asterisks is now replaced.",
-      "The weekly Telegram summary reaches the model as aggregates: totals, category sums and a few payee names with digits masked. A test serialises the digest and checks that the account name, a card number and the description text are absent. I removed the masking to confirm, and two tests failed. Payment references are text written by whoever pays me, so the only tools that change data can set categories and nothing else.",
-      "The backup service taught me the same thing from the deploy side. Docker created the backups folder as root on the mini PC, the dump failed, and the container kept showing as running until I made a failed dump exit. Deploying the finished phase brought the mini PC forward six PRs, and the first sync pruned 1,310 old rows and categorised the 840 that remained.",
+      'The weekly Telegram summary reaches the model as aggregates: totals, category sums and a few payee names with digits masked. A test serialises the digest and checks that the account name, a card number and the description text are absent. I removed the masking to confirm, and two tests failed. Payment references are text written by whoever pays me, so the only tools that change data can set categories and nothing else.',
+      'The backup service taught me the same thing from the deploy side. Docker created the backups folder as root on the mini PC, the dump failed, and the container kept showing as running until I made a failed dump exit. Deploying the finished phase brought the mini PC forward six PRs, and the first sync pruned 1,310 old rows and categorised the 840 that remained.',
       'A control counts once I have broken it and watched a test fail, and real data shows gaps that a hand-made fixture never will.',
     ],
-    screenshots: ['PersonalOps/PO7.webp', 'PersonalOps/PO8.webp', 'PersonalOps/PO9.webp'],
-    tools: ['TypeScript', 'MCP', 'Akahu', 'Claude API', 'PostgreSQL', 'Telegram', 'Docker Compose'],
+    screenshots: [
+      'PersonalOps/PO7.webp',
+      'PersonalOps/PO8.webp',
+      'PersonalOps/PO9.webp',
+    ],
+    tools: [
+      'TypeScript',
+      'MCP',
+      'Akahu',
+      'Claude API',
+      'PostgreSQL',
+      'Telegram',
+      'Docker Compose',
+    ],
   },
   {
     id: 'personal-ops-platform-entry-2-local-knowledge-base',
