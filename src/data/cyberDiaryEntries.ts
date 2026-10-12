@@ -40,6 +40,38 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-6-job-heartbeats-watchdog',
+    date: '2026-10-12',
+    category: 'Personal Ops Platform',
+    title:
+      'Making silent failures loud: job heartbeats, a watchdog, and an alert I triggered on purpose',
+    workedOn: [
+      'Added a job_runs table and a heartbeat for the finance sync, notes scan, backup, briefing and summary',
+      'Built a /status command and a watchdog in the bot service that share one set of staleness limits',
+      'Backdated the notes scan heartbeat by 20 hours to make the alert fire on the real service',
+      'Wrote ADR 8 and updated the README with the limits I accepted',
+    ],
+    body: [
+      'Until this phase, every background job on the mini PC failed quietly. A failed sync or briefing retried and wrote a log line, so I would only find out when I noticed something missing. I added a job_runs table with one row per job: the last success and the last attempt. Each job records a heartbeat when it finishes, and the backup script does the same through psql. I store no error text, because errors can carry URLs, tokens or payee names, and the table ends up in a chat. A failure just leaves the old success time where it was.',
+      'A job is stale when its last success is older than its limit: one hour for the notes scan, 13 hours for the finance sync, 26 hours for the backup and the briefing, and 8 days for the summary. Each limit is the schedule plus slack. The /status command and the watchdog both read the same rules, so they cannot disagree. The watchdog runs in the bot service every 5 minutes. It sends one alert per incident with the job name and its age, then one message when the job works again. It sends the alert before it marks it as sent, so a Telegram failure means the next check tries again. A job that has never run does not alert.',
+      'To test it I did not change a limit or add a test hook. I backdated the notes scan heartbeat by 20 hours in the database and waited. About 90 seconds later Telegram showed "Notes scan has not succeeded for 20h." When the next real rescan ran, it sent "Notes scan is working again." The unit tests use a fake clock, so this was the first time the whole path ran for real: the table, the rule, the check, the message and the all-clear. One small thing came up on deploy. The backup container had to be restarted to load the new bind-mounted script, because it was still running the copy it had already read.',
+      "I wrote down what this does not cover. The watchdog lives in the bot service and sends through Telegram, so if either is down, nothing alerts me. The briefing counts as a success even when one section shows as unavailable, because the message still went out. The notes scan heartbeat shows the scheduler is alive, not that every file edit was indexed. The real fix for the first limit is a check from outside the box, so a dead-man's switch is on the ideas list.",
+      'A monitor that runs on the thing it watches shares its failures, and a check only means something once you have made it fire on the real system.',
+    ],
+    screenshots: [
+      'PersonalOps/PO18.webp',
+      'PersonalOps/PO16.webp',
+      'PersonalOps/PO17.webp',
+    ],
+    tools: [
+      'TypeScript',
+      'PostgreSQL',
+      'Telegram Bot API',
+      'Docker Compose',
+      'vitest',
+    ],
+  },
+  {
     id: 'personal-ops-platform-entry-4-host-hardening-scan',
     date: '2026-10-12',
     category: 'Personal Ops Platform',
