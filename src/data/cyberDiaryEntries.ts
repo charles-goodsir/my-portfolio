@@ -40,6 +40,36 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-8-attacking-my-own-server',
+    date: '2026-10-12',
+    category: 'Personal Ops Platform',
+    title:
+      'Attacking my own server: a mask I could search around, and tests that tested nothing',
+    workedOn: [
+      'Wrote a threat model with 22 threats before attacking anything, and approved it first',
+      'Built a raw socket harness and about 200 attack tests against a local copy of the server and its tools',
+      'Fixed 17 findings, none of them a way in from outside, and broke each fix on purpose to check its test',
+      'Decided an audit line, one token and no rate limit in an ADR',
+      'Deployed to the mini PC and repeated the read-only checks from my laptop',
+    ],
+    body: [
+      'I wrote the threat model from the code before I attacked anything: a trust-boundary diagram, four kinds of attacker, and 22 threats in STRIDE tables for the MCP server, the text that reaches Claude through the tools, and the bot, the diary file and the notes folder. Anything I had not checked was marked to test, so a bypass only counted once a test showed it. The attacks ran against a local copy with a throwaway database, and the live mini PC only got read-only checks. A failing test was a finding, and I never weakened one to make it pass.',
+      "Seventeen things came out of it, all fixed, none a way in from outside. The one I keep coming back to is the masking. The tools hid long numbers from the output, but the search filter and the rule matching ran on the unmasked text, so someone could ask whether a card number started with a given prefix and narrow it one step at a time. I only saw it by reading the query before writing the attack. The others: a two-letter category rule moved most of a test database to Income in one call, a newline in a payee printed a fake transaction row, the server parsed a stranger's body before it checked the token, and failed token guesses left no trace in the log. Batch C was smaller things, such as notes ingest following a symlink out of the folder, no limit on file size or memory, and a network error that could carry the bot token.",
+      'A lot of what went wrong was my own tests. Seven of my first twelve failing tests were wrong assumptions of mine, and two were my client waiting on a reply. A test for a pagination loop ran its own process out of memory, which was the finding but a poor way to fail. When I broke each fix on purpose, four survived. Three had two layers guarding the same thing, so removing one changed nothing, and one test sent a body over the 100 KB limit, so it was refused before it reached the code it claimed to test. I added a test per layer and rewrote that one to read the log line.',
+      "I decided three open questions in an ADR. Every authenticated request now writes one audit line with the tool and the argument names and never the values. One token with every tool is accepted, because the write tools only change categories and a rule that matches more than a quarter of the transactions is refused. There is no rate limit, because the token is long and random and a limit would let a stranger lock me out. Then I deployed seven merges to the mini PC and repeated the checks from my laptop. Bad JSON with no token is now a 401 and not an HTML page naming Express, and a wrong token shows up in the box's log. One row in my retest table proves little, because my live data has no row for the search to find, and I said so in the table.",
+      'A control that hides what is shown and not what can be asked is half a control, and a test only counts once you have broken the thing it guards and watched it fail.',
+    ],
+    screenshots: ['PersonalOps/PO21.webp', 'PersonalOps/PO22.webp'],
+    tools: [
+      'TypeScript',
+      'vitest',
+      'Express',
+      'PostgreSQL',
+      'curl',
+      'Docker Compose',
+    ],
+  },
+  {
     id: 'personal-ops-platform-entry-7-outside-check-repo-rules',
     date: '2026-10-12',
     category: 'Personal Ops Platform',
