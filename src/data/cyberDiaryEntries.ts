@@ -40,6 +40,37 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-4-host-hardening-scan',
+    date: '2026-10-12',
+    category: 'Personal Ops Platform',
+    title:
+      'Hardening the mini PC before it holds bank data, and a scan that said the host was down',
+    workedOn: [
+      'Scanned the mini PC from my laptop: only SSH and the MCP port answered',
+      'Disabled cups, cups-browsed and ModemManager, and deleted the old Azure DevOps agent folder',
+      "Confirmed Ubuntu's security origin in the unattended-upgrades log",
+      'Wrote the disk encryption decision into the README',
+      'Next: check the first scheduled briefing',
+    ],
+    body: [
+      'Before I trusted the mini PC with bank data, I worked through the host list I had put off. I started read-only: listening ports, running services, update timers and the disk. A scan from my laptop found only SSH on 22 and the MCP server on 3000, which is what I wanted. But three services I never use were running: cups, cups-browsed and ModemManager. That is a printer service and a modem manager on a wifi-only box with no printer. They listened on localhost only, so the scan could not see them.',
+      "I disabled all three and deleted the 892 MB folder left by the Azure DevOps build agent from my old pipeline project. The agent service was already disabled, but the folder was still there. I also read the unattended-upgrades log instead of trusting the config. It lists origin=Ubuntu,archive=noble-security among the allowed origins, which is the fix for Mint's default config missing Ubuntu's security updates. The scan gave the same two open ports before and after, so removing those services shrank what runs on the box and left what is reachable unchanged.",
+      'The scan taught me something about the firewall. The first run of nmap said the host seemed down, because nmap pings first and the firewall drops pings. Adding -Pn skipped the ping. The full scan was slow because each dropped packet waits for a timeout, and silence is what I want from a closed port when I scan from outside.',
+      'I decided not to encrypt the disk. Encrypting an existing root disk means a reinstall, the realistic threat is someone taking a home PC, and the Akahu and API tokens can be revoked. I wrote the reasoning into the README and left it for the next rebuild. SSH password login stays behind the LAN-only rule and fail2ban, and I left Avahi running.',
+      "I got one thing wrong along the way. I said the morning briefing had arrived, but what I had seen was my own test message, and the mini PC's clock showed the scheduled run was still hours away. A manual run proves the sections and the config. Only an unattended morning proves the timer.",
+      'Check each claim against the thing that can show it: a scan from another machine for what is reachable, a log for what ran, and a scheduled run for the schedule.',
+    ],
+    screenshots: ['PersonalOps/PO10.webp', 'PersonalOps/PO11.webp'],
+    tools: [
+      'Linux Mint',
+      'ufw',
+      'nmap',
+      'systemd',
+      'unattended-upgrades',
+      'Docker Compose',
+    ],
+  },
+  {
     id: 'personal-ops-platform-entry-3-finance-agent-masking',
     date: '2026-10-12',
     category: 'Personal Ops Platform',
