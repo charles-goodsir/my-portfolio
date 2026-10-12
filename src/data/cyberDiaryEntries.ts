@@ -68,6 +68,16 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       'curl',
       'Docker Compose',
     ],
+    links: [
+      {
+        label: 'Security Testing',
+        url: 'https://github.com/charles-goodsir/personal-ops-platform/blob/main/docs/security-testing.md',
+      },
+      {
+        label: 'Risk Assessment',
+        url: 'https://github.com/charles-goodsir/personal-ops-platform/blob/main/RISK_ASSESSMENT.md',
+      },
+    ],
   },
   {
     id: 'personal-ops-platform-entry-7-outside-check-repo-rules',
