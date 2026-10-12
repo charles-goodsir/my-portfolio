@@ -12,6 +12,20 @@ interface Project {
 
 const securityProjects: Project[] = [
   {
+    id: 'personal-ops',
+    title: 'Personal Ops Platform',
+    description:
+      'In progress. A self-hosted MCP server on my home mini PC that lets Claude search my notes and categorise my bank transactions without the raw data leaving my hardware. So far: token auth and a firewall rule, local embeddings, masked descriptions with tests I broke on purpose, a hardened host, and a watchdog proved by making it fire',
+    technologies: [
+      'TypeScript',
+      'MCP',
+      'PostgreSQL',
+      'Ollama',
+      'Docker Compose',
+      'Claude API',
+    ],
+  },
+  {
     id: 'secure-expense-claims',
     title: 'Secure Expense Claims',
     description:

@@ -12,6 +12,7 @@ import VisitorRiskAssessment from './components/VisitorRiskAssessment'
 import NotFound from './components/NotFound'
 import AppSecHomelab from './components/Projects/AppSecHomelab'
 import SecureAzureLandingZone from './components/Projects/SecureAzureLandingZone'
+import PersonalOps from './components/Projects/PersonalOps'
 import SecureExpenseClaims from './components/Projects/SecureExpenseClaims'
 import Detour from './components/Projects/Detour'
 import FlightTracker from './components/Projects/FlightTracker'
@@ -39,6 +40,7 @@ function App() {
             path="projects/secure-expense-claims"
             element={<SecureExpenseClaims />}
           />
+          <Route path="projects/personal-ops" element={<PersonalOps />} />
           <Route path="projects/detour" element={<Detour />} />
           <Route path="projects/finance-tracker" element={<FinanceTracker />} />
           <Route path="projects/flight-tracker" element={<FlightTracker />} />
