@@ -40,6 +40,35 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-7-outside-check-repo-rules',
+    date: '2026-10-12',
+    category: 'Personal Ops Platform',
+    title:
+      'A check on the watchdog: an outside ping, a schedule left on defaults, and a push GitHub refused',
+    workedOn: [
+      'Made the bot ping a Healthchecks.io check after each watchdog check that worked, so an email arrives if the bot or Telegram goes down',
+      'Stopped the bot on the mini PC to make the alert fire',
+      'Found the check was still on its default 1 day schedule and changed it to 5 minutes with a 10 minute grace',
+      'Made the repo public with a ruleset on main, secret scanning and push protection',
+      'Tried a direct push to main and watched GitHub reject it',
+    ],
+    body: [
+      "The watchdog from the last phase had a hole I had already written down: it runs in the bot service and sends through Telegram, so if either is down, nothing alerts me. I added a check from outside the mini PC. After each watchdog check that worked, the bot sends one empty request to a Healthchecks.io check, and Healthchecks emails me when the requests stop. If the watchdog's own check fails, because the database is unreachable, it does not ping, since a watchdog that cannot read the heartbeats is not working. A failed ping is only logged, so a dead Healthchecks cannot stop the real alerts. The ping URL holds a random id that is the only secret, so it lives in .env at mode 600, must be https, and never appears in a log or an error. I chose email as the channel because Telegram might be the thing that is down. I did not use Uptime Kuma, which would need a second machine, or my own Cloudflare Worker, where I would be writing the alert logic myself.",
+      "To test it I stopped the bot on the mini PC and waited. My first screenshot of the check showed it was still on Healthchecks' defaults: a period of 1 day and a grace time of 1 hour. With those, stopping the bot would have taken about a day to alert. I changed it to a 5 minute period and 10 minutes of grace. Then I clicked Ping now on the page, which counts as a real ping and reset the clock, so nothing arrived when I expected it. I left it alone, the check went down, and the email came through. Then I started the bot again.",
+      'The same day I made the repo public. I scanned all 60 commits with gitleaks first and found no secrets. Then I added a ruleset on main: changes need a pull request, the CI check has to pass, and force pushes and deletion are blocked. I let admins bypass for pull requests only, so I can merge past a failing check in an emergency but cannot push straight to main. I also turned on secret scanning with push protection and Dependabot alerts. To test the ruleset I made an empty commit and pushed it at main. GitHub rejected it with a message that changes must be made through a pull request and that the required check was expected.',
+      "The ping proves that the bot service, its database connection and the watchdog loop are alive. It does not prove Telegram works, and it does not say which job is stale, which is still the watchdog's work. If Healthchecks and the mini PC fail together, nothing alerts me, and I accepted that. I did not test the force push and deletion rules separately: my delete attempt was refused only because main is the default branch, and a force push would have hit the pull request rule first.",
+      "A monitor is only as good as its settings, and the defaults were set for someone else's job, so read them and then make the thing fail once to see when you hear about it.",
+    ],
+    screenshots: ['PersonalOps/PO19.webp', 'PersonalOps/PO20.webp'],
+    tools: [
+      'Healthchecks.io',
+      'GitHub rulesets',
+      'gitleaks',
+      'TypeScript',
+      'Docker Compose',
+    ],
+  },
+  {
     id: 'personal-ops-platform-entry-6-job-heartbeats-watchdog',
     date: '2026-10-12',
     category: 'Personal Ops Platform',
