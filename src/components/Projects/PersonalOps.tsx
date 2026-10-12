@@ -51,6 +51,8 @@ const technologies = [
   'Telegram',
   'ufw',
   'GitHub Actions',
+  'Claude Code',
+  'Claude API',
 ]
 
 function PersonalOps() {
