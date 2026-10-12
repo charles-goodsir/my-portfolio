@@ -58,7 +58,11 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       "I wrote down what this does not cover. The watchdog lives in the bot service and sends through Telegram, so if either is down, nothing alerts me. The briefing counts as a success even when one section shows as unavailable, because the message still went out. The notes scan heartbeat shows the scheduler is alive, not that every file edit was indexed. The real fix for the first limit is a check from outside the box, so a dead-man's switch is on the ideas list.",
       'A monitor that runs on the thing it watches shares its failures, and a check only means something once you have made it fire on the real system.',
     ],
-    screenshots: ['PersonalOps/PO16.webp', 'PersonalOps/PO17.webp'],
+    screenshots: [
+      'PersonalOps/PO18.webp',
+      'PersonalOps/PO16.webp',
+      'PersonalOps/PO17.webp',
+    ],
     tools: [
       'TypeScript',
       'PostgreSQL',
