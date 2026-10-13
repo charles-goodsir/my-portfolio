@@ -40,6 +40,36 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-30-azure-policy-guardrails',
+    date: '2026-10-13',
+    category: 'Secure Expense Claims',
+    title: 'Azure Policy guardrails, and a pipeline that cannot remove them',
+    workedOn: [
+      'Assigned eight built-in Azure Policy definitions to the resource group, ran them in Audit for a clean baseline, then switched seven to Deny',
+      'Tried to break each one as Owner in the portal',
+      'Proved the pipeline identity cannot write policy assignments',
+    ],
+    body: [
+      "I assigned eight built-in policies to the expense claims resource group: no shared key on storage, no public blobs, restricted storage network access, HTTPS only on storage and the Container App, no public network on Postgres, Entra-only auth on Postgres, and an allowed-locations list. I did it by hand rather than through Terraform, on purpose. The pipeline is Contributor, and Contributor can't write policy assignments, so the thing that builds the environment can't switch off its own guardrails. They also sit on the resource group, so they survive the nightly teardown.",
+      'I ran them in Audit first and triggered a scan. All eight came back Compliant, with each check covering the one resource it should. Then I switched seven to Deny (the Entra-only one has no Deny effect) and tried to break each one in the portal as Owner: turning shared keys back on, enabling anonymous blob access, turning off secure transfer, opening the storage network, enabling Postgres public access, allowing insecure ingress, and creating a storage account in West US. Every one failed with RequestDisallowedByPolicy and our message pointing at the policy doc. I checked afterwards that nothing had changed.',
+      "The part that surprised me was the pipeline test. I opened a PR adding a policy assignment in Terraform. The plan went green with one to add, because a plan only reads state and never tries the write. After merge and approval the apply failed with a 403, since Contributor can't write Microsoft.Authorization. I reverted it straight away so main didn't drift from Azure. I also found that the allowed-locations assignment stores no effect at all and falls back to the policy's default of Deny, so the portal showing Deny was right.",
+      'A green plan only shows what Terraform intends to do, so the way to know what an identity is allowed to do is to make it try.',
+    ],
+    tools: ['Azure Policy', 'Azure Portal', 'Terraform', 'GitHub Actions'],
+    tags: ['azure-policy', 'guardrails', 'least-privilege', 'devsecops'],
+    screenshots: [
+      'SecureExpenseClaims/SEC66.webp',
+      'SecureExpenseClaims/SEC67.webp',
+      'SecureExpenseClaims/SEC68.webp',
+      'SecureExpenseClaims/SEC69.webp',
+      'SecureExpenseClaims/SEC70.webp',
+      'SecureExpenseClaims/SEC71.webp',
+      'SecureExpenseClaims/SEC72.webp',
+      'SecureExpenseClaims/SEC73.webp',
+      'SecureExpenseClaims/SEC74.webp',
+    ],
+  },
+  {
     id: 'personal-ops-platform-entry-8-attacking-my-own-server',
     date: '2026-10-12',
     category: 'Personal Ops Platform',
