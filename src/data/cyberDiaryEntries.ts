@@ -44,6 +44,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-10-13',
     category: 'Secure Expense Claims',
     title: 'Azure Policy guardrails, and a pipeline that cannot remove them',
+    milestone: true,
     workedOn: [
       'Assigned eight built-in Azure Policy definitions to the resource group, ran them in Audit for a clean baseline, then switched seven to Deny',
       'Tried to break each one as Owner in the portal',
