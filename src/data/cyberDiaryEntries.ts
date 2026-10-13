@@ -40,10 +40,40 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-31-defender-malware-scanning',
+    date: '2026-10-13',
+    category: 'Secure Expense Claims',
+    title: 'Defender malware scanning, and a test file that got past it',
+    workedOn: [
+      'Triaged the Defender for Cloud recommendations as fix, accept or false positive',
+      'Turned on Defender for Storage malware scanning',
+      'Uploaded a malicious test receipt through the app and a plain one straight to the container to see what the scanner caught',
+    ],
+    body: [
+      'Defender for Cloud had already assigned its own default initiative to the subscription, so I got eleven recommendations I never asked for. I wrote each one up as fix, accept or false positive. Two storage ones turned out to be stale: Defender had evaluated the freshly rebuilt account and later re-evaluated it as healthy, which matched my own policies. The three email-notification ones were a real fix, one free security contact setting. Along the way I turned on the paid CSPM plan by accident, saw the 30-day trial counter in the CLI, and switched it off.',
+      'Then I turned on Defender for Storage with malware scanning and uploaded a receipt through the app made of an EICAR test string behind a %PDF header, because the app only checks the first bytes. The app accepted it four times, and the scanner tagged every blob "No threats found" within a second. EICAR is only recognised at the start of a file, so the header the app demands is exactly what hides it. For a while I thought scanning wasn\'t running, because the portal showed no tags. It was a permissions problem: Owner is a control plane role, and listing or searching blob index tags needs a data role.',
+      "With Storage Blob Data Owner I could see the tags. I then uploaded a plain EICAR file straight to the container, bypassing the app. It was tagged Malicious, a high severity alert fired, and the email I set up in the triage step arrived. So the control works, and the gap is between what the app lets in and what the scanner can recognise. I also noted that those tags can be edited by anyone with tag write permission, so they're a signal and not a lock.",
+      'A scanner only catches what it can recognise, so whatever sits in front of it decides what it gets to see.',
+    ],
+    tools: [
+      'Microsoft Defender for Cloud',
+      'Defender for Storage',
+      'Azure Portal',
+      'Azure CLI',
+    ],
+    tags: ['defender', 'malware-scanning', 'file-upload', 'triage'],
+    screenshots: [
+      'SecureExpenseClaims/SEC75.webp',
+      'SecureExpenseClaims/SEC76.webp',
+      'SecureExpenseClaims/SEC77.webp',
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-30-azure-policy-guardrails',
     date: '2026-10-13',
     category: 'Secure Expense Claims',
     title: 'Azure Policy guardrails, and a pipeline that cannot remove them',
+    milestone: true,
     workedOn: [
       'Assigned eight built-in Azure Policy definitions to the resource group, ran them in Audit for a clean baseline, then switched seven to Deny',
       'Tried to break each one as Owner in the portal',
