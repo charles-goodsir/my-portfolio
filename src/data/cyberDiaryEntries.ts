@@ -40,6 +40,41 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-32-fail-closed-receipt-downloads',
+    date: '2026-10-15',
+    category: 'Secure Expense Claims',
+    title:
+      'Fail-closed receipt downloads, and a scanner that was never switched on',
+    workedOn: [
+      'API refuses to serve a receipt unless Defender for Storage tagged it "No threats found"',
+      'Made a custom Storage Blob Tag Reader role with tags/read only',
+      'Found the rebuilt storage account was never enrolled in Defender for Storage and fixed it through the API',
+      'Next: move the Defender enrolment into Terraform',
+    ],
+    body: [
+      'The API now refuses to serve a receipt unless the blob\'s Defender for Storage index tag, "Malware Scanning scan result", says "No threats found". Anything else is a 409: a malicious tag, a missing tag, or a scan that never ran. I chose fail-closed on purpose, so that a broken or missing scanner blocks downloads instead of quietly letting everything through.',
+      "The first Azure test returned a 500 instead of the 409 I expected. The API's Storage Blob Data Contributor role can read and write blobs but cannot read index tags, so the tag lookup came back 403. I made a custom role, Storage Blob Tag Reader, with exactly one data action (tags/read) and no tag write, because an API that can write tags could mark a malicious receipt clean. The pipeline can't create roles, so I made the role by hand and widened the deploy identity's RBAC-admin condition so Terraform can assign it.",
+      'The second problem came after a rebuild. The subscription-level Defender for Storage plan was on, but the new storage account was not enrolled: per-account setting off, no Event Grid topic, so no tags, and the gate refused everything. The portal\'s Enable button sat on "Enablement in progress" with no write in the Activity Log, so I set it with a direct call to the defenderForStorageSettings API. Tags landed within seconds after that. I proved the gate three ways: a clean blob downloads (200), a blob I retagged "Malicious" is refused (409), and a blob with its tags deleted is refused (409). The storage firewall also blocked my own IP from the tag view until I added it.',
+      'I accepted that anyone with tag write access can still change a tag, so the gate is only as strong as who holds that permission. Enrolment is still a manual step, so moving it into Terraform is next.',
+      'The control that matters most in a fail-closed design is the one that fails quietly: my gate worked perfectly while the scanner behind it was never switched on, and the only symptom was everything being refused.',
+    ],
+    tools: [
+      'Azure',
+      'Defender for Storage',
+      'Blob index tags',
+      'Azure RBAC',
+      '.NET',
+    ],
+    tags: ['fail-closed', 'malware-scanning', 'least-privilege', 'custom-role'],
+    screenshots: [
+      'SecureExpenseClaims/SEC78.webp',
+      'SecureExpenseClaims/SEC79.webp',
+      'SecureExpenseClaims/SEC80.webp',
+      'SecureExpenseClaims/SEC81.webp',
+      'SecureExpenseClaims/SEC82.webp',
+    ],
+  },
+  {
     id: 'personal-ops-platform-entry-9-read-only-dashboard',
     date: '2026-10-14',
     category: 'Personal Ops Platform',
