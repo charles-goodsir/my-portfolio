@@ -30,6 +30,8 @@ export const owaspTop10: OwaspRisk[] = [
       'Moved the expense claims roles into Entra ID as app roles assigned on the enterprise app, with assignment required, so nobody inside the app, Admin included, can change their own role',
       "Found that my own unassigned account could still get a token for the expense claims API, because Entra checks assignment on the app you sign in to and the web app didn't require it. Fixed it twice: the web app now requires assignment, and the API rejects any token with no roles before it creates a user",
       'Attacked the deployed expense claims app with real Entra tokens for each user: 28 access control attacks, including IDOR on claims and receipts, self-approval, smuggled status fields, double payment and forged tokens. All 28 were refused, after I checked the script reported a planted IDOR',
+      'Opened a PR adding an Azure Policy assignment through the expense claims pipeline. The plan went green with one to add, and the apply failed with a 403, because the pipeline identity is Contributor and cannot write Microsoft.Authorization. The thing that builds the environment cannot switch off its own guardrails',
+      'Gave the personal ops dashboard its own Postgres role, dashboard_ro, with SELECT on four tables. On the live box an INSERT, a DELETE and a read of the rules table were each refused. RESET ROLE does not undo the role but SET ROLE to my own login user does, which I accepted because the dashboard runs fixed queries, and recorded it in an ADR',
     ],
     next: [
       "PortSwigger's Access Control and Server-Side Request Forgery learning paths",
@@ -66,6 +68,15 @@ export const owaspTop10: OwaspRisk[] = [
         label: 'Expense claims: 28 access control attacks with real tokens',
         entryId: 'secure-expense-claims-entry-29-twenty-eight-attacks',
       },
+      {
+        label:
+          'Expense claims: a pipeline that cannot remove its own guardrails',
+        entryId: 'secure-expense-claims-entry-30-azure-policy-guardrails',
+      },
+      {
+        label: 'Personal ops: a read-only dashboard and its database role',
+        entryId: 'personal-ops-platform-entry-9-read-only-dashboard',
+      },
     ],
   },
   {
@@ -89,11 +100,14 @@ export const owaspTop10: OwaspRisk[] = [
       'Added a weekly drift check that plans the expense claims environment with the read-only identity and goes red on any difference. A tag I added in the portal turned it red with exit code 2, and removing the tag turned it green',
       'Registered the expense claims sign-in URL as a single-page app, which uses PKCE and no secret, after the Web platform type broke sign-in with AADSTS9002326. I removed the Web entry so nobody can attach a client secret to it. Review also caught an environment variable name with one underscore instead of two that Terraform accepted as valid',
       "On the mini PC, traced a timeout to a DOCKER-USER chain I'd written months earlier that drops forwarded container traffic except allowed ports. ufw status listed an 8080 rule that wasn't the one letting traffic through, so I read the loaded rules and added a RETURN line for the new port",
+      'Assigned eight built-in Azure Policy definitions to the expense claims resource group by hand, ran them in Audit for a clean baseline, then switched seven to Deny (the Entra-only one has no Deny effect). I tried to break each one as Owner in the portal, and every attempt failed with RequestDisallowedByPolicy',
+      'Scanned the mini PC from my laptop with nmap and found only SSH and the MCP port. Disabled cups, cups-browsed and ModemManager, deleted an old 892 MB Azure DevOps agent folder, and checked the unattended-upgrades log for the Ubuntu security origin instead of trusting the config',
+      'Found that the Healthchecks.io check for the personal ops watchdog was still on its default 1 day period and 1 hour grace, which would have taken about a day to alert. I changed it to 5 minutes with a 10 minute grace and stopped the bot to see the email arrive',
     ],
     next: [
-      'Information disclosure / directory listing labs, and a config audit of the mini PC itself against CIS Benchmarks',
+      'Information disclosure / directory listing labs, and a CIS Benchmark audit of the mini PC (so far the host hardening is a port scan and a service review)',
     ],
-    tools: ['OWASP ZAP', 'Trivy', 'Semgrep'],
+    tools: ['OWASP ZAP', 'Trivy', 'Semgrep', 'Azure Policy', 'nmap'],
     relatedDiaryLinks: [
       {
         label: 'First ZAP baseline scan',
@@ -142,6 +156,19 @@ export const owaspTop10: OwaspRisk[] = [
         label:
           'Personal ops: the firewall rules actually loaded on the mini PC',
         entryId: 'personal-ops-platform-entry-1-mcp-foundation-firewall',
+      },
+      {
+        label: 'Expense claims: Azure Policy guardrails',
+        entryId: 'secure-expense-claims-entry-30-azure-policy-guardrails',
+      },
+      {
+        label:
+          'Personal ops: hardening the mini PC and a scan that said the host was down',
+        entryId: 'personal-ops-platform-entry-4-host-hardening-scan',
+      },
+      {
+        label: 'Personal ops: a monitor schedule left on its defaults',
+        entryId: 'personal-ops-platform-entry-7-outside-check-repo-rules',
       },
     ],
   },
@@ -254,8 +281,10 @@ export const owaspTop10: OwaspRisk[] = [
       'Built a vulnerable-by-design .NET/React app, reproduced the SQL injection login bypass and reflected XSS in my own code, then fixed both with parameterized queries and JSX text interpolation, and re-tested each fix against the original exploit',
       'Wired Semgrep into a GitHub Actions pipeline. It caught the seeded ProductsController.cs SQLi and missed the structurally identical one in AuthController.cs. I traced the miss to the rule not treating [FromBody]-bound objects as a tainted source and documented it as a known false negative',
       'Moved on to the Authentication path next rather than Command/NoSQL injection - higher priority given how much of it maps to real login-flow bugs',
+      'Planted script tags and attribute breakouts as a merchant name, a category and a budget name in the personal ops dashboard, then fetched the real page over a socket. The test checks that every < on the page opens a tag the page writes. I broke the escaping, then only the quote escaping, then the digit masking, and each one failed its test',
+      'Attacking my own MCP server found a newline in a payee that printed a fake transaction row in the tool output, which I fixed and covered with a test',
     ],
-    tools: ['Burp Suite', 'Semgrep'],
+    tools: ['Burp Suite', 'Semgrep', 'Vitest'],
     relatedDiaryLinks: [
       {
         label: 'SQL Injection labs',
@@ -273,6 +302,15 @@ export const owaspTop10: OwaspRisk[] = [
         label: 'Homelab: XSS exploit and fix',
         entryId: 'appsec-homelab-entry-13-product-search-xss-fix',
       },
+      {
+        label:
+          'Personal ops: attack tests for markup injection on the dashboard',
+        entryId: 'personal-ops-platform-entry-9-read-only-dashboard',
+      },
+      {
+        label: 'Personal ops: attacking my own MCP server',
+        entryId: 'personal-ops-platform-entry-8-attacking-my-own-server',
+      },
     ],
   },
   {
@@ -289,11 +327,14 @@ export const owaspTop10: OwaspRisk[] = [
       'Wrote a STRIDE threat model for the expense claims app before any code: six assets, five trust boundaries and 24 threats, each with the control that addresses it and the phase it lands in. Some of it shaped the data model, like stopping anyone approving their own claim and writing the audit row in the same transaction as the status change',
       'Designed receipt uploads so nothing the uploader chooses is trusted: the file type comes from the first bytes, not the name or Content-Type, the stored name is generated by the server, uploads are capped at 5 MB, and downloads are always attachments. A text file named fake.pdf was refused with a 415',
       'Gave the expense claims API a per-user rate limit of 100 requests a minute, with anonymous callers counted by IP. The test lowers it to 3 and checks a second user still gets through, so it fails if the limiter is removed or if everyone shares one budget',
+      'Wrote a threat model for the personal ops MCP server before attacking it: a trust-boundary diagram, four kinds of attacker and 22 STRIDE threats. About 200 attack tests produced 17 findings, none a way in from outside, and I fixed all of them. The worst was a mask that hid card numbers from the output while the search filter still ran on the unmasked text',
+      "Wrote the personal ops dashboard's threat model section (D1 to D9) and ADR 11 before any code",
+      'Uploaded a receipt made of an EICAR test string behind a %PDF header. The app accepted it four times because it only checks the first bytes, and Defender for Storage tagged it No threats found, because EICAR is only recognised at the start of a file. A plain EICAR file uploaded straight to the container was tagged Malicious',
     ],
     next: [
       "Prove each threat model control in the expense claims app as it's built, and read OWASP's ASVS design-level requirements",
     ],
-    tools: ['NIST CSF 2.0'],
+    tools: ['NIST CSF 2.0', 'STRIDE'],
     relatedDiaryLinks: [
       {
         label: 'Homelab risk assessment (NIST CSF)',
@@ -314,6 +355,19 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Expense claims: errors and a per-user rate limit',
         entryId: 'secure-expense-claims-entry-13-errors-and-rate-limits',
+      },
+      {
+        label: 'Personal ops: attacking my own server',
+        entryId: 'personal-ops-platform-entry-8-attacking-my-own-server',
+      },
+      {
+        label: 'Personal ops: a read-only dashboard threat model',
+        entryId: 'personal-ops-platform-entry-9-read-only-dashboard',
+      },
+      {
+        label:
+          'Expense claims: a malware scanner and a receipt that got past it',
+        entryId: 'secure-expense-claims-entry-31-defender-malware-scanning',
       },
     ],
   },
@@ -396,6 +450,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Proved the secret scan blocks a merge by opening a PR with a made-up API key. gitleaks failed the required check and the ruleset blocked the merge',
       "Put the expense claims app's money rules in Postgres as well as the API: a check constraint rejects zero or negative amounts, and an xmin concurrency token stops one save overwriting another. Both are proved by integration tests against a real Postgres container, since an in-memory database ignores both",
       "Expense claims images are pushed to GHCR by the same job that scans them with Trivy, only on main, and Terraform deploys the API pinned to the image's sha256 digest, so a moved tag cannot change what runs",
+      'Made the personal ops repo public with a ruleset on main: changes need a pull request and the CI check, force pushes and deletion are blocked, and admin bypass works through a PR only. A direct push to main was rejected by GitHub. I did not test the force push and deletion rules separately',
     ],
     next: [
       'The PortSwigger Insecure Deserialization path, and artifact signing with Sigstore/cosign',
@@ -437,12 +492,16 @@ export const owaspTop10: OwaspRisk[] = [
         label: 'Expense claims: scanned images deployed by digest',
         entryId: 'secure-expense-claims-entry-22-digest-deploy-dev-auth-off',
       },
+      {
+        label: 'Personal ops: a ruleset and a push GitHub refused',
+        entryId: 'personal-ops-platform-entry-7-outside-check-repo-rules',
+      },
     ],
   },
   {
     rank: 'A09:2025',
     title: 'Security Logging and Alerting Failures',
-    progress: 'Planned',
+    progress: 'In progress',
     summary:
       'Insufficient logging, monitoring, and alerting means breaches go undetected for longer - or are detected only after significant damage is done.',
     whyItMatters:
@@ -452,13 +511,18 @@ export const owaspTop10: OwaspRisk[] = [
       'The expense claims app writes an audit row for every status change, with who did it from the signed-in identity, in the same transaction as the change. That covers logging the actions that matter, but nothing alerts on them yet',
       "Changing someone's manager writes its own audit row with the old and new manager, because it decides who can approve their money. Audit action names are kept to one word so later detections can search for them exactly",
       "The expense claims API's database role only has SELECT and INSERT on the audit table, so the database refuses edits even if the app tried. A test signs in as that role and checks UPDATE, DELETE and ALTER TABLE all fail",
+      'Added job heartbeats and a watchdog to the personal ops platform. Each background job records its last success, and the watchdog sends one Telegram alert per incident when a job goes stale, then an all-clear. I backdated a real heartbeat by 20 hours and the alert arrived about 90 seconds later',
+      'Added a check from outside the mini PC: after each good watchdog check the bot pings Healthchecks.io, which emails me when the pings stop. Stopping the bot produced the DOWN email, and starting it again produced the UP email',
+      "The personal ops MCP server now writes one audit line for every authenticated request, with the tool and the argument names and never the values. Failed token guesses are logged with the caller's IP and a failure count",
+      'Turned on Defender for Storage malware scanning on the expense claims storage account. A plain EICAR file uploaded to the container was tagged Malicious, a high severity alert fired and the notification email arrived',
     ],
     next: [
       "Read OWASP's Logging Cheat Sheet for what should and shouldn't be logged",
       'Set up centralized logging for the homelab app, even something simple like a local Loki stack',
       'Define what "suspicious" looks like for the app (failed logins, repeated 403s) and alert on it',
+      'Alert on the expense claims audit actions, which are logged but not watched yet',
     ],
-    tools: [],
+    tools: ['Healthchecks.io', 'Defender for Storage'],
     relatedDiaryLinks: [
       {
         label: 'Expense claims: approvals with an audit row for every change',
@@ -472,6 +536,22 @@ export const owaspTop10: OwaspRisk[] = [
         label: 'Expense claims: audit rows the app itself cannot delete',
         entryId:
           'secure-expense-claims-entry-23-database-role-and-access-review',
+      },
+      {
+        label: 'Personal ops: job heartbeats and a watchdog',
+        entryId: 'personal-ops-platform-entry-6-job-heartbeats-watchdog',
+      },
+      {
+        label: 'Personal ops: an outside check on the watchdog',
+        entryId: 'personal-ops-platform-entry-7-outside-check-repo-rules',
+      },
+      {
+        label: 'Personal ops: audit lines and failed-token logging',
+        entryId: 'personal-ops-platform-entry-8-attacking-my-own-server',
+      },
+      {
+        label: 'Expense claims: Defender malware scanning',
+        entryId: 'secure-expense-claims-entry-31-defender-malware-scanning',
       },
     ],
   },
