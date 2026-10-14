@@ -40,6 +40,30 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-9-read-only-dashboard',
+    date: '2026-10-14',
+    category: 'Personal Ops Platform',
+    title: 'A read-only dashboard, and two limits the attack tests found',
+    workedOn: [
+      "Wrote the dashboard's threat model section (D1 to D9) and ADR 11 before any code",
+      'Dashboard on node:http: Host allowlist, GET only, one password, two fixed paths, a policy with no inline script or style',
+      'Read-only Postgres role (SELECT on four tables) taken on at connection start',
+      '31 attack tests: markup breakouts, card numbers, 300 wrong passwords, Host spellings, a dead database',
+      'Live retest on the mini PC, with an INSERT and a DELETE as dashboard_ro refused',
+      'Next: the payday plan, then dependency scanning in CI',
+    ],
+    body: [
+      'I added a read-only dashboard to the platform: a web page on the mini PC that shows spending against my budgets, subscriptions and job health. A new web page on a box that holds my bank data is a new way in, so I wrote its threat model section and an ADR before any code. The page is plain node:http. Each request is checked in order: the Host name against an allowlist, the method (GET and HEAD only), one password with a constant-time compare, then a fixed list of two paths. It connects to Postgres as dashboard_ro, a role with SELECT on four tables, and the port is published on 127.0.0.1 only, so I reach it through an SSH tunnel. The dashboard in my screenshot is running on made-up data.',
+      'My first Host check parsed the header with the URL parser. When I wrote the attack test, 127.1 and 2130706433 both passed, because the parser rewrites them to 127.0.0.1. I replaced it with a strict pattern that compares the name as written. The read-only role showed me a second limit. I expected RESET ROLE to undo it, and it does not, because the role comes from the connection options and that is the session default. But SET ROLE to my own login user works, so a session that can run arbitrary SQL can leave the role. The dashboard runs fixed queries only, so I accepted that, pinned it with a test, and wrote it into the ADR along with the fix, a login role with its own password.',
+      'For markup injection I planted script tags and attribute breakouts as a merchant name, a category and a budget name, then fetched the real page over a socket. Searching the response for a script tag misses a quote that ends an attribute early, so the test checks that every < on the page opens a tag the page writes, with only attributes it uses. My first two versions of that check flagged valid markup and then words inside quoted values, and I fixed the checker. I also broke the escaping, then only the quote escaping, then the digit masking, and each one failed its test. The 31 attack tests found no bypass.',
+      'Then I repeated the checks that need no write access on the live box. Port 3100 does not answer over the LAN. A missing or wrong password gets a 401, a wrong Host a 403, a POST a 405 and a traversal path a 404. The container has a read-only filesystem and no capabilities. As dashboard_ro, an INSERT, a DELETE and a read of the rules table were each refused, inside a transaction I rolled back.',
+      'Writing the attack tests while I built the dashboard found two limits I would not have seen by reading the code: a second spelling of the same address passing the Host check, and a read-only role that one statement could undo. Each is now a test, and the role is a recorded decision in an ADR.',
+    ],
+    screenshots: ['PersonalOps/PO24.webp', 'PersonalOps/PO25.webp'],
+    tools: ['Node.js', 'PostgreSQL', 'Vitest', 'Docker Compose'],
+    tags: ['least privilege', 'DNS rebinding', 'XSS', 'CSP'],
+  },
+  {
     id: 'secure-expense-claims-entry-31-defender-malware-scanning',
     date: '2026-10-13',
     category: 'Secure Expense Claims',
