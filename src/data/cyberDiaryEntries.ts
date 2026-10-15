@@ -40,6 +40,30 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-10-payday-plan-and-goals',
+    date: '2026-10-15',
+    category: 'Personal Ops Platform',
+    title: 'Payday plan replaces budgets, and two tests that proved nothing',
+    workedOn: [
+      'Payday plan: rent and bills fixed, savings from what I spent under my target, goals by weight',
+      'A message the morning after payday, sent once even across a restart',
+      '/payday set takes several pairs and checks all of them before saving any',
+      'Spending meter with one alert at 80% and one at 100% per fortnight',
+      'Removed the budgets in three PRs and dropped the table last',
+      'Attack batch E: ten tests, no findings',
+      'Next: dependency scanning in CI',
+    ],
+    body: [
+      'I replaced the monthly budgets with a payday plan. The morning after each fortnightly pay, the finance service sends one Telegram message that splits the pay. Rent and bills stay fixed, whatever I spent under my spending target goes to savings and investments, and the savings share is split across my goals by weight. It only suggests, because Akahu is read-only for me. The pay lands in the evening and Akahu stamps it 23:59:59, so it is not in my data until the 00:05 sync. A message on payday would plan from money it cannot see, so it goes out the day after.',
+      'Three controls carry it. The last payday the message covered is stored in the database and written only after the send succeeds, so a restart repeats nothing and a failed send retries for three more days. One /payday set message can carry every setting, and every pair is checked before any is saved. A spending meter sends one alert at 80% and one at 100% per fortnight, and the stored alert state names the payday it belongs to, so the next fortnight starts clean without a reset job.',
+      'I broke each control to see its test fail. Saving pairs as they were read, instead of checking them all first, failed 22 tests. Removing the call that marks the message as sent failed three. Two of my own checks proved nothing at first: one ran without the database settings, so every database test was skipped, and one still passed when I changed >= to > because no test used exactly 100%. I gave the payday anchor as the day after pay, and the code expects the payday itself. CI lint also failed on a regular expression the deleted budget code had left behind, which typecheck and 584 tests had not caught.',
+      "Most of the threat model section for this phase already had tests from the earlier steps, so the attack batch added ten. Eight cover bad pairs in one message, one sends a stranger's commands through the real handler, and one sends the message twice across a restart against the real table. None found a bug. I dropped the budgets table last, in its own migration, because it deletes the limits and cannot be undone.",
+      'The order makes a change like this safe. Build the replacement, move each caller over in its own PR, delete the old code, and drop the data last, and every PR in between can ship. A test only counts once I have seen it fail on broken code.',
+    ],
+    tools: ['TypeScript', 'Postgres', 'Vitest', 'Telegram', 'Akahu'],
+    tags: ['idempotency', 'input validation', 'threat modelling', 'alerting'],
+  },
+  {
     id: 'secure-expense-claims-entry-32-fail-closed-receipt-downloads',
     date: '2026-10-15',
     category: 'Secure Expense Claims',
