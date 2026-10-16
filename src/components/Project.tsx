@@ -15,7 +15,7 @@ const securityProjects: Project[] = [
     id: 'personal-ops',
     title: 'Personal Ops Platform',
     description:
-      'In progress. A self-hosted MCP server on my home mini PC that lets Claude search my notes and categorise my bank transactions without the raw data leaving my hardware. So far: token auth and a firewall rule, local embeddings, masked descriptions with tests I broke on purpose, a hardened host, and a watchdog proved by making it fire',
+      'In progress. A self-hosted MCP server on my home mini PC that lets Claude search my notes and categorise my bank transactions without the raw data leaving my hardware. So far: token auth and a firewall rule, local embeddings, masked descriptions with tests I broke on purpose, a hardened host, a watchdog proved by making it fire, a read-only dashboard with 31 attack tests, and a payday plan sent once even across a restart',
     technologies: [
       'TypeScript',
       'MCP',
@@ -29,7 +29,7 @@ const securityProjects: Project[] = [
     id: 'secure-expense-claims',
     title: 'Secure Expense Claims',
     description:
-      'In progress. An expense claims app on Azure, built from a STRIDE threat model, then hardened, attacked and monitored. So far: the threat model, CI with required checks, the claims workflow with access control and audited approvals, a Terraform deployment to Azure behind an approval gate, Entra ID sign-in, and 28 access control attacks against the deployed app, all refused',
+      'In progress. An expense claims app on Azure, built from a STRIDE threat model, then hardened, attacked and monitored. So far: the threat model, CI with required checks, the claims workflow with access control and audited approvals, a Terraform deployment to Azure behind an approval gate, Entra ID sign-in, 28 access control attacks against the deployed app (all refused), Azure Policy guardrails, and receipt downloads that fail closed on a Defender malware scan',
     technologies: [
       '.NET 10',
       'React',

@@ -233,6 +233,15 @@ function SecureExpenseClaims() {
               • An attack script that tries 28 access control attacks with real
               tokens. It caught a planted IDOR, and all 28 were refused in Azure
             </li>
+            <li>
+              • Eight Azure Policy guardrails on the resource group that the
+              pipeline identity cannot change, each tried and refused as Owner
+            </li>
+            <li>
+              • Defender for Storage malware scanning, with receipt downloads
+              that fail closed unless the blob is tagged clean, and the
+              enrolment in Terraform
+            </li>
           </ul>
         </div>
 
