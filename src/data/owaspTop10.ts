@@ -103,11 +103,22 @@ export const owaspTop10: OwaspRisk[] = [
       'Assigned eight built-in Azure Policy definitions to the expense claims resource group by hand, ran them in Audit for a clean baseline, then switched seven to Deny (the Entra-only one has no Deny effect). I tried to break each one as Owner in the portal, and every attempt failed with RequestDisallowedByPolicy',
       'Scanned the mini PC from my laptop with nmap and found only SSH and the MCP port. Disabled cups, cups-browsed and ModemManager, deleted an old 892 MB Azure DevOps agent folder, and checked the unattended-upgrades log for the Ubuntu security origin instead of trusting the config',
       'Found that the Healthchecks.io check for the personal ops watchdog was still on its default 1 day period and 1 hour grace, which would have taken about a day to alert. I changed it to 5 minutes with a 10 minute grace and stopped the bot to see the email arrive',
+      'Moved the Defender for Storage enrolment into Terraform, then read the live setting back and found enrolment on but malware scanning off. The apply reported success and the same call run as my own user turned scanning on, so I kept the resource for enrolment and drift detection and will document the manual call after each rebuild',
+      "Stopped a plan that would have deleted the scanner's firewall exception from the storage account, and told Terraform to ignore that one attribute. The next plan showed no changes and a clean upload still got its tag",
+      'Found a rebuilt storage account that Defender for Storage had never enrolled, so no tags appeared and the receipt gate refused every download. I set it with a direct call to the defenderForStorageSettings API',
     ],
     next: [
       'Information disclosure / directory listing labs, and a CIS Benchmark audit of the mini PC (so far the host hardening is a port scan and a service review)',
     ],
-    tools: ['OWASP ZAP', 'Trivy', 'Semgrep', 'Azure Policy', 'nmap'],
+    tools: [
+      'OWASP ZAP',
+      'Trivy',
+      'Semgrep',
+      'Azure Policy',
+      'nmap',
+      'Terraform',
+      'Terraform',
+    ],
     relatedDiaryLinks: [
       {
         label: 'First ZAP baseline scan',
@@ -169,6 +180,15 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Personal ops: a monitor schedule left on its defaults',
         entryId: 'personal-ops-platform-entry-7-outside-check-repo-rules',
+      },
+      {
+        label:
+          'Expense claims: Defender enrolment in Terraform and a scanner that stayed off',
+        entryId: 'secure-expense-claims-entry-33-scanning-reported-on-but-off',
+      },
+      {
+        label: 'Expense claims: receipt downloads that fail closed',
+        entryId: 'secure-expense-claims-entry-32-fail-closed-receipt-downloads',
       },
     ],
   },
@@ -515,6 +535,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Added a check from outside the mini PC: after each good watchdog check the bot pings Healthchecks.io, which emails me when the pings stop. Stopping the bot produced the DOWN email, and starting it again produced the UP email',
       "The personal ops MCP server now writes one audit line for every authenticated request, with the tool and the argument names and never the values. Failed token guesses are logged with the caller's IP and a failure count",
       'Turned on Defender for Storage malware scanning on the expense claims storage account. A plain EICAR file uploaded to the container was tagged Malicious, a high severity alert fired and the notification email arrived',
+      'Added a spending meter to the personal ops platform that sends one alert at 80% and one at 100% per fortnight. The stored alert state names the payday it belongs to, so the next fortnight starts clean without a reset job',
     ],
     next: [
       "Read OWASP's Logging Cheat Sheet for what should and shouldn't be logged",
@@ -553,6 +574,10 @@ export const owaspTop10: OwaspRisk[] = [
         label: 'Expense claims: Defender malware scanning',
         entryId: 'secure-expense-claims-entry-31-defender-malware-scanning',
       },
+      {
+        label: 'Personal ops: a spending meter with two alerts a fortnight',
+        entryId: 'personal-ops-platform-entry-10-payday-plan-and-goals',
+      },
     ],
   },
   {
@@ -566,16 +591,28 @@ export const owaspTop10: OwaspRisk[] = [
     done: [
       'Forced a real failure in the expense claims API by pointing it at a database port with nothing listening. The response was the Npgsql exception and its stack trace in plain text. Every error now returns a problem-details response with a generic title and a trace ID in every environment, and the stack trace goes only to the server log',
       'My first handler turned a 400 into a 500, because ASP.NET reports a malformed request body in Development by throwing, and the handler caught it like any other error. The mass-assignment test failed, which is how I found it. Bad requests now keep their original status',
+      'Made receipt downloads fail closed: the API serves a receipt only when Defender for Storage tagged the blob "No threats found", and a malicious tag, a missing tag or a scan that never ran each return a 409. A clean blob downloaded with a 200, a blob I retagged Malicious was refused, and a blob with its tags deleted was refused',
+      "The gate first returned a 500 and not the 409, because the API's role could not read blob index tags. I added a custom role with only tags/read, so the API can read a tag but cannot write one and mark a bad file clean",
+      'Made /payday set check every pair in a message before saving any, so one bad value saves nothing. The payday message records the payday it covered only after the send succeeds, so a restart repeats nothing and a failed send retries',
     ],
     next: [
       "Practice fuzzing an endpoint with Burp Intruder-style payloads (or ZAP's fuzzer) in the PortSwigger labs",
       'Break the homelab app on purpose (malformed input, network drops mid-request) and check what it exposes',
     ],
-    tools: ['ASP.NET Core', 'xUnit'],
+    tools: ['ASP.NET Core', 'xUnit', 'Defender for Storage'],
     relatedDiaryLinks: [
       {
         label: 'Expense claims: errors that say nothing useful to an attacker',
         entryId: 'secure-expense-claims-entry-13-errors-and-rate-limits',
+      },
+      {
+        label: 'Expense claims: receipt downloads that fail closed',
+        entryId: 'secure-expense-claims-entry-32-fail-closed-receipt-downloads',
+      },
+      {
+        label:
+          'Personal ops: a payday message sent once and pairs checked together',
+        entryId: 'personal-ops-platform-entry-10-payday-plan-and-goals',
       },
     ],
   },

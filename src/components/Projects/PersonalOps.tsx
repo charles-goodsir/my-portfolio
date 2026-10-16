@@ -181,6 +181,15 @@ function PersonalOps() {
               when a background job goes stale, proved by backdating a real
               heartbeat
             </li>
+            <li>
+              • A read-only dashboard on its own Postgres role, with 31 attack
+              tests and a live retest on the mini PC
+            </li>
+            <li>
+              • A payday plan that sends once even across a restart, checks
+              every setting before saving any, and alerts at 80% and 100% of
+              spending
+            </li>
           </ul>
         </div>
 
