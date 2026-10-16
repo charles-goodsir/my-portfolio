@@ -40,6 +40,33 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-33-scanning-reported-on-but-off',
+    date: '2026-10-16',
+    category: 'Secure Expense Claims',
+    title: 'Defender enrolment in Terraform, and a scanner that stayed off',
+    workedOn: [
+      'Put the Defender for Storage enrolment into Terraform with azurerm_security_center_storage_defender',
+      'Found the pipeline applies it but malware scanning stays off, read back from the API',
+      "Stopped a plan that would have deleted the scanner's firewall exception",
+      'Next: document the manual step, turn Defender for Storage off and tear down',
+    ],
+    body: [
+      'I moved the Defender for Storage enrolment into Terraform so a rebuilt storage account would not need the manual API call. The first apply failed with "already exists", because I had enabled that account by hand. After a rebuild it applied cleanly in five seconds, so I went and read the live setting back. Enrolment was on, but malware scanning was not: onUpload was off with the cap at -1, while the config said on with 10 GB.',
+      "A plan showed Terraform wanting to change those two values, and applying it reported success, but the setting was still off afterwards. The same call run as my own user turned it on. I think the pipeline identity's Contributor role is the reason, but I have not proven it. I kept the resource for enrolment and drift detection, and I will document the manual call after each rebuild, because I would rather not widen the pipeline's roles to fix it.",
+      'Turning scanning on exposed a second problem. Defender adds a firewall exception for its scanner to the storage account, and the next plan wanted to delete it. Applying that would have blocked the scanner, so no tags, and the API would have refused every download. I told Terraform to ignore that one attribute with ignore_changes, and the following plan showed no changes. A clean upload then got its tag within seconds and downloaded with a 200.',
+      'I decided the pipeline should not be able to change a security control it cannot be trusted to confirm. The gate stayed fail-closed throughout, so none of this let a bad file through, but it did leave me with a control that looked enabled and was not.',
+      'A successful apply only tells me the API accepted the request, so I now read the live setting back before I trust a control.',
+    ],
+    tools: ['Terraform', 'Azure', 'Defender for Storage', 'GitHub Actions'],
+    tags: ['fail-closed', 'malware-scanning', 'least-privilege', 'drift'],
+    screenshots: [
+      'SecureExpenseClaims/SEC83.webp',
+      'SecureExpenseClaims/SEC84.webp',
+      'SecureExpenseClaims/SEC85.webp',
+      'SecureExpenseClaims/SEC86.webp',
+    ],
+  },
+  {
     id: 'personal-ops-platform-entry-10-payday-plan-and-goals',
     date: '2026-10-15',
     category: 'Personal Ops Platform',
