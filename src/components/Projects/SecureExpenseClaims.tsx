@@ -251,9 +251,16 @@ function SecureExpenseClaims() {
           <p className="text-ink-muted">
             Complete. Before using this in production I&apos;d log the manager
             at decision time so the Sentinel rules don&apos;t depend on history,
-            find out why the pipeline&apos;s apply leaves malware scanning off
-            and turn it on there, and limit who can write blob index tags,
-            because the download gate trusts them.
+            find out why the pipeline&apos;s apply leaves malware scanning off,
+            and limit who can write blob index tags, because the download gate
+            trusts them. I&apos;d also add a Content-Security-Policy to the app
+            the API serves, review token storage (tokens sit in sessionStorage),
+            put the eight policy assignments into the drift check, and set a
+            spending limit, since my two budgets email me and stop nothing. Two
+            detections are not built: failed sign-ins and forged tokens, because
+            the API logs no token failures and Entra&apos;s sign-in logs need a
+            paid licence, and Defender malicious-file alerts, which need the
+            paid plan.
           </p>
         </div>
 

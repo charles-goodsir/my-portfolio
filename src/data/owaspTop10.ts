@@ -546,14 +546,21 @@ export const owaspTop10: OwaspRisk[] = [
       "The personal ops MCP server now writes one audit line for every authenticated request, with the tool and the argument names and never the values. Failed token guesses are logged with the caller's IP and a failure count",
       'Turned on Defender for Storage malware scanning on the expense claims storage account. A plain EICAR file uploaded to the container was tagged Malicious, a high severity alert fired and the notification email arrived',
       'Added a spending meter to the personal ops platform that sends one alert at 80% and one at 100% per fortnight. The stored alert state names the payday it belongs to, so the next fortnight starts clean without a reset job',
+      "Copied every expense claims audit row to the logs after a successful save, with ids only, then wrote two Sentinel rules as Terraform: an approval by someone who is not the employee's manager, and a decision soon after the manager was changed. Each query was tested on made-up log lines first, and the second fired on a real approval in the live app",
+      'My first live check of the Sentinel rule showed no incidents, which looked like a pass. A query showing each decision with its manager said NO MANAGER HISTORY, because the manager was set before the logging existed, so the rule had nothing to compare. It is a known limit, written into the docs',
     ],
     next: [
       "Read OWASP's Logging Cheat Sheet for what should and shouldn't be logged",
       'Set up centralized logging for the homelab app, even something simple like a local Loki stack',
       'Define what "suspicious" looks like for the app (failed logins, repeated 403s) and alert on it',
-      'Alert on the expense claims audit actions, which are logged but not watched yet',
+      'Alert on failed sign-ins and forged tokens in the expense claims app, once the API logs token failures and I have a sign-in log source that does not need a paid licence',
     ],
-    tools: ['Healthchecks.io', 'Defender for Storage'],
+    tools: [
+      'Healthchecks.io',
+      'Defender for Storage',
+      'Microsoft Sentinel',
+      'KQL',
+    ],
     relatedDiaryLinks: [
       {
         label: 'Expense claims: approvals with an audit row for every change',
@@ -587,6 +594,11 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Personal ops: a spending meter with two alerts a fortnight',
         entryId: 'personal-ops-platform-entry-10-payday-plan-and-goals',
+      },
+      {
+        label: 'Expense claims: two Sentinel detections',
+        entryId:
+          'secure-expense-claims-entry-34-detection-with-nothing-to-judge',
       },
     ],
   },
