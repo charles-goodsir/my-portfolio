@@ -40,6 +40,41 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'secure-expense-claims-entry-34-detection-with-nothing-to-judge',
+    date: '2026-10-19',
+    category: 'Secure Expense Claims',
+    title: 'First Sentinel detection, and a quiet test that proved nothing',
+    workedOn: [
+      'Copied every audit row to the logs after a successful save, ids only',
+      'Turned on Sentinel for the workspace in Terraform',
+      "Wrote a rule for an approval by someone who is not the employee's manager, as code",
+      'Tested the query on made-up log lines, and broke it to see it fail',
+      'Next: a rule for a burst of failed sign-ins, and one for a reporting line change',
+    ],
+    body: [
+      "The audit trail lived only in Postgres, so nothing could watch it. I made the API write one log line per audit row after the save succeeds, with the actor, claim, employee and status change as ids and nothing else. A failed save, like a concurrency conflict, writes no row and no line. I put it in one place, the context's save method, so every writer is covered.",
+      "The first rule flags an approval or rejection by someone who is not the employee's manager. The API already refuses that with a 404, so the rule is a second layer that would catch an API bug or a database edit. It works out the manager from the SetManager lines in the same logs, not from the API's own query. I proved the logic on a table of made-up lines first: a legitimate approval stays quiet, an approval after the manager changed alerts, and an employee with no history is ignored. Flipping the comparison made the quiet row appear and the alert row vanish, so the comparison decides the result. Then I deployed it as Terraform and read the stored rule back from Azure.",
+      "Two things did not work the first time. My query for the audit lines used startswith and found nothing, because the console log prints each entry over two lines and indents the message, and the tests had passed because they read the message directly. Then I checked the deployed rule against real approvals. No incident appeared, which looked like a pass, but a query showing each decision with its manager said NO MANAGER HISTORY for both. Alice's manager had been set before the logging existed, so the rule had nothing to compare. After Adam set the manager again, the same query said the manager matches.",
+      'I decided not to build a second rule for approvals with no history. It is a known limit, written into the docs, with the production answer of logging the manager at decision time.',
+      'A test that stays quiet only counts if it was given the case it should judge, so I check that the thing that should have been compared was actually there.',
+    ],
+    tools: ['Microsoft Sentinel', 'KQL', 'Log Analytics', 'Terraform', '.NET'],
+    tags: [
+      'detection engineering',
+      'audit logging',
+      'false negatives',
+      'Sentinel',
+    ],
+    screenshots: [
+      'SecureExpenseClaims/SEC90.webp',
+      'SecureExpenseClaims/SEC87.webp',
+      'SecureExpenseClaims/SEC88.webp',
+      'SecureExpenseClaims/SEC89.webp',
+      'SecureExpenseClaims/SEC91.webp',
+      'SecureExpenseClaims/SEC92.webp',
+    ],
+  },
+  {
     id: 'personal-ops-platform-entry-11-pending-charges',
     date: '2026-10-16',
     category: 'Personal Ops Platform',
