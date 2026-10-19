@@ -186,6 +186,11 @@ function PersonalOps() {
               tests and a live retest on the mini PC
             </li>
             <li>
+              • Pending card charges kept in their own table and shown as an
+              estimate, while alerts and the payday plan read settled spending
+              only
+            </li>
+            <li>
               • A payday plan that sends once even across a restart, checks
               every setting before saving any, and alerts at 80% and 100% of
               spending
@@ -196,10 +201,11 @@ function PersonalOps() {
         <div className="bg-card border border-line rounded-lg shadow-card p-8">
           <h2 className="text-2xl font-bold text-ink mb-6">Known limits</h2>
           <p className="text-ink-muted">
-            The watchdog runs on the same box and sends through Telegram, so if
-            either is down nothing alerts me. The disk is not encrypted, which I
-            decided against for now because tokens can be revoked and it would
-            mean a reinstall. Both are written down in the repo.
+            The watchdog runs on the same box and sends through Telegram, so an
+            outside check on Healthchecks.io emails me if either goes down. The
+            disk is not encrypted, which I decided against for now because
+            tokens can be revoked and it would mean a reinstall. That decision
+            is written down in the repo.
           </p>
         </div>
 
