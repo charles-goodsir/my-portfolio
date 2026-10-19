@@ -44,6 +44,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     date: '2026-10-19',
     category: 'Secure Expense Claims',
     title: 'Two Sentinel detections, and a quiet test that proved nothing',
+    milestone: true,
     workedOn: [
       'Copied every audit row to the logs after a successful save, ids only',
       'Turned on Sentinel for the workspace in Terraform',
@@ -56,7 +57,8 @@ export const cyberDiaryEntries: DiaryEntry[] = [
       "The first rule flags an approval or rejection by someone who is not the employee's manager. The API already refuses that with a 404, so the rule is a second layer that would catch an API bug or a database edit. It works out the manager from the SetManager lines in the same logs, not from the API's own query. I proved the logic on a table of made-up lines first: a legitimate approval stays quiet, an approval after the manager changed alerts, and an employee with no history is ignored. Flipping the comparison made the quiet row appear and the alert row vanish, so the comparison decides the result. Then I deployed it as Terraform and read the stored rule back from Azure.",
       "Two things did not work the first time. My query for the audit lines used startswith and found nothing, because the console log prints each entry over two lines and indents the message, and the tests had passed because they read the message directly. Then I checked the deployed rule against real approvals. No incident appeared, which looked like a pass, but a query showing each decision with its manager said NO MANAGER HISTORY for both. Alice's manager had been set before the logging existed, so the rule had nothing to compare. After Adam set the manager again, the same query said the manager matches.",
       "The second rule flags a decision by a manager assigned less than an hour earlier, the pattern for routing someone's claims to a friend. It went through the same made-up-lines test, and then on the live app it showed an incident when Adam changed Alice's manager and Manny approved her claim. That is a rule firing on real traffic from the real API. I decided not to build a third rule for approvals with no history. It is a known limit, written into the docs, with the production answer of logging the manager at decision time.",
-      'A test that stays quiet only counts if it was given the case it should judge, so I check that the thing that should have been compared was actually there.',
+      "That closes Secure Expense Claims. Across the 34 entries the same four mistakes kept turning up. A control looked on and was off: an auto-merge that didn't wait for CI, an assignment setting that did nothing, a scanner that was never enrolled, a rule with no history to compare. A test passed because it never ran the case it was meant to judge. A green plan or a successful apply told me what was asked, not what was true. And a guardrail sat where the thing it guarded could reach it.",
+      "What worked every time was the same. Put the rule where the guarded thing can't change it, in the database, in Entra, in Azure Policy or in a role with one data action. Break it on purpose and watch the test fail. Read the live setting back after every apply. I'll treat those as standing steps in the next project.",
     ],
     tools: ['Microsoft Sentinel', 'KQL', 'Log Analytics', 'Terraform', '.NET'],
     tags: [

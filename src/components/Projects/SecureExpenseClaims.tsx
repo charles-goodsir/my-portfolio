@@ -88,14 +88,14 @@ function SecureExpenseClaims() {
             <h1 className="text-4xl font-bold text-ink">
               Secure Expense Claims
             </h1>
-            <span className="inline-block bg-warn/10 text-warn px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
-              In progress
+            <span className="inline-block bg-success/10 text-success px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+              Complete
             </span>
           </div>
           <p className="text-xl text-ink-muted mb-6">
             An expense claims app on Azure: employees submit claims with
-            receipts, managers approve them, and finance pays them. I&apos;m
-            building it, then hardening, attacking and monitoring it.
+            receipts, managers approve them, and finance pays them. I built it,
+            then hardened, attacked and monitored it.
           </p>
           <p className="text-xl text-ink-muted mb-6">
             It joins my two previous projects: the AppSec Homelab was an app
@@ -249,10 +249,11 @@ function SecureExpenseClaims() {
         <div className="bg-card border border-line rounded-lg shadow-card p-8">
           <h2 className="text-2xl font-bold text-ink mb-6">Status</h2>
           <p className="text-ink-muted">
-            In progress. Phase 0 (threat model, CI and required checks), Phase 1
-            (the app in Docker Compose behind nginx), Phase 2 (deployment to
-            Azure through Terraform) and Phase 3 (Entra ID sign-in, proved by
-            attacking it) are done.
+            Complete. Before using this in production I&apos;d log the manager
+            at decision time so the Sentinel rules don&apos;t depend on history,
+            find out why the pipeline&apos;s apply leaves malware scanning off
+            and turn it on there, and limit who can write blob index tags,
+            because the download gate trusts them.
           </p>
         </div>
 
