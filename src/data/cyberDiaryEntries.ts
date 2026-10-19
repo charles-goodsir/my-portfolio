@@ -40,6 +40,30 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-11-pending-charges',
+    date: '2026-10-16',
+    category: 'Personal Ops Platform',
+    title:
+      'Pending charges in their own table, and a leak test that proved nothing',
+    workedOn: [
+      'Found why the briefing said nothing was spent: the bank had not settled the charges',
+      'Pending charges in their own table, replaced whole on every sync',
+      'Description masked, used only for my rules, and out of reach of the dashboard role',
+      'Briefing and dashboard show settled plus pending as an estimate',
+      'Alerts and the payday plan stay on settled spending only',
+      'Next: dependency scanning and signed images',
+    ],
+    body: [
+      'The 16 October briefing said I had spent nothing the day before, and my bank app showed four pending card charges. The sync had run and added rows, so it was working. Akahu lists a purchase from its main endpoint only after the bank settles it, which can take days. Pending charges come from a separate endpoint that my sync never called. I made one read-only call to check that a personal app could use it, printing only the count and the field names, and it returned the four.',
+      "Akahu's docs say pending charges have no id and no category, can change, and that the local copy should be rebuilt on every fetch. So they go in their own table, replaced whole inside one transaction on every sync, and nothing is matched against the settled transactions. A charge that settles drops out of one table and appears in the other. The client reads four fields and never the meta block, which can hold account numbers, and it caps the response at 1,000 items. The description is stored masked and cut to 300 characters. It exists only so my own rules can keep rent out of the estimate, and the dashboard role has a column grant that leaves it out.",
+      'The briefing and the dashboard now show settled plus pending as an estimate and write the split out. The 80% and 100% alerts and the payday plan read settled spending only, because an alert that has gone out cannot be recalled when a pending charge vanishes. A pending list older than 26 hours is left out, so a failing fetch cannot show old numbers as current. After the first deploy the pending total looked far too large next to the settled figure. I checked it against the settled data for duplicates before building on it. There were none, and the big charge was real.',
+      "I broke each control to check its test. Dropping the masking, the transaction, the column grant, the size cap, the stale limit, the timezone handling and the transfer exclusion each failed a test, and so did making the alert read the combined figure. Two of my tests would have missed real failures. My first attack test ran as the table owner, but the page runs as the read-only role, where a query that reads the description fails with permission denied. I added a test that runs the meter's query as that role. My first leak check looked for the hostile strings themselves, which also appear on the page as payee names from the settled data, so it proved nothing until I put a canary prefix on every pending description.",
+      'Data that changes after I read it should not be matched or merged. I rebuild my copy each time, keep it apart from the settled data, label anything built from it as an estimate, and keep it out of anything I cannot undo.',
+    ],
+    tools: ['TypeScript', 'Postgres', 'Vitest', 'Akahu', 'Telegram'],
+    tags: ['untrusted input', 'least privilege', 'data integrity', 'testing'],
+  },
+  {
     id: 'secure-expense-claims-entry-33-scanning-reported-on-but-off',
     date: '2026-10-16',
     category: 'Secure Expense Claims',

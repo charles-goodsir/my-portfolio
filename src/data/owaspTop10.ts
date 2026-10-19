@@ -32,6 +32,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Attacked the deployed expense claims app with real Entra tokens for each user: 28 access control attacks, including IDOR on claims and receipts, self-approval, smuggled status fields, double payment and forged tokens. All 28 were refused, after I checked the script reported a planted IDOR',
       'Opened a PR adding an Azure Policy assignment through the expense claims pipeline. The plan went green with one to add, and the apply failed with a 403, because the pipeline identity is Contributor and cannot write Microsoft.Authorization. The thing that builds the environment cannot switch off its own guardrails',
       'Gave the personal ops dashboard its own Postgres role, dashboard_ro, with SELECT on four tables. On the live box an INSERT, a DELETE and a read of the rules table were each refused. RESET ROLE does not undo the role but SET ROLE to my own login user does, which I accepted because the dashboard runs fixed queries, and recorded it in an ADR',
+      'Stored the pending-charge description masked and gave the dashboard role a column grant that leaves it out. My first attack test ran as the table owner, so it could not show that a query reading the description fails for the role the page runs as. I added a test that runs the meter query as dashboard_ro and gets permission denied',
     ],
     next: [
       "PortSwigger's Access Control and Server-Side Request Forgery learning paths",
@@ -76,6 +77,10 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: 'Personal ops: a read-only dashboard and its database role',
         entryId: 'personal-ops-platform-entry-9-read-only-dashboard',
+      },
+      {
+        label: 'Personal ops: pending charges kept out of the dashboard role',
+        entryId: 'personal-ops-platform-entry-11-pending-charges',
       },
     ],
   },
@@ -350,6 +355,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Wrote a threat model for the personal ops MCP server before attacking it: a trust-boundary diagram, four kinds of attacker and 22 STRIDE threats. About 200 attack tests produced 17 findings, none a way in from outside, and I fixed all of them. The worst was a mask that hid card numbers from the output while the search filter still ran on the unmasked text',
       "Wrote the personal ops dashboard's threat model section (D1 to D9) and ADR 11 before any code",
       'Uploaded a receipt made of an EICAR test string behind a %PDF header. The app accepted it four times because it only checks the first bytes, and Defender for Storage tagged it No threats found, because EICAR is only recognised at the start of a file. A plain EICAR file uploaded straight to the container was tagged Malicious',
+      'Designed pending bank charges as data that can change after I read it: a separate table replaced whole in one transaction on every sync, never matched against settled transactions, shown as an estimate, and left out of the 80% and 100% alerts and the payday plan, because an alert that has gone out cannot be recalled. A pending list older than 26 hours is dropped, so a failing fetch cannot show old numbers as current',
     ],
     next: [
       "Prove each threat model control in the expense claims app as it's built, and read OWASP's ASVS design-level requirements",
@@ -388,6 +394,10 @@ export const owaspTop10: OwaspRisk[] = [
         label:
           'Expense claims: a malware scanner and a receipt that got past it',
         entryId: 'secure-expense-claims-entry-31-defender-malware-scanning',
+      },
+      {
+        label: 'Personal ops: pending charges in their own table',
+        entryId: 'personal-ops-platform-entry-11-pending-charges',
       },
     ],
   },
