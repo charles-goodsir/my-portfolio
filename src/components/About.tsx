@@ -32,6 +32,11 @@ const roles = [
     detail:
       'security testing and vulnerability management, building on Security+ and my lab work',
   },
+  {
+    name: 'GRC Analyst (entry level)',
+    detail:
+      'policy-against-evidence reviews, like the fictional accountancy firm in my Lab Notes',
+  },
 ]
 
 // Only what the Lab Notes or CV show me using.
@@ -202,6 +207,9 @@ function About() {
               </li>
             ))}
           </ul>
+          <p className="mt-4 text-sm text-ink-muted">
+            Open to remote roles, and to roles in Auckland, Melbourne or London.
+          </p>
         </div>
         <div>
           <h2 className="text-sm font-semibold text-ink uppercase tracking-wide mb-3">
