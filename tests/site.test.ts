@@ -65,7 +65,8 @@ test('every notebook has a hover description', () => {
   const diary = read('src/components/CyberDiary.tsx')
   for (const category of new Set(cyberDiaryEntries.map((e) => e.category)))
     assert.ok(
-      diary.includes(`'${category}':`),
+      diary.includes(`'${category}':`) ||
+        new RegExp(`^\\s*${category}:`, 'm').test(diary),
       `add '${category}' to descriptions in CyberDiary.tsx`,
     )
 })

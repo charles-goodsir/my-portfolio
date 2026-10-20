@@ -56,6 +56,7 @@ const descriptions: Record<string, string> = {
     'An expense app on Azure, threat-modelled, attacked and monitored',
   'Personal Ops Platform':
     'A self-hosted MCP server and database on my home mini PC',
+  GRC: 'Policy against evidence: reviews of fictional firms',
 }
 
 const entryCount = (n: number) => `${n} ${n === 1 ? 'entry' : 'entries'}`

@@ -29,3 +29,4 @@ dist-ssr
 # Local design audit output
 DESIGN-IS-*/
 plans/
+!public/grc/**/*.md
