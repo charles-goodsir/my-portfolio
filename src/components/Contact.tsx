@@ -6,7 +6,7 @@ function Contact() {
     <section id="contact" className="max-w-[45rem] mx-auto py-16 px-4">
       <SectionHeader
         title="Get In Touch"
-        intro="I'm always interested in new opportunities, especially software, platform, or security-adjacent roles that fit with my CompTIA Security+ certification. Feel free to reach out!"
+        intro="I'm always interested in new opportunities, especially software, platform, or security-adjacent roles that fit with my CompTIA Security+ certification. I'm open to remote work and to roles in Auckland, Melbourne or London. Feel free to reach out!"
       />
 
       <Card>
