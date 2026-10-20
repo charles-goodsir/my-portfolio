@@ -40,6 +40,77 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'grc-beginner-entry-01-a-policy-that-names-someone-who-left',
+    date: '2026-10-21',
+    category: 'GRC',
+    title:
+      'Five findings on a small firm, and the policy that named someone who had left',
+    workedOn: [
+      'Read the access control policy and incident procedure for a fictional 15-person accountancy firm',
+      'Checked both against the Microsoft 365 user list, the incident log and the office manager interview',
+      'Asked the client for the contractor contract and permissions list, and learned neither existed',
+      'Wrote five findings with ratings, then had them graded against the answer key',
+    ],
+    body: [
+      'I reviewed a fictional accountancy firm on two topics: who has access to what, and how it handles incidents. I read the two policies first, then checked each against the user list, the incident log and the interview notes. My five findings were an out-of-date incident procedure, a contractor with no contract, MFA not enforced, leavers still enabled and a wrong-client email that was never assessed. The one that needed a cross-check was the incident contact. The procedure names Priya Shah, and the interview says she has left. I did not go on to the user list, which shows her k.shah account left on 27 February and is still enabled.',
+      "I asked the client for the contractor's contract and permissions. Neither existed, only an email agreement. I was graded a B, about 70%. I had caught four of the five planted gaps. I missed the shared office-admin login as a finding, even though it was in my notes. I found two leavers still signing in but missed a third, l.okoro. I rated MFA Medium when it should have been High, because three of the four accounts without it are the partners. I spent one finding on the contractor, which was not a planted gap, and I aimed the wrong-client email finding at a signed deletion confirmation the procedure never asks for. The procedure asks for a partner decision within 72 hours, and the log shows none.",
+      'Next time I will quote the policy line before calling something a gap, and count the rows in the evidence before writing a number. I will pick my findings by what the evidence proves, not by what looks most worrying. A control is only as good as the person it names, so check the policy against the people and accounts that exist.',
+    ],
+    codeSnippets: [
+      {
+        label: 'user-list.csv: three leavers, all still Enabled',
+        code: `user,role,hr_status,account_status,last_signin,mfa_enabled
+g.barros,Accountant,Left 2026-06-30,Enabled,2026-07-14,Yes
+k.shah,IT lead,Left 2026-02-27,Enabled,2026-03-02,Yes
+l.okoro,Admin,Left 2026-09-11,Enabled,2026-09-11,Yes`,
+      },
+      {
+        label: 'user-list.csv: the four accounts with MFA off',
+        code: `user,role,hr_status,account_status,last_signin,mfa_enabled
+a.holm,Partner,Active,Enabled,2026-10-16,No
+b.mossop,Partner,Active,Enabled,2026-10-15,No
+c.tran,Partner,Active,Enabled,2026-10-16,No
+office-admin,Shared,n/a,Enabled,2026-10-16,No`,
+      },
+      {
+        label: 'Incident procedure steps 3 and 4, and the INC-03 log row',
+        code: `3. If client or personal data may be affected, the IT lead tells a partner. The partners decide within 72 hours whether the incident must be reported to the ICO and whether clients must be told.
+4. When the incident is closed, the IT lead records the cause in the log.
+
+| ID | Date | Summary | Action taken | Closed | Cause recorded | Client or ICO assessment |
+|---|---|---|---|---|---|---|
+| INC-03 | 2026-08-04 | Client tax summary emailed to the wrong client (similar company names) | Recipient asked by email to delete it | 2026-08-05 | No | None recorded |`,
+      },
+      {
+        label:
+          'Incident procedure step 1, and the user list row for the IT lead',
+        code: `1. Anyone who spots a security problem (suspicious email, lost device, wrong recipient, odd login) tells the IT lead straight away: Priya Shah, ext. 214, priya.shah@haldenmoss.example.
+
+user,role,hr_status,account_status,last_signin,mfa_enabled
+k.shah,IT lead,Left 2026-02-27,Enabled,2026-03-02,Yes`,
+      },
+    ],
+    tools: ['Microsoft 365', 'UK GDPR'],
+    tags: ['GRC', 'access review', 'incident response', 'leavers'],
+    links: [
+      { label: 'Engagement scope', url: '/grc/beginner/scope.md' },
+      {
+        label: 'Access control policy',
+        url: '/grc/beginner/access-control-policy.md',
+      },
+      {
+        label: 'Incident procedure and log',
+        url: '/grc/beginner/incident-procedure-and-log.md',
+      },
+      { label: 'User list (export)', url: '/grc/beginner/user-list.csv' },
+      {
+        label: 'Interview notes: office manager',
+        url: '/grc/beginner/interview-notes-office-manager.md',
+      },
+      { label: 'Grading report', url: '/grc/beginner/grading-report.md' },
+    ],
+  },
+  {
     id: 'secure-expense-claims-entry-34-detection-with-nothing-to-judge',
     date: '2026-10-19',
     category: 'Secure Expense Claims',

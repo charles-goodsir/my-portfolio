@@ -1,0 +1,18 @@
+user,role,hr_status,account_status,last_signin,mfa_enabled
+a.holm,Partner,Active,Enabled,2026-10-16,No
+b.mossop,Partner,Active,Enabled,2026-10-15,No
+c.tran,Partner,Active,Enabled,2026-10-16,No
+d.rafferty,Accountant,Active,Enabled,2026-10-16,Yes
+e.whitlock,Accountant,Active,Enabled,2026-10-15,Yes
+f.nwosu,Accountant,Active,Enabled,2026-10-16,Yes
+g.barros,Accountant,Left 2026-06-30,Enabled,2026-07-14,Yes
+h.sweeney,Bookkeeper,Active,Enabled,2026-10-14,Yes
+i.kowalski,Bookkeeper,Active,Enabled,2026-10-16,Yes
+j.pryce,Admin,Active,Enabled,2026-10-16,Yes
+k.shah,IT lead,Left 2026-02-27,Enabled,2026-03-02,Yes
+l.okoro,Admin,Left 2026-09-11,Enabled,2026-09-11,Yes
+m.fenn,Trainee,Active,Enabled,2026-10-15,Yes
+n.laurent,Trainee,Active,Enabled,2026-10-16,Yes
+o.adebayo,Reception,Active,Enabled,2026-10-16,Yes
+office-admin,Shared,n/a,Enabled,2026-10-16,No
+# Export taken 2026-10-16 from the Microsoft 365 admin centre. This is the full list of accounts.
