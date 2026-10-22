@@ -57,7 +57,10 @@ const descriptions: Record<string, string> = {
   'Personal Ops Platform':
     'A self-hosted MCP server and database on my home mini PC',
   GRC: 'Policy against evidence: reviews of fictional firms',
+  'GRC Lite': 'A small compliance tool behind six required CI checks',
 }
+
+const claudeProjects = new Set(['Personal Ops Platform', 'GRC Lite'])
 
 const entryCount = (n: number) => `${n} ${n === 1 ? 'entry' : 'entries'}`
 
@@ -81,6 +84,7 @@ function CyberDiary() {
             <SectionHeader
               title={notebook.name}
               intro={[
+                claudeProjects.has(notebook.name) && 'Claude Project',
                 descriptions[notebook.name],
                 entryCount(notebook.entries.length),
               ]
@@ -148,6 +152,12 @@ function CyberDiary() {
                 </span>
               </span>
               <span className="mt-auto text-xs text-white/85 leading-relaxed">
+                {claudeProjects.has(n.name) && (
+                  <>
+                    Claude Project
+                    <br />
+                  </>
+                )}
                 {entryCount(n.entries.length)}
                 <br />
                 Latest{' '}

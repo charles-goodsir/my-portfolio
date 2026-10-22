@@ -87,6 +87,9 @@ function PersonalOps() {
             <span className="inline-block bg-warn/10 text-warn px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
               In progress
             </span>
+            <span className="inline-block bg-primary/10 text-primary px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
+              Claude Project
+            </span>
           </div>
           <p className="text-xl text-ink-muted mb-6">
             A self-hosted platform on my home mini PC that lets Claude work with
