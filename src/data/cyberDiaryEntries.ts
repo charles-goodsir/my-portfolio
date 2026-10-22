@@ -40,6 +40,37 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-12-signed-images-and-verified-deploy',
+    date: '2026-10-22',
+    category: 'Personal Ops Platform',
+    title:
+      'A deploy that checks who built the image, and a timer I forgot to install',
+    workedOn: [
+      'Dependency audit in CI and weekly, proved red on a vulnerable dependency',
+      'Dependabot with a 7 day cooldown and ignore rules, after it moved my image to Node 25',
+      'Release workflow: build, Trivy scan, push by digest, keyless cosign signature',
+      'Scan found 14 fixable findings in my own base image, now none',
+      'Nightly updater that verifies the signature, stays up or rolls back, and reports every outcome',
+      'Next: wrap-up, or a scanning pipeline over my other repos',
+    ],
+    body: [
+      'The mini PC built its own image from source on every deploy, so nothing checked it and nothing scanned it. I added a dependency audit as its own workflow, so a registry outage cannot block a merge, and a weekly run for the case where a quiet repo gets no pull requests. To prove it I opened a draft pull request that added a package with a known advisory. The audit failed in 6 seconds while the normal build check passed, and the clean pull request passed both. Dependabot came next, with a 7 day cooldown and no auto-merge, and the first thing it did was move my image from Node 24 to Node 25. I merged it before I had written an ignore rule for the node image, and Node 25 is not long term support. I put the pinned Node 24 digest back and added rules for the node image, Node types and the pre-1.0 Ollama image.',
+      "A release workflow now builds the image on main, scans it with Trivy, pushes it to GHCR by digest and signs it with cosign, using the workflow's own identity and no stored key. It uses no third party actions: Trivy and cosign are downloaded at pinned versions and checked against pinned checksums, which I compared with the publishers' own files. I scanned the image I already had before writing the gate, and it had 14 fixable high or critical findings. Seven were in the copy of npm bundled in the Node image, which nothing of mine runs, and seven were in a Debian package the newest base image had not picked up, one of them critical. The final image now drops npm and upgrades that package, and the scan reports none.",
+      "The box pulls, and nothing pushes to it. A script checks the digest of main, verifies the signature against my release workflow on main by digest, pulls the image, and waits for every service to stay up for 60 seconds. If they do not, the previous image goes back and the failed digest is skipped. I proved the refusals on the box with an image that has no signature and an image signed by Sigstore's own identity. To prove the rollback I asked for 300 seconds of stability in a 15 second wait, which cannot succeed, so the real signed image had to roll back, and the bot container's image id then matched the previous image. The real update stayed up. Its Telegram message did not arrive, because the connection reset and a failed send was only logged, so the call now retries.",
+      'I did not install the nightly timer, and three days later the watchdog told me the image update had not succeeded. The heartbeat was working: the last success was my manual run, and the alert came 26 hours after it. I installed the timer and ran the unit once under systemd as my own user. A signature proves where an image came from but says nothing about whether the code is safe, and a rollback restores the image and leaves the database alone, so a migration has to work with the release before it.',
+      'The control I trust most in this phase is the one that noticed something I forgot. A job that stops running needs a heartbeat that someone watches, because a quiet failure produces no error.',
+    ],
+    tools: [
+      'GitHub Actions',
+      'Trivy',
+      'cosign',
+      'Docker',
+      'Dependabot',
+      'Bash',
+    ],
+    tags: ['supply chain', 'image signing', 'rollback', 'dependency scanning'],
+  },
+  {
     id: 'grc-foundation-entry-02-a-rule-with-an-if-in-it',
     date: '2026-10-22',
     category: 'GRC',
