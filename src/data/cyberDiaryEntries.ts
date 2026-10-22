@@ -40,6 +40,58 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'grc-lite-entry-1-secret-scan-scanned-every-branch',
+    date: '2026-10-22',
+    category: 'GRC Lite',
+    title: 'My secret scan failed the wrong PRs',
+    workedOn: [
+      'Added six required CI checks to grc-lite',
+      'Proved each check by making it fail',
+    ],
+    body: [
+      'Phase 3 of grc-lite put six required checks on every pull request into main: pytest on Python 3.10, 3.12 and 3.14, ruff, pip-audit, and a gitleaks scan over the git history. I pinned the actions to commit SHAs, verify the gitleaks binary against a checksum, and apply branch protection to admins too, so I cannot merge past a red check.',
+      'To prove each check, I opened a throwaway PR that should fail only that check. A broken golden test failed pytest, an unused import failed ruff, and pinning jinja2==3.1.2 made pip-audit list several advisories. The fourth PR added a made-up AWS-shaped key. Branch protection blocked all four, but the secret scan was also red on the three PRs that had no secret in them.',
+      'The cause was my own config. The checkout fetched every branch, and gitleaks git scans every ref, so the key on the proof-secret branch failed every other PR. That made my secret proof worthless, because I could not tell whether the scan had caught the key or was failing everywhere. I closed the proof PRs, deleted the leaking branch first because the scan would still have seen it, and limited the scan to the history that would merge.',
+      'I reran it with two PRs open at the same time. The fake-key PR failed only the secret scan and was blocked, and the harmless README change passed all six checks while the key branch still existed. Then I closed both without merging.',
+      'A check that goes red once has not been proved until you know it went red for the reason you meant, and a test with no clean case next to it cannot tell a working control from one that fails everything.',
+    ],
+    codeSnippets: [
+      {
+        label: 'Before',
+        code: './gitleaks git --redact --no-banner --verbose .',
+      },
+      {
+        label: 'After',
+        code: './gitleaks git --redact --no-banner --verbose --log-opts="HEAD" .',
+      },
+    ],
+    tools: [
+      'GitHub Actions',
+      'gitleaks',
+      'pip-audit',
+      'Ruff',
+      'pytest',
+      'GitHub branch protection',
+    ],
+    tags: [
+      'GRC Lite',
+      'secret scanning',
+      'branch protection',
+      'CI/CD pipeline',
+    ],
+    links: [
+      {
+        label: 'grc-lite on GitHub',
+        url: 'https://github.com/charles-goodsir/grc-lite',
+      },
+    ],
+    milestone: true,
+    screenshots: [
+      'GRCLite/fake-key-pr-only-secrets-red.webp',
+      'GRCLite/harmless-pr-all-green.webp',
+    ],
+  },
+  {
     id: 'personal-ops-platform-entry-12-signed-images-and-verified-deploy',
     date: '2026-10-22',
     category: 'Personal Ops Platform',
@@ -56,7 +108,7 @@ export const cyberDiaryEntries: DiaryEntry[] = [
     body: [
       'The mini PC built its own image from source on every deploy, so nothing checked it and nothing scanned it. I added a dependency audit as its own workflow, so a registry outage cannot block a merge, and a weekly run for the case where a quiet repo gets no pull requests. To prove it I opened a draft pull request that added a package with a known advisory. The audit failed in 6 seconds while the normal build check passed, and the clean pull request passed both. Dependabot came next, with a 7 day cooldown and no auto-merge, and the first thing it did was move my image from Node 24 to Node 25. I merged it before I had written an ignore rule for the node image, and Node 25 is not long term support. I put the pinned Node 24 digest back and added rules for the node image, Node types and the pre-1.0 Ollama image.',
       "A release workflow now builds the image on main, scans it with Trivy, pushes it to GHCR by digest and signs it with cosign, using the workflow's own identity and no stored key. It uses no third party actions: Trivy and cosign are downloaded at pinned versions and checked against pinned checksums, which I compared with the publishers' own files. I scanned the image I already had before writing the gate, and it had 14 fixable high or critical findings. Seven were in the copy of npm bundled in the Node image, which nothing of mine runs, and seven were in a Debian package the newest base image had not picked up, one of them critical. The final image now drops npm and upgrades that package, and the scan reports none.",
-      "The box pulls, and nothing pushes to it. A script checks the digest of main, verifies the signature against my release workflow on main by digest, pulls the image, and waits for every service to stay up for 60 seconds. If they do not, the previous image goes back and the failed digest is skipped. I proved the refusals on the box with an image that has no signature and an image signed by Sigstore's own identity. To prove the rollback I asked for 300 seconds of stability in a 15 second wait, which cannot succeed, so the real signed image had to roll back, and the bot container's image id then matched the previous image. The real update stayed up. Its Telegram message did not arrive, because the connection reset and a failed send was only logged, so the call now retries.",
+      "The box pulls, and nothing pushes to it. A script checks the digest of main, verifies the signature against my release workflow on main by digest, pulls the image, and waits for every service to stay up for 60 seconds. If they do not, the previous image goes back and the failed digest is skipped. I proved the refusals on the box with an image that has no signature and an image signed by Sigstore's own identity. To prove the rollback I asked for 300 seconds of stability in a 15 second wait, which cannot succeed, so the real signed image had to roll back, and the bot container's image id then matched the previous image. The real update stayed up. Its Telegram message did not arrive, because the connection reset and my code only logged the failed send, so the call now retries.",
       'I did not install the nightly timer, and three days later the watchdog told me the image update had not succeeded. The heartbeat was working: the last success was my manual run, and the alert came 26 hours after it. I installed the timer and ran the unit once under systemd as my own user. A signature proves where an image came from but says nothing about whether the code is safe, and a rollback restores the image and leaves the database alone, so a migration has to work with the release before it.',
       'The control I trust most in this phase is the one that noticed something I forgot. A job that stops running needs a heartbeat that someone watches, because a quiet failure produces no error.',
     ],
@@ -160,7 +212,7 @@ const REQUIRED = ["title", "criteria", "condition", "cause", "consequence", "act
       'Wrote five findings with ratings, then had them graded against the answer key',
     ],
     body: [
-      'I reviewed a fictional accountancy firm on two topics: who has access to what, and how it handles incidents. I read the two policies first, then checked each against the user list, the incident log and the interview notes. My five findings were an out-of-date incident procedure, a contractor with no contract, MFA not enforced, leavers still enabled and a wrong-client email that was never assessed. The one that needed a cross-check was the incident contact. The procedure names Priya Shah, and the interview says she has left. I did not go on to the user list, which shows her k.shah account left on 27 February and is still enabled.',
+      'I reviewed a fictional accountancy firm on two topics: who has access to what, and how it handles incidents. I read the two policies first, then checked each against the user list, the incident log and the interview notes. My five findings were an out-of-date incident procedure, a contractor with no contract, MFA not enforced, leavers still enabled and a wrong-client email that was never assessed. The one that needed a cross-check was the incident contact. The procedure names Priya Shah, and the interview says she has left. I went on to the user list, which shows her k.shah account left on 27 February and is still enabled.',
       "I asked the client for the contractor's contract and permissions. Neither existed, only an email agreement. I was graded a B, about 70%. I had caught four of the five planted gaps. I missed the shared office-admin login as a finding, even though it was in my notes. I found two leavers still signing in but missed a third, l.okoro. I rated MFA Medium when it should have been High, because three of the four accounts without it are the partners. I spent one finding on the contractor, which was not a planted gap, and I aimed the wrong-client email finding at a signed deletion confirmation the procedure never asks for. The procedure asks for a partner decision within 72 hours, and the log shows none.",
       'Next time I will quote the policy line before calling something a gap, and count the rows in the evidence before writing a number. I will pick my findings by what the evidence proves, not by what looks most worrying. A control is only as good as the person it names, so check the policy against the people and accounts that exist.',
     ],
@@ -234,10 +286,10 @@ k.shah,IT lead,Left 2026-02-27,Enabled,2026-03-02,Yes`,
     body: [
       "The audit trail lived only in Postgres, so nothing could watch it. I made the API write one log line per audit row after the save succeeds, with the actor, claim, employee and status change as ids and nothing else. A failed save, like a concurrency conflict, writes no row and no line. I put it in one place, the context's save method, so every writer is covered.",
       "The first rule flags an approval or rejection by someone who is not the employee's manager. The API already refuses that with a 404, so the rule is a second layer that would catch an API bug or a database edit. It works out the manager from the SetManager lines in the same logs, not from the API's own query. I proved the logic on a table of made-up lines first: a legitimate approval stays quiet, an approval after the manager changed alerts, and an employee with no history is ignored. Flipping the comparison made the quiet row appear and the alert row vanish, so the comparison decides the result. Then I deployed it as Terraform and read the stored rule back from Azure.",
-      "Two things did not work the first time. My query for the audit lines used startswith and found nothing, because the console log prints each entry over two lines and indents the message, and the tests had passed because they read the message directly. Then I checked the deployed rule against real approvals. No incident appeared, which looked like a pass, but a query showing each decision with its manager said NO MANAGER HISTORY for both. Alice's manager had been set before the logging existed, so the rule had nothing to compare. After Adam set the manager again, the same query said the manager matches.",
+      "Two things did not work the first time. My query for the audit lines used startswith and found nothing, because the console log prints each entry over two lines and indents the message, and the tests had passed because they read the message itself. Then I checked the deployed rule against real approvals. No incident appeared, which looked like a pass, but a query showing each decision with its manager said NO MANAGER HISTORY for both. Alice's manager had been set before the logging existed, so the rule had nothing to compare. After Adam set the manager again, the same query said the manager matches.",
       "The second rule flags a decision by a manager assigned less than an hour earlier, the pattern for routing someone's claims to a friend. It went through the same made-up-lines test, and then on the live app it showed an incident when Adam changed Alice's manager and Manny approved her claim. That is a rule firing on real traffic from the real API. I decided not to build a third rule for approvals with no history. It is a known limit, written into the docs, with the production answer of logging the manager at decision time.",
       "That closes Secure Expense Claims. Across the 34 entries the same four mistakes kept turning up. A control looked on and was off: an auto-merge that didn't wait for CI, an assignment setting that did nothing, a scanner that was never enrolled, a rule with no history to compare. A test passed because it never ran the case it was meant to judge. A green plan or a successful apply told me what was asked, not what was true. And a guardrail sat where the thing it guarded could reach it.",
-      "What worked every time was the same. Put the rule where the guarded thing can't change it, in the database, in Entra, in Azure Policy or in a role with one data action. Break it on purpose and watch the test fail. Read the live setting back after every apply. I'll treat those as standing steps in the next project.",
+      "Three steps worked each time. Put the rule where the guarded thing can't change it, in the database, in Entra, in Azure Policy or in a role with one data action. Break it on purpose and watch the test fail. Read the live setting back after every apply. I'll treat those as standing steps in the next project.",
     ],
     tools: ['Microsoft Sentinel', 'KQL', 'Log Analytics', 'Terraform', '.NET'],
     tags: [
@@ -292,7 +344,7 @@ k.shah,IT lead,Left 2026-02-27,Enabled,2026-03-02,Yes`,
       'Next: document the manual step, turn Defender for Storage off and tear down',
     ],
     body: [
-      'I moved the Defender for Storage enrolment into Terraform so a rebuilt storage account would not need the manual API call. The first apply failed with "already exists", because I had enabled that account by hand. After a rebuild it applied cleanly in five seconds, so I went and read the live setting back. Enrolment was on, but malware scanning was not: onUpload was off with the cap at -1, while the config said on with 10 GB.',
+      'I moved the Defender for Storage enrolment into Terraform so a rebuilt storage account would not need the manual API call. The first apply failed with "already exists", because I had enabled that account by hand. After a rebuild it applied in five seconds, so I read the live setting back. Enrolment was on, but malware scanning was not: onUpload was off with the cap at -1, while the config said on with 10 GB.',
       "A plan showed Terraform wanting to change those two values, and applying it reported success, but the setting was still off afterwards. The same call run as my own user turned it on. I think the pipeline identity's Contributor role is the reason, but I have not proven it. I kept the resource for enrolment and drift detection, and I will document the manual call after each rebuild, because I would rather not widen the pipeline's roles to fix it.",
       'Turning scanning on exposed a second problem. Defender adds a firewall exception for its scanner to the storage account, and the next plan wanted to delete it. Applying that would have blocked the scanner, so no tags, and the API would have refused every download. I told Terraform to ignore that one attribute with ignore_changes, and the following plan showed no changes. A clean upload then got its tag within seconds and downloaded with a 200.',
       'The gate stayed fail-closed throughout, so no bad file got through, but I was left with a control that looked enabled and was off.',
@@ -348,7 +400,7 @@ k.shah,IT lead,Left 2026-02-27,Enabled,2026-03-02,Yes`,
       "The first Azure test returned a 500 instead of the 409 I expected. The API's Storage Blob Data Contributor role can read and write blobs but cannot read index tags, so the tag lookup came back 403. I made a custom role, Storage Blob Tag Reader, with exactly one data action (tags/read) and no tag write, because an API that can write tags could mark a malicious receipt clean. The pipeline can't create roles, so I made the role by hand and widened the deploy identity's RBAC-admin condition so Terraform can assign it.",
       'The second problem came after a rebuild. The subscription-level Defender for Storage plan was on, but the new storage account was not enrolled: per-account setting off, no Event Grid topic, so no tags, and the gate refused everything. The portal\'s Enable button sat on "Enablement in progress" with no write in the Activity Log, so I set it with a direct call to the defenderForStorageSettings API. Tags landed within seconds after that. I proved the gate three ways: a clean blob downloads (200), a blob I retagged "Malicious" is refused (409), and a blob with its tags deleted is refused (409). The storage firewall also blocked my own IP from the tag view until I added it.',
       'I accepted that anyone with tag write access can still change a tag, so the gate is only as strong as who holds that permission. Enrolment is still a manual step, so moving it into Terraform is next.',
-      'A fail-closed gate only helps if the scanner behind it is running. Mine worked perfectly while the scanner was off, and the only symptom was every download being refused.',
+      'A fail-closed gate only helps if the scanner behind it is running. Mine did what I built it to do while the scanner was off, and the only symptom was a refused download.',
     ],
     tools: [
       'Azure',

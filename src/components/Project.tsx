@@ -8,12 +8,14 @@ interface Project {
   title: string
   description: string
   technologies: string[]
+  claudeProject?: boolean
 }
 
 const securityProjects: Project[] = [
   {
     id: 'personal-ops',
     title: 'Personal Ops Platform',
+    claudeProject: true,
     description:
       'In progress. A self-hosted MCP server on my home mini PC that lets Claude search my notes and categorise my bank transactions without the raw data leaving my hardware. So far: token auth and a firewall rule, local embeddings, masked descriptions with tests I broke on purpose, a hardened host, a watchdog proved by making it fire, a read-only dashboard with 31 attack tests, signed images with a verified deploy, a payday plan sent once even across a restart, and pending charges shown as an estimate',
     technologies: [
@@ -153,6 +155,9 @@ function Projects() {
                 {project.description}
               </p>
               <div className="flex flex-wrap gap-2 mb-4">
+                {project.claudeProject && (
+                  <Tag variant="primary">Claude Project</Tag>
+                )}
                 {project.technologies.map((tech) => (
                   <Tag key={tech}>{tech}</Tag>
                 ))}
