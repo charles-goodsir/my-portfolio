@@ -40,6 +40,84 @@ export interface DiaryEntry {
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'grc-foundation-entry-02-a-rule-with-an-if-in-it',
+    date: '2026-10-22',
+    category: 'GRC',
+    title: 'Seven of eight gaps found, and the rule that started with an if',
+    workedOn: [
+      'Read the access control, incident and supplier policies for a fictional 21-person dental practice',
+      'Checked each rule against the user list, the incident log, the supplier register and the practice manager interview',
+      "Logged the patient record access rule as can't test and asked the client for the access logs",
+      'Picked seven findings, rated them, and had them graded against the answer key',
+    ],
+    body: [
+      "I assessed a fictional dental practice on three topics: who has access to what, how it handles incidents, and how it manages suppliers that hold patient data. I turned the rules in the three policies into rows on a criteria sheet, logged the evidence for each, and marked each row as meets, gap or can't test. The non-obvious part was that some rules are conditional. The incident procedure only asks for a decision on reporting to the ICO if patient data may be affected, so you cannot test it by counting entries.",
+      'I found 7 of the 8 planted gaps. The one I missed was INC-04, where a receptionist emailed a list of patient names and treatments to the wrong patient and the only action was a phone call asking them to delete it. I had marked that rule as meets because 3 of the 5 incidents had a decision logged. That was the wrong test. I should have asked, for each incident, whether the condition applied and then whether a decision was recorded, which would have shown that INC-03 and INC-04 had none. I also submitted seven findings when I had eight slots, rated two of them too low (the unreviewed incidents and the supplier with no data processing agreement), and wrote that the ICO was notified for three incidents when in each case the decision was that no notification was needed. Five of my findings had no Cause line. That was down to my notes tool, which marked Cause as optional, so it never flagged them as missing.',
+      "I spent no slots on the password length, the data protection lead role or backups, because none of them broke a rule written in the practice's own policies, and I kept the overseas login inside the MFA finding instead of giving it a slot of its own. I made Cause a required field in the notes tool, so a finding with no cause now shows as incomplete. Next time I will test a conditional rule one item at a time, use every slot, check any claim in my notes against its source before it goes into a finding, and add a Cause line to every finding. A rule that says if needs the condition tested first, and counting the entries that look right hides the one that is not.",
+    ],
+    codeSnippets: [
+      {
+        label:
+          'Incident procedure step 3, and the two log rows with no decision',
+        code: `3. If patient data may be affected, the Practice Manager decides within 72 hours whether the ICO must be told and whether patients must be notified, and records the decision in the log.
+
+| ID | Date | Summary | Action taken | Closed | Review date and cause | ICO / patient decision recorded |
+|---|---|---|---|---|---|---|
+| INC-03 | 2026-06-19 | Printer left patient letters in the output tray overnight | Letters collected next morning | 2026-06-19 | None | None |
+| INC-04 | 2026-07-23 | Receptionist emailed tomorrow's appointment list (patient names and treatments) to the wrong patient with the same first name | Recipient asked by phone to delete it | 2026-07-24 | None | None |`,
+      },
+      {
+        label: 'user-list.csv: five leavers, all still Enabled',
+        code: `user,role,hr_status,account_status,last_signin,mfa_enabled
+hyg.hart,Hygienist,Left 2026-04-17,Enabled,2026-04-17,Yes
+nurse.lowe,Dental nurse,Left 2026-05-29,Enabled,2026-06-12,Yes
+nurse.nolan,Dental nurse,Left 2026-09-12,Enabled,2026-09-12,Yes
+rec.rees,Reception,Left 2026-07-31,Enabled,2026-08-04,Yes
+fin.vance,Finance,Left 2026-03-06,Enabled,2026-03-09,Yes`,
+      },
+      {
+        label: 'notes tool: Cause added to the required fields',
+        code: `// before
+const REQUIRED = ["title", "criteria", "condition", "consequence", "action", "owner", "due", "likelihood", "lwhy", "impact", "iwhy"];
+// after
+const REQUIRED = ["title", "criteria", "condition", "cause", "consequence", "action", "owner", "due", "likelihood", "lwhy", "impact", "iwhy"];`,
+      },
+    ],
+    tools: ['Microsoft 365', 'UK GDPR', 'JavaScript'],
+    tags: [
+      'GRC',
+      'incident response',
+      'supplier management',
+      'conditional controls',
+      'evidence testing',
+    ],
+    links: [
+      { label: 'Engagement scope', url: '/grc/foundation/scope.md' },
+      {
+        label: 'Access control policy',
+        url: '/grc/foundation/access-control-policy.md',
+      },
+      {
+        label: 'Incident procedure and log',
+        url: '/grc/foundation/incident-procedure-and-log.md',
+      },
+      {
+        label: 'Supplier policy and register',
+        url: '/grc/foundation/supplier-policy-and-register.md',
+      },
+      { label: 'User list (export)', url: '/grc/foundation/user-list.csv' },
+      {
+        label: 'User list (readable view)',
+        url: '/grc/foundation/user-list.html',
+      },
+      {
+        label: 'Interview notes: practice manager',
+        url: '/grc/foundation/interview-notes-practice-manager.md',
+      },
+      { label: 'Grading report', url: '/grc/foundation/grading-report.md' },
+    ],
+  },
+  {
     id: 'grc-beginner-entry-01-a-policy-that-names-someone-who-left',
     date: '2026-10-21',
     category: 'GRC',
