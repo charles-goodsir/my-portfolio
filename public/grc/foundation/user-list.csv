@@ -1,0 +1,32 @@
+user,role,hr_status,account_status,last_signin,mfa_enabled
+dr.ahmed,Dentist,Active,Enabled,2026-10-14,Yes
+dr.bell,Dentist,Active,Enabled,2026-10-13,No
+dr.chaudhry,Dentist,Active,Enabled,2026-10-14,No
+dr.dunmore,Dentist,Active,Enabled,2026-10-12,No
+dr.eze,Dentist,Active,Enabled,2026-10-14,No
+dr.farouk,Dentist,Active,Enabled,2026-10-13,Yes
+hyg.farrow,Hygienist,Active,Enabled,2026-10-14,Yes
+hyg.gill,Hygienist,Active,Enabled,2026-10-13,Yes
+hyg.hart,Hygienist,Left 2026-04-17,Enabled,2026-04-17,Yes
+hyg.ibarra,Hygienist,Active,Enabled,2026-10-14,Yes
+nurse.iqbal,Dental nurse,Active,Enabled,2026-10-14,Yes
+nurse.jones,Dental nurse,Active,Enabled,2026-10-14,Yes
+nurse.khan,Dental nurse,Active,Enabled,2026-10-13,Yes
+nurse.lowe,Dental nurse,Left 2026-05-29,Enabled,2026-06-12,Yes
+nurse.mehta,Dental nurse,Active,Enabled,2026-10-14,Yes
+nurse.nolan,Dental nurse,Left 2026-09-12,Enabled,2026-09-12,Yes
+nurse.okafor,Dental nurse,Active,Enabled,2026-10-12,Yes
+nurse.price,Dental nurse,Active,Enabled,2026-10-14,Yes
+nurse.quill,Dental nurse,Active,Enabled,2026-10-13,Yes
+rec.owens,Reception,Active,Enabled,2026-10-14,Yes
+rec.patel,Reception,Active,Enabled,2026-10-14,Yes
+rec.quinn,Reception,Active,Enabled,2026-10-13,No
+rec.rees,Reception,Left 2026-07-31,Enabled,2026-08-04,Yes
+pm.stone,Practice manager,Active,Enabled,2026-10-14,Yes
+fin.turner,Finance,Active,Enabled,2026-10-14,Yes
+fin.vance,Finance,Left 2026-03-06,Enabled,2026-03-09,Yes
+it.contractor,External IT contractor,n/a,Enabled,2026-10-10,Yes
+reception-clifton,Shared,n/a,Enabled,2026-10-14,No
+reception-redland,Shared,n/a,Enabled,2026-10-14,No
+xray-pc,Shared,n/a,Enabled,2026-10-14,No
+# Export taken 2026-10-14 from the Microsoft 365 admin centre. This is the full list of accounts.
