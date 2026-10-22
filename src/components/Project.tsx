@@ -8,25 +8,9 @@ interface Project {
   title: string
   description: string
   technologies: string[]
-  claudeProject?: boolean
 }
 
 const securityProjects: Project[] = [
-  {
-    id: 'personal-ops',
-    title: 'Personal Ops Platform',
-    claudeProject: true,
-    description:
-      'In progress. A self-hosted MCP server on my home mini PC that lets Claude search my notes and categorise my bank transactions without the raw data leaving my hardware. So far: token auth and a firewall rule, local embeddings, masked descriptions with tests I broke on purpose, a hardened host, a watchdog proved by making it fire, a read-only dashboard with 31 attack tests, signed images with a verified deploy, a payday plan sent once even across a restart, and pending charges shown as an estimate',
-    technologies: [
-      'TypeScript',
-      'MCP',
-      'PostgreSQL',
-      'Ollama',
-      'Docker Compose',
-      'Claude API',
-    ],
-  },
   {
     id: 'secure-expense-claims',
     title: 'Secure Expense Claims',
@@ -78,6 +62,23 @@ const securityProjects: Project[] = [
       'React Three Fiber',
       'Tailwind CSS',
       'Vite',
+    ],
+  },
+]
+
+const claudeProjects: Project[] = [
+  {
+    id: 'personal-ops',
+    title: 'Personal Ops Platform',
+    description:
+      'In progress. A self-hosted MCP server on my home mini PC that lets Claude search my notes and categorise my bank transactions without the raw data leaving my hardware. So far: token auth and a firewall rule, local embeddings, masked descriptions with tests I broke on purpose, a hardened host, a watchdog proved by making it fire, a read-only dashboard with 31 attack tests, signed images with a verified deploy, a payday plan sent once even across a restart, and pending charges shown as an estimate',
+    technologies: [
+      'TypeScript',
+      'MCP',
+      'PostgreSQL',
+      'Ollama',
+      'Docker Compose',
+      'Claude API',
     ],
   },
 ]
@@ -136,6 +137,23 @@ const earlierProjects: Project[] = [
   },
 ]
 
+function ProjectCard({ project }: { project: Project }) {
+  return (
+    <li>
+      <Card to={`/projects/${project.id}`}>
+        <h3 className="text-xl font-bold text-ink mb-2">{project.title}</h3>
+        <p className="text-ink-muted text-sm mb-4">{project.description}</p>
+        <div className="flex flex-wrap gap-2 mb-4">
+          {project.technologies.map((tech) => (
+            <Tag key={tech}>{tech}</Tag>
+          ))}
+        </div>
+        <span className="text-primary text-sm font-medium">View details →</span>
+      </Card>
+    </li>
+  )
+}
+
 function Projects() {
   return (
     <section id="projects" className="max-w-[45rem] mx-auto py-16 px-4">
@@ -146,27 +164,20 @@ function Projects() {
       </h2>
       <ul className="space-y-4">
         {securityProjects.map((project) => (
-          <li key={project.id}>
-            <Card to={`/projects/${project.id}`}>
-              <h3 className="text-xl font-bold text-ink mb-2">
-                {project.title}
-              </h3>
-              <p className="text-ink-muted text-sm mb-4">
-                {project.description}
-              </p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {project.claudeProject && (
-                  <Tag variant="primary">Claude Project</Tag>
-                )}
-                {project.technologies.map((tech) => (
-                  <Tag key={tech}>{tech}</Tag>
-                ))}
-              </div>
-              <span className="text-primary text-sm font-medium">
-                View details →
-              </span>
-            </Card>
-          </li>
+          <ProjectCard key={project.id} project={project} />
+        ))}
+      </ul>
+
+      <h2 className="text-sm font-semibold text-ink uppercase tracking-wide mt-14 mb-2">
+        Built with Claude
+      </h2>
+      <p className="text-sm text-ink-muted mb-4">
+        Claude wrote the code, commits and pull requests for these. I set the
+        goals, reviewed the work and made the decisions.
+      </p>
+      <ul className="space-y-4">
+        {claudeProjects.map((project) => (
+          <ProjectCard key={project.id} project={project} />
         ))}
       </ul>
 

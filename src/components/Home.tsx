@@ -1,12 +1,12 @@
 import { Link } from 'react-router'
-import { cyberDiaryEntries } from '../data/cyberDiaryEntries'
+import { claudeProjects, cyberDiaryEntries } from '../data/cyberDiaryEntries'
 import { owaspTop10 } from '../data/owaspTop10'
 import Button from './ui/Button'
 import VisitorBadge from './ui/VisitorBadge'
 import { hasFinePointer } from './Play/device'
 
-// The data file is newest first.
-const latest = cyberDiaryEntries[0]
+// The data file is newest first; skip the projects Claude built.
+const latest = cyberDiaryEntries.find((e) => !claudeProjects.has(e.category))!
 const owaspCount = (progress: string) =>
   owaspTop10.filter((r) => r.progress === progress).length
 

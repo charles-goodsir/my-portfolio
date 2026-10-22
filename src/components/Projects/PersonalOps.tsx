@@ -12,7 +12,7 @@ const images = [
     width: 1004,
     height: 1122,
     caption:
-      'I removed the masking on purpose and two tests failed, which proved the digest test was checking something real.',
+      'Claude removed the masking on purpose and two tests failed, which proved the digest test was checking something real.',
   },
   {
     src: firewallImg,
@@ -88,7 +88,7 @@ function PersonalOps() {
               In progress
             </span>
             <span className="inline-block bg-primary/10 text-primary px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wide">
-              Claude Project
+              Built with Claude
             </span>
           </div>
           <p className="text-xl text-ink-muted mb-6">
@@ -113,7 +113,7 @@ function PersonalOps() {
               to="/diary?project=Personal%20Ops%20Platform"
               className="bg-ink text-card px-6 py-3 rounded-lg hover:opacity-90 transition-colors duration-300 font-semibold"
             >
-              Full write-up in my Lab Notes
+              Full write-up of the build
             </Link>
             <a
               href="https://github.com/charles-goodsir/personal-ops-platform"
@@ -133,15 +133,15 @@ function PersonalOps() {
           <div className="prose prose-lg max-w-none">
             <p className="text-ink-muted mb-4">
               Giving an AI model access to personal data raises one question at
-              every step: what leaves the machine? I built this to answer it in
-              code. The server runs on a mini PC at home, notes are embedded
-              with a local model, and the finance agent only sees masked
-              descriptions and aggregates.
+              every step: what leaves the machine? Claude built this to answer
+              it in code, to my brief. The server runs on a mini PC at home,
+              notes are embedded with a local model, and the finance agent only
+              sees masked descriptions and aggregates.
             </p>
             <p className="text-ink-muted">
-              Each control has a test, and I have broken most of them to watch
-              the test fail. Real data found gaps that fixtures never did, such
-              as a card number mask that let the last four digits through.
+              Each control has a test, and Claude has broken most of them to
+              watch the test fail. Real data found gaps that fixtures never did,
+              such as a card number mask that let the last four digits through.
             </p>
           </div>
         </div>

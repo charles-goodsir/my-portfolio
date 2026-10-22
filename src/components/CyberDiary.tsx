@@ -1,5 +1,5 @@
 import { Link, useSearchParams } from 'react-router'
-import { cyberDiaryEntries } from '../data/cyberDiaryEntries'
+import { claudeProjects, cyberDiaryEntries } from '../data/cyberDiaryEntries'
 import { formatDate } from './diaryAssets'
 import SectionHeader from './ui/SectionHeader'
 
@@ -11,10 +11,15 @@ const notebooks = [
   entries: cyberDiaryEntries.filter((entry) => entry.category === name),
 }))
 
-// Latest milestone from each notebook, or its latest entry until it has one.
-const highlights = notebooks.map(
-  (n) => n.entries.find((entry) => entry.milestone) ?? n.entries[0],
-)
+type IndexedNotebook = (typeof notebooks)[number] & { i: number }
+
+// Keep each notebook's index across both shelves so cover colours and tooltip ids stay put.
+const indexed: IndexedNotebook[] = notebooks.map((n, i) => ({ ...n, i }))
+
+// Latest milestone from each lab notebook, or its latest entry until it has one.
+const highlights = notebooks
+  .filter((n) => !claudeProjects.has(n.name))
+  .map((n) => n.entries.find((entry) => entry.milestone) ?? n.entries[0])
 
 // Cover colours cycle through this list; fixed, so white text stays readable in both themes.
 const covers = [
@@ -60,9 +65,59 @@ const descriptions: Record<string, string> = {
   'GRC Lite': 'A small compliance tool behind six required CI checks',
 }
 
-const claudeProjects = new Set(['Personal Ops Platform', 'GRC Lite'])
+const labShelf = indexed.filter((n) => !claudeProjects.has(n.name))
+const claudeShelf = indexed.filter((n) => claudeProjects.has(n.name))
 
 const entryCount = (n: number) => `${n} ${n === 1 ? 'entry' : 'entries'}`
+
+function Shelf({ items }: { items: IndexedNotebook[] }) {
+  return (
+    <ul className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-8">
+      {items.map(({ i, ...n }) => (
+        <li key={n.name} className="group relative">
+          <Link
+            to={`/diary?project=${encodeURIComponent(n.name)}`}
+            aria-describedby={
+              descriptions[n.name] ? `notebook-desc-${i}` : undefined
+            }
+            className={`relative flex flex-col aspect-3/4 ${covers[i % covers.length]} text-white rounded-l-sm rounded-r-md pl-6 pr-3 py-4 shadow-[3px_3px_0_0_#f8fafc,4px_4px_0_0_#cbd5e1,6px_6px_0_0_#f8fafc,7px_7px_0_0_#cbd5e1] motion-safe:transition-transform duration-200 hover:-translate-y-1`}
+          >
+            {/* Spine */}
+            <span
+              aria-hidden="true"
+              className="absolute inset-y-0 left-0 w-3 bg-black/30 rounded-l-sm border-r border-white/20"
+            />
+            <span className="mt-4 min-h-14 flex items-center justify-center bg-[#fdfbf5] text-slate-900 rounded-sm px-2 py-2 text-center shadow-sm">
+              <span className="text-sm font-semibold leading-snug">
+                {n.name}
+              </span>
+            </span>
+            <span className="mt-auto text-xs text-white/85 leading-relaxed">
+              {entryCount(n.entries.length)}
+              <br />
+              Latest{' '}
+              <time dateTime={n.entries[0].date}>
+                {formatDate(n.entries[0].date, {
+                  day: 'numeric',
+                  month: 'short',
+                })}
+              </time>
+            </span>
+          </Link>
+          {descriptions[n.name] && (
+            <span
+              id={`notebook-desc-${i}`}
+              role="tooltip"
+              className="pointer-events-none absolute left-0 right-0 top-full z-10 mt-4 bg-card border border-line rounded-lg shadow-card px-3 py-2 text-sm text-ink-muted leading-snug opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible motion-safe:transition-opacity duration-200"
+            >
+              {descriptions[n.name]}
+            </span>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 function CyberDiary() {
   const [searchParams] = useSearchParams()
@@ -84,7 +139,7 @@ function CyberDiary() {
             <SectionHeader
               title={notebook.name}
               intro={[
-                claudeProjects.has(notebook.name) && 'Claude Project',
+                claudeProjects.has(notebook.name) && 'Built with Claude',
                 descriptions[notebook.name],
                 entryCount(notebook.entries.length),
               ]
@@ -131,56 +186,7 @@ function CyberDiary() {
         intro="A running log of security labs and practice, one notebook per project."
       />
 
-      <ul className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-8">
-        {notebooks.map((n, i) => (
-          <li key={n.name} className="group relative">
-            <Link
-              to={`/diary?project=${encodeURIComponent(n.name)}`}
-              aria-describedby={
-                descriptions[n.name] ? `notebook-desc-${i}` : undefined
-              }
-              className={`relative flex flex-col aspect-3/4 ${covers[i % covers.length]} text-white rounded-l-sm rounded-r-md pl-6 pr-3 py-4 shadow-[3px_3px_0_0_#f8fafc,4px_4px_0_0_#cbd5e1,6px_6px_0_0_#f8fafc,7px_7px_0_0_#cbd5e1] motion-safe:transition-transform duration-200 hover:-translate-y-1`}
-            >
-              {/* Spine */}
-              <span
-                aria-hidden="true"
-                className="absolute inset-y-0 left-0 w-3 bg-black/30 rounded-l-sm border-r border-white/20"
-              />
-              <span className="mt-4 min-h-14 flex items-center justify-center bg-[#fdfbf5] text-slate-900 rounded-sm px-2 py-2 text-center shadow-sm">
-                <span className="text-sm font-semibold leading-snug">
-                  {n.name}
-                </span>
-              </span>
-              <span className="mt-auto text-xs text-white/85 leading-relaxed">
-                {claudeProjects.has(n.name) && (
-                  <>
-                    Claude Project
-                    <br />
-                  </>
-                )}
-                {entryCount(n.entries.length)}
-                <br />
-                Latest{' '}
-                <time dateTime={n.entries[0].date}>
-                  {formatDate(n.entries[0].date, {
-                    day: 'numeric',
-                    month: 'short',
-                  })}
-                </time>
-              </span>
-            </Link>
-            {descriptions[n.name] && (
-              <span
-                id={`notebook-desc-${i}`}
-                role="tooltip"
-                className="pointer-events-none absolute left-0 right-0 top-full z-10 mt-4 bg-card border border-line rounded-lg shadow-card px-3 py-2 text-sm text-ink-muted leading-snug opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible motion-safe:transition-opacity duration-200"
-              >
-                {descriptions[n.name]}
-              </span>
-            )}
-          </li>
-        ))}
-      </ul>
+      <Shelf items={labShelf} />
 
       {highlights.length > 0 && (
         <nav
@@ -210,6 +216,15 @@ function CyberDiary() {
           </ul>
         </nav>
       )}
+
+      <h2 className="mt-16 mb-2 text-sm font-semibold text-ink uppercase tracking-wide">
+        Built with Claude
+      </h2>
+      <p className="text-sm text-ink-muted mb-6">
+        Claude wrote the code, commits and pull requests for these. I set the
+        goals, reviewed the work and made the decisions.
+      </p>
+      <Shelf items={claudeShelf} />
     </section>
   )
 }
