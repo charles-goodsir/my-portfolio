@@ -191,6 +191,11 @@ function PersonalOps() {
               only
             </li>
             <li>
+              • Images built and scanned in CI, signed with keyless cosign, and
+              deployed only after the mini PC verifies the signature, with a
+              rollback if the services don&apos;t stay up
+            </li>
+            <li>
               • A payday plan that sends once even across a restart, checks
               every setting before saving any, and alerts at 80% and 100% of
               spending
