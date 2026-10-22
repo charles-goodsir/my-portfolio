@@ -138,14 +138,13 @@ const REQUIRED = ["title", "criteria", "condition", "cause", "consequence", "act
       },
       { label: 'User list (export)', url: '/grc/foundation/user-list.csv' },
       {
-        label: 'User list (readable view)',
-        url: '/grc/foundation/user-list.html',
-      },
-      {
         label: 'Interview notes: practice manager',
         url: '/grc/foundation/interview-notes-practice-manager.md',
       },
-      { label: 'Grading report', url: '/grc/foundation/grading-report.md' },
+      {
+        label: 'Findings register with grading (.xlsx)',
+        url: '/grc/foundation/findings-register-graded.xlsx',
+      },
     ],
   },
   {
