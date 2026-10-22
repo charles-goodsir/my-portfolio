@@ -219,9 +219,13 @@ export const owaspTop10: OwaspRisk[] = [
       'In the expense claims app, made NuGet fail the restore on high and critical advisories instead of using dotnet list package --vulnerable, which exits 0 even when it finds something. Tested it by adding System.Text.Json 8.0.4, and the restore failed with NU1903',
       "Watched Dependabot auto-merge a patch update one second after the secret scan passed, while four other checks were still running. Auto-merge waits for required checks, and the ruleset didn't require any yet. All five passed, but nothing would have stopped a failure",
       "When Docker Hub rate-limited and then timed out my CI, I copied the Postgres image by its exact digest to GitHub's own registry, so CI pulls the same bytes with the token every run already has",
+      'Added a dependency audit to the personal ops platform as its own workflow, so a registry outage cannot block a merge, plus a weekly run for a quiet repo. A draft PR that added a package with a known advisory failed the audit in 6 seconds while the normal build check passed',
+      'Set Dependabot up with a 7 day cooldown and no auto-merge. It moved my image from Node 24 to Node 25 before I had written an ignore rule, so I pinned the Node 24 digest back and added rules for the node image, Node types and the pre-1.0 Ollama image',
+      'Built a release workflow for the personal ops image with no third party actions: Trivy and cosign are downloaded at pinned versions and checked against pinned checksums. The scan found 14 fixable high or critical findings in my own base image, 7 in the bundled npm and 7 in a Debian package, and the final image now reports none',
+      "Signed each image with keyless cosign and made the mini PC verify the signature against my release workflow on main, by digest, before it deploys. An image with no signature and one signed by Sigstore's own identity were both refused, and a failed health check rolls back to the previous image",
     ],
     next: ['Generate an SBOM for the app'],
-    tools: ['Dependabot', 'Trivy', 'gitleaks', 'NuGet audit'],
+    tools: ['Dependabot', 'Trivy', 'gitleaks', 'NuGet audit', 'cosign'],
     relatedDiaryLinks: [
       {
         label: 'AppSec Homelab',
@@ -259,6 +263,11 @@ export const owaspTop10: OwaspRisk[] = [
       {
         label: "Personal ops: a CI image copied by digest to GitHub's registry",
         entryId: 'personal-ops-platform-entry-2-local-knowledge-base',
+      },
+      {
+        label: 'Personal ops: a deploy that checks who built the image',
+        entryId:
+          'personal-ops-platform-entry-12-signed-images-and-verified-deploy',
       },
     ],
   },
@@ -481,16 +490,16 @@ export const owaspTop10: OwaspRisk[] = [
       "Put the expense claims app's money rules in Postgres as well as the API: a check constraint rejects zero or negative amounts, and an xmin concurrency token stops one save overwriting another. Both are proved by integration tests against a real Postgres container, since an in-memory database ignores both",
       "Expense claims images are pushed to GHCR by the same job that scans them with Trivy, only on main, and Terraform deploys the API pinned to the image's sha256 digest, so a moved tag cannot change what runs",
       'Made the personal ops repo public with a ruleset on main: changes need a pull request and the CI check, force pushes and deletion are blocked, and admin bypass works through a PR only. A direct push to main was rejected by GitHub. I did not test the force push and deletion rules separately',
+      "Made the mini PC deploy only signed images: the updater verifies a keyless cosign signature against my release workflow on main, by digest, before it pulls. An image with no signature and one signed by Sigstore's own identity were both refused. If the new image's services don't stay up for 60 seconds, it rolls back, which I proved with a wait that could not succeed",
     ],
-    next: [
-      'The PortSwigger Insecure Deserialization path, and artifact signing with Sigstore/cosign',
-    ],
+    next: ['The PortSwigger Insecure Deserialization path'],
     tools: [
       'Azure DevOps approvals',
       'GitHub rulesets',
       'SSH commit signing',
       'actionlint',
       'gitleaks',
+      'cosign',
     ],
     relatedDiaryLinks: [
       {
@@ -526,6 +535,11 @@ export const owaspTop10: OwaspRisk[] = [
         label: 'Personal ops: a ruleset and a push GitHub refused',
         entryId: 'personal-ops-platform-entry-7-outside-check-repo-rules',
       },
+      {
+        label: 'Personal ops: a deploy that checks who built the image',
+        entryId:
+          'personal-ops-platform-entry-12-signed-images-and-verified-deploy',
+      },
     ],
   },
   {
@@ -548,6 +562,7 @@ export const owaspTop10: OwaspRisk[] = [
       'Added a spending meter to the personal ops platform that sends one alert at 80% and one at 100% per fortnight. The stored alert state names the payday it belongs to, so the next fortnight starts clean without a reset job',
       "Copied every expense claims audit row to the logs after a successful save, with ids only, then wrote two Sentinel rules as Terraform: an approval by someone who is not the employee's manager, and a decision soon after the manager was changed. Each query was tested on made-up log lines first, and the second fired on a real approval in the live app",
       'My first live check of the Sentinel rule showed no incidents, which looked like a pass. A query showing each decision with its manager said NO MANAGER HISTORY, because the manager was set before the logging existed, so the rule had nothing to compare. It is a known limit, written into the docs',
+      'The personal ops watchdog told me the nightly image update had not succeeded, 26 hours after the last success. I had forgotten to install the timer. The heartbeat worked and the alert reached me, which is the case it exists for',
     ],
     next: [
       "Read OWASP's Logging Cheat Sheet for what should and shouldn't be logged",
@@ -599,6 +614,12 @@ export const owaspTop10: OwaspRisk[] = [
         label: 'Expense claims: two Sentinel detections',
         entryId:
           'secure-expense-claims-entry-34-detection-with-nothing-to-judge',
+      },
+      {
+        label:
+          'Personal ops: a timer I forgot to install, caught by the watchdog',
+        entryId:
+          'personal-ops-platform-entry-12-signed-images-and-verified-deploy',
       },
     ],
   },
