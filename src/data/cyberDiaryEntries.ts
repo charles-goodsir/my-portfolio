@@ -25,6 +25,13 @@ export interface DiaryEntry {
   labs?: DiaryLab[]
   /** Before/after (or standalone) code snippets, rendered as labelled code blocks after `body`. */
   codeSnippets?: { label: string; code: string }[]
+  /** A file of mine shown as a highlighted card inside `body`, after the paragraph at `afterParagraph` (0-based). */
+  featuredFile?: {
+    label: string
+    summary: string
+    url: string
+    afterParagraph: number
+  }
   tools?: string[]
   tags?: string[]
   /** External references, rendered as a list at the end. */
@@ -200,6 +207,12 @@ const REQUIRED = ["title", "criteria", "condition", "consequence", "action", "ow
 const REQUIRED = ["title", "criteria", "condition", "cause", "consequence", "action", "owner", "due", "likelihood", "lwhy", "impact", "iwhy"];`,
       },
     ],
+    featuredFile: {
+      label: 'Findings register (graded)',
+      summary: 'My seven findings with ratings, graded against the answer key.',
+      url: '/grc/foundation/findings-register-graded.xlsx',
+      afterParagraph: 1,
+    },
     tools: ['Microsoft 365', 'UK GDPR', 'JavaScript'],
     tags: [
       'GRC',
