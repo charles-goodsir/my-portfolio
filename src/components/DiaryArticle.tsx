@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import type { DiaryEntry } from '../data/cyberDiaryEntries'
 import { formatDate, resolveScreenshot, scriptMap } from './diaryAssets'
 
@@ -5,6 +6,44 @@ interface DiaryArticleProps {
   entry: DiaryEntry
   /** Heading level for the entry title. 'h1' on the standalone entry page. */
   titleAs?: 'h1' | 'h3'
+}
+
+function FeaturedFile({
+  file,
+}: {
+  file: NonNullable<DiaryEntry['featuredFile']>
+}) {
+  return (
+    <a
+      href={file.url}
+      download
+      className="flex items-center gap-4 rounded-lg border border-line bg-sunken p-4 hover:border-primary motion-safe:transition-colors"
+    >
+      {/* Fixed green so the white grid reads in both themes. */}
+      <span
+        aria-hidden="true"
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-emerald-700"
+      >
+        <svg
+          className="h-7 w-7 text-white"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.75}
+          viewBox="0 0 24 24"
+        >
+          <rect x="3.5" y="4.5" width="17" height="15" rx="1.5" />
+          <path d="M3.5 9.5h17M3.5 14.5h17M9.5 4.5v15" />
+        </svg>
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-semibold text-ink">{file.label}</span>
+        <span className="block text-sm text-ink-muted">{file.summary}</span>
+      </span>
+      <span className="hidden shrink-0 text-sm font-medium text-primary sm:inline">
+        Download .xlsx
+      </span>
+    </a>
+  )
 }
 
 function DiaryArticle({ entry, titleAs = 'h3' }: DiaryArticleProps) {
@@ -56,12 +95,14 @@ function DiaryArticle({ entry, titleAs = 'h3' }: DiaryArticleProps) {
         {entry.body.length > 0 && (
           <div className="space-y-3">
             {entry.body.map((paragraph, index) => (
-              <p
-                key={`${entry.id}-body-${index}`}
-                className="text-ink-muted text-sm leading-relaxed"
-              >
-                {paragraph}
-              </p>
+              <Fragment key={`${entry.id}-body-${index}`}>
+                <p className="text-ink-muted text-sm leading-relaxed">
+                  {paragraph}
+                </p>
+                {entry.featuredFile?.afterParagraph === index && (
+                  <FeaturedFile file={entry.featuredFile} />
+                )}
+              </Fragment>
             ))}
           </div>
         )}
