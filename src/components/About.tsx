@@ -55,6 +55,9 @@ const skills = [
       'Dependabot',
       'NIST CSF 2.0',
       'CSP & security headers',
+      'Microsoft Sentinel (KQL)',
+      'Defender for Cloud',
+      'Azure Policy',
     ],
   },
   {
@@ -209,6 +212,8 @@ function About() {
           </ul>
           <p className="mt-4 text-sm text-ink-muted">
             Open to remote roles, and to roles in Auckland, Melbourne or London.
+            NZ and UK citizen with full Australian and UK work rights, no visa
+            needed.
           </p>
         </div>
         <div>
