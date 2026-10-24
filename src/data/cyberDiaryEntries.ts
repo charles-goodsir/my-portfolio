@@ -50,6 +50,37 @@ export const claudeProjects = new Set(['Personal Ops Platform', 'GRC Lite'])
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'grc-lite-entry-3-checks-that-passed-for-the-wrong-reason',
+    date: '2026-10-24',
+    category: 'GRC Lite',
+    title: 'Checks that passed for the wrong reason',
+    workedOn: [
+      'Claude built a local study web app for grc-lite',
+      'Claude proved each of its defences by breaking it',
+    ],
+    body: [
+      'Claude turned grc-lite into a local web app for working through practice assessments, and the interesting part was the threat model. A server on my own machine still has an attacker, because any web page I visit can send requests to localhost. So it only listens on 127.0.0.1 and refuses any request whose Host header is not localhost, which is what a DNS rebinding request looks like. Every API call needs a random token created at startup, and writes must be JSON, which a cross-site form cannot send. Text from files and notes is drawn as plain text under a strict Content-Security-Policy.',
+      'Claude proved each defence by removing it and watching a test fail, and over forty breaks that found three checks that proved nothing. One delete test passed even though its deletes had failed with a 415 that was ignored. A symlink test pointed at an invalid file, so following the link looked the same as refusing it. One break never changed the code at all, because the search pattern did not match the formatted source. Where two layers guarded the same path, removing one failed nothing, so both had to be removed to see the test bite.',
+      'The same mistake came back with the CSP. The progress bars were sized with a style attribute, which the policy blocks, so every bar drew at full width. The check had read the numbers, not looked at the page. Claude confirmed in the browser that a style attribute does nothing, moved the sizing into the DOM, and added a test that bans style attributes, innerHTML and similar patterns in the page code, then put each one back to check it fails. My first run on a real level found another one Claude had missed: hiding the file list squashed the main pane, because the check covered the CSS rule and not where the panels ended up.',
+      'Some of it is only self-discipline. The lock that stops edits after I submit a level, and the rule that opens the answer key only once a level is graded, are undone by deleting a file. The submission hash proves the file matches what I submitted, not when I did the work. Claude tested the Host check with a fake header, not a real rebinding attack.',
+      'A check you have never seen fail is the same as no check, and so is a check of the wrong thing. Break the control on purpose and measure the result you actually care about.',
+    ],
+    codeSnippets: [
+      {
+        label: 'Host check',
+        code: 'app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])',
+      },
+    ],
+    tools: ['FastAPI', 'pytest', 'curl', 'GitHub Actions'],
+    tags: ['GRC Lite', 'secure coding', 'Content-Security-Policy', 'testing'],
+    links: [
+      {
+        label: 'grc-lite on GitHub',
+        url: 'https://github.com/charles-goodsir/grc-lite',
+      },
+    ],
+  },
+  {
     id: 'grc-lite-entry-2-keeping-account-names-out-of-git',
     date: '2026-10-22',
     category: 'GRC Lite',
