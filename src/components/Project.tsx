@@ -12,6 +12,21 @@ interface Project {
 
 const securityProjects: Project[] = [
   {
+    id: 'grc',
+    title: 'GRC Assessor Practice and grc-lite',
+    description:
+      'In progress. Gap assessments of fictional companies, each with its own policies, evidence and a sealed answer key, graded against what I caught and missed (a B, then 7 of 8 planted gaps). Alongside it, grc-lite, a compliance-as-code tool that Claude built to run them: criteria, evidence and findings as YAML in Git, a validating command line, an Entra ID evidence collector that keeps account names out of the repo, and a local study app, all behind six required CI checks',
+    technologies: [
+      'Python',
+      'FastAPI',
+      'YAML',
+      'pytest',
+      'Microsoft Graph',
+      'GitHub Actions',
+      'ISO 27001',
+    ],
+  },
+  {
     id: 'secure-expense-claims',
     title: 'Secure Expense Claims',
     description:
