@@ -19,6 +19,7 @@ const screenshotModules = import.meta.glob(
     '../assets/PortfolioSite/*.webp',
     '../assets/PersonalOps/*.webp',
     '../assets/GRCLite/*.webp',
+    '../assets/GRC/*.webp',
   ],
   { eager: true, import: 'default' },
 ) as Record<string, string>

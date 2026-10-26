@@ -50,6 +50,31 @@ export const claudeProjects = new Set(['Personal Ops Platform', 'GRC Lite'])
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'grc-supplier-entry-03-supplier-claims-vs-records',
+    date: '2026-10-26',
+    category: 'GRC',
+    title: 'Testing what a firm says about its suppliers',
+    workedOn: [
+      'Supplier risk assessment for a fictional accountancy firm',
+      'Testing interview statements against the data room',
+    ],
+    body: [
+      'Level 3 of my GRC practice is a supplier and third-party risk assessment of a fictional accountancy firm, scored against its own Supplier Management Policy. Today I turned the policy into a criteria sheet, one rule per row with the evidence I would need to test it. Then I went through the data room and logged each piece of evidence against the rule it supports, with the file and the exact row or clause I relied on.',
+      'The part that taught me most was setting the interview statements next to the records. The Operations Director said every supplier has a signed DPA before data is sent, that the register is checked every quarter, and that all client data stays in the UK. The records showed the latest register review was in February, a payroll supplier had told the firm on 9 March it was moving data entry to India, and the log of replies, approvals and signed transfer risk assessments was empty. Under that notice the change is deemed accepted after 30 days of silence, so doing nothing was itself a decision. The IT Lead said supplier accounts are shut the same day a supplier leaves, but the access export still shows enabled accounts for a supplier whose contract ended in March, with logins after that date. Two statements held up. Incidents were logged the day the firm heard of them, and the shared helpdesk logins matched what I was told.',
+      "I also logged five requests for evidence the data room did not contain, and recorded what came back instead of assuming. The TalkLoop reply was only an unsigned DPA sent for countersignature, so it did not count as a DPA on file. The two contract clauses I asked for were weaker than the policy requires: the PayrollPlus clause gives 72 hours to report an incident against the policy's 24, and the CloudVault clause sets no time limit. For access reviews, nothing exists in writing. I marked that as evidence requested, not as a pass, and I recorded the two rules I have not tested yet as untested. I stopped at the evidence for each rule and have not written the findings yet.",
+      'An interview answer tells you what someone believes about their process, and only a record can show what the process did. The useful habit is to log each statement, find the record that confirms or contradicts it, and treat a missing record as a result in its own right.',
+    ],
+    screenshots: [
+      'GRC/interview-notes-vs-my-notes.webp',
+      'GRC/supplier-notice-no-reply-no-tra.webp',
+      'GRC/access-export-scanpro-no-mfa.webp',
+      'GRC/payrollplus-clause-72-hours.webp',
+      'GRC/payrollplus-incident-row.webp',
+    ],
+    tools: ['Markdown', 'YAML', 'Python'],
+    tags: ['GRC', 'third-party risk', 'ISO 27001', 'evidence testing'],
+  },
+  {
     id: 'grc-lite-entry-3-checks-that-passed-for-the-wrong-reason',
     date: '2026-10-24',
     category: 'GRC Lite',
