@@ -50,6 +50,26 @@ export const claudeProjects = new Set(['Personal Ops Platform', 'GRC Lite'])
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-13-audit-caught-an-advisory-on-a-dependency-i-never-chose',
+    date: '2026-10-27',
+    category: 'Personal Ops Platform',
+    title: 'The weekly audit went red on a dependency I never chose',
+    workedOn: [
+      'Weekly and per-PR dependency audit failed on a new high advisory in body-parser',
+      'Traced it to express inside the MCP server and fixed it with a pnpm override',
+    ],
+    body: [
+      'The audit workflow added in Phase 14 failed on a pull request, and the weekly run on main had been red since the 26th. Four days earlier the same job had failed because the npm registry timed out, so Claude read the log before trusting this one. This time it listed a real finding: a high denial of service advisory in body-parser, in the range from 2.0.0 up to but not including 2.4.0. My lockfile had 2.3.0.',
+      'I never chose that package. It comes in through express, which the MCP server uses, so the path in the log was packages/mcp-server, express, body-parser. Nothing in my code changed. The advisory was published after my last green run, which is why main went red with no pull request behind it. Only the scheduled run could have caught it.',
+      "Claude's first fix was pnpm update on body-parser. It cleared the high finding, but it also moved unrelated development tooling in the lockfile, so Claude threw it away and put an override in the workspace file that requires body-parser 2.4.0 or later, with a comment saying to remove it once express asks for that itself. The lockfile then changed only body-parser and qs. The audit command now exits 0, and 2 low and 3 moderate findings remain below the gate.",
+      'The local tests could not cover this. The database was not running, so the MCP server attack tests were skipped, the same as on main. The pull request is open, and both its audit job and its normal check pass in CI. I have not yet seen the audit go green on main after the merge.',
+      "A scan that only runs when code changes would have missed this, because the advisory database changed and my code did not. A schedule is what turns a dependency check from a gate on my own edits into a watch on everyone else's.",
+    ],
+    screenshots: ['PersonalOps/PO26.webp'],
+    tools: ['pnpm', 'GitHub Actions', 'Express', 'Bash'],
+    tags: ['dependency scanning', 'supply chain', 'advisory', 'CI/CD'],
+  },
+  {
     id: 'grc-supplier-entry-03-supplier-claims-vs-records',
     date: '2026-10-26',
     category: 'GRC',
