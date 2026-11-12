@@ -50,6 +50,25 @@ export const claudeProjects = new Set(['Personal Ops Platform', 'GRC Lite'])
  */
 export const cyberDiaryEntries: DiaryEntry[] = [
   {
+    id: 'personal-ops-platform-entry-14-learning-iso-27001-with-a-message-that-admits-the-gaps',
+    date: '2026-11-12',
+    category: 'Personal Ops Platform',
+    title: 'A daily ISO 27001 message that admits what I have not built',
+    workedOn: [
+      'Daily Telegram message with one ISO 27001 clause or Annex A control, 118 in total',
+      'Threat model section G, ADR 15 and a new risk for a service that takes no input',
+    ],
+    body: [
+      'I want to understand ISO 27001 properly, and reading it once does not make it stick. So I built a small service that sends one clause or Annex A control to Telegram every morning at 09:30, after the diary message. There are 118 entries in a fixed order: the 25 management system clauses first, then the 93 controls. Each one says what it asks, where it shows up in my own projects, and gives one interview-style question. The entry for a day is worked out from the date, so a missed day is skipped and nothing is stored.',
+      'The decision I care about is that a fixed file writes the messages, and a model does not. A model would add a bill and a way for a confident wrong claim to reach me every morning, and I am trying to learn the real thing. The standard is copyrighted, so every entry is in my own words. I wrote them from memory, without the standard open, so the wording needs checking, and I kept that as an open row in the threat model, not a footnote.',
+      'The part that took care was the line about my own stack. Several first drafts claimed controls I could not point to, such as a clearer deploy checklist after I forgot the timer, antivirus on the box, and nothing being open to the internet. I removed or softened each one I could not back with something I had built or checked. What is left names the gaps as often as the matches: no internal policy document, no Statement of Applicability, no impartial internal audit, no backup restore test, no outbound allowlist.',
+      'The service takes no input and calls nothing except Telegram, so there was nothing to attack. The threat model section for it has five rows instead of a test batch, and one of them, a wrong entry, is still open. It started on the box without trouble, but I have not yet seen its first message, which is due tomorrow at 09:30.',
+      'A message that tells you where you fall short is more useful than one that flatters you, and a control I cannot show is a gap I should be able to name. I would rather hear it from my own tooling every morning than discover it in an interview.',
+    ],
+    tools: ['Docker Compose', 'Telegram', 'TypeScript', 'Bash'],
+    tags: ['ISO 27001', 'GRC', 'threat model', 'risk register'],
+  },
+  {
     id: 'personal-ops-platform-entry-13-audit-caught-an-advisory-on-a-dependency-i-never-chose',
     date: '2026-10-27',
     category: 'Personal Ops Platform',
